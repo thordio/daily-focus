@@ -115,6 +115,7 @@ class RSSScraper(BaseScraper):
                     metadata={
                         "feed_name": source.name,
                         "category": source.category,
+                        "topic": source.topic,
                         "tags": [tag.term for tag in entry.get("tags", [])],
                         "candidate_images": candidate_images,
                     },

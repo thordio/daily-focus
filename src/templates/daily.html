@@ -2,6 +2,7 @@
 <html lang="{{ "zh-CN" if language == "zh" else "en" }}">
 <head>
 <meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#1a1a2e">
@@ -23,15 +24,17 @@
   --score-7to8: #ea580c;
   --score-5to6: #6b7280;
   --score-bg: #f3f4f6;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.06);
   --details-bg: #f9fafb;
-  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --header-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --footer-bg: #f3f4f6;
+  --card-radius: 14px;
 }
 
+/* System dark mode (only when user hasn't set manual preference) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f172a;
     --card-bg: #1e293b;
     --text: #e2e8f0;
@@ -42,13 +45,45 @@
     --tag-bg: #334155;
     --tag-text: #e2e8f0;
     --score-bg: #334155;
-    --shadow: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
     --details-bg: #1e293b;
-    --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --header-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     --footer-bg: #1e293b;
+    --card-radius: 14px;
   }
+
+  /* Dark mode score badge overrides */
+  :root:not([data-theme="light"]) .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  :root:not([data-theme="light"]) .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+  :root:not([data-theme="light"]) .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
 }
+
+/* Manual dark mode (user explicitly chose dark) */
+:root[data-theme="dark"] {
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --tag-bg: #334155;
+  --tag-text: #e2e8f0;
+  --score-bg: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
+  --details-bg: #1e293b;
+  --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --footer-bg: #1e293b;
+  --card-radius: 14px;
+}
+
+:root[data-theme="dark"] .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+:root[data-theme="dark"] .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+:root[data-theme="dark"] .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
+
+/* Manual light mode (user explicitly chose light) -- no extra vars needed, :root is light */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -64,8 +99,8 @@ body {
   font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.7;
-  font-size: 16px;
+  line-height: 1.75;
+  font-size: 16.5px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -95,10 +130,22 @@ summary:focus-visible {
 
 /* Header */
 .header {
+  position: relative;
   background: var(--header-gradient);
   color: #fff;
-  padding: 40px 0 32px;
-  margin-bottom: 32px;
+  padding: 40px 0 36px;
+  margin-bottom: 36px;
+  overflow: hidden;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
 }
 
 .header .container {
@@ -106,9 +153,9 @@ summary:focus-visible {
 }
 
 .header-title {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   margin-bottom: 8px;
 }
 
@@ -129,14 +176,37 @@ summary:focus-visible {
   border-top: 1px solid rgba(255,255,255,0.15);
 }
 
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.theme-toggle:active { transform: scale(0.95); }
+
 .period-badge {
   display: inline-block;
   background: rgba(255,255,255,0.2);
-  border-radius: 4px;
-  padding: 2px 10px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 6px;
+  padding: 3px 12px;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
 /* Demo data banner */
@@ -154,11 +224,17 @@ summary:focus-visible {
 }
 
 @media (prefers-color-scheme: dark) {
-  .demo-banner {
+  :root:not([data-theme="light"]) .demo-banner {
     background: rgba(245,158,11,0.15);
     border-color: #f59e0b;
     color: #fbbf24;
   }
+}
+
+:root[data-theme="dark"] .demo-banner {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
 }
 
 /* Empty state */
@@ -183,30 +259,35 @@ summary:focus-visible {
 .news-card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
+  border-left: 4px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 28px;
+  margin-bottom: 24px;
   box-shadow: var(--shadow);
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .news-card:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
+
+.news-card:has(.score-9) { border-left-color: var(--score-9plus); }
+.news-card:has(.score-7) { border-left-color: var(--score-7to8); }
+.news-card:has(.score-5) { border-left-color: var(--score-5to6); }
 
 .card-header {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .card-index {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,25 +299,20 @@ summary:focus-visible {
 
 .score-badge {
   flex-shrink: 0;
-  min-width: 36px;
-  height: 32px;
-  padding: 0 8px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 700;
+  min-width: 40px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
   text-align: center;
-  line-height: 32px;
+  line-height: 34px;
 }
 
 .score-9 { background: #fef2f2; color: var(--score-9plus); }
 .score-7 { background: #fff7ed; color: var(--score-7to8); }
 .score-5 { background: var(--score-bg); color: var(--score-5to6); }
 
-@media (prefers-color-scheme: dark) {
-  .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
-  .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
-  .score-5 { background: rgba(148,163,184,0.2); color: #cbd5e1; }
-}
 
 .card-title-area {
   flex: 1;
@@ -244,10 +320,10 @@ summary:focus-visible {
 }
 
 .card-title {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 4px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 6px;
 }
 
 .card-title a {
@@ -287,18 +363,18 @@ summary:focus-visible {
 
 .card-body {
   font-size: 15px;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--text);
 }
 
 .card-body > * + * {
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .section-label {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -310,18 +386,18 @@ summary:focus-visible {
 
 .section-content {
   font-size: 15px;
-  line-height: 1.8;
+  line-height: 1.85;
 }
 
 .details-section {
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .details-section details {
   background: var(--details-bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 10px;
+  padding: 14px 18px;
   margin-top: 8px;
 }
 
@@ -339,18 +415,18 @@ summary:focus-visible {
 }
 
 .details-section details[open] {
-  padding-bottom: 16px;
+  padding-bottom: 18px;
 }
 
 .details-section details[open] summary {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
 .details-content {
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--text);
 }
 
@@ -359,7 +435,7 @@ summary:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .tag {
@@ -377,7 +453,7 @@ summary:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .images img {
@@ -389,8 +465,8 @@ summary:focus-visible {
 
 /* References */
 .references {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
   border-top: 1px solid var(--border);
 }
 
@@ -415,10 +491,87 @@ summary:focus-visible {
   word-break: break-all;
 }
 
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding: 14px 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.tab-btn:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tab-btn .tab-count {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.tab-btn.active .tab-count {
+  opacity: 1;
+}
+
+/* Tab panels */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Footer */
 .footer {
-  margin-top: 48px;
-  padding: 32px 0;
+  margin-top: 56px;
+  padding: 36px 0;
   background: var(--footer-bg);
   border-top: 1px solid var(--border);
   font-size: 13px;
@@ -439,37 +592,44 @@ summary:focus-visible {
 /* Responsive */
 @media (max-width: 480px) {
   .header { padding: 28px 0 24px; }
-  .header-title { font-size: 22px; }
+  .header-title { font-size: 24px; }
   .header-meta { font-size: 13px; gap: 8px; }
-  .news-card { padding: 18px; border-radius: 10px; }
-  .card-title { font-size: 16px; }
+  .theme-toggle { top: 12px; right: 12px; width: 44px; height: 44px; font-size: 18px; }
+  .news-card { padding: 20px; border-radius: 12px; }
+  .card-title { font-size: 17px; }
   .card-body { font-size: 14px; }
   .card-header { gap: 10px; }
+  .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 10px; }
+  .tab-nav { gap: 6px; margin-bottom: 22px; padding: 12px 0; }
 }
 
 @media (max-width: 375px) {
   .container { padding: 0 16px; }
   .header .container { padding: 0 16px; }
   .header { padding: 24px 0 18px; }
-  .header-title { font-size: 20px; }
+  .header-title { font-size: 21px; }
   .header-meta { font-size: 12px; gap: 6px; }
   .header-stats { font-size: 12px; }
-  .news-card { padding: 14px; border-radius: 8px; }
-  .card-title { font-size: 15px; }
+  .theme-toggle { top: 10px; right: 10px; width: 44px; height: 44px; font-size: 18px; }
+  .news-card { padding: 16px; border-left-width: 3px; border-radius: 10px; }
+  .card-title { font-size: 16px; }
   .card-body { font-size: 13px; }
   .card-header { gap: 8px; }
-  .card-index { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
-  .score-badge { min-width: 32px; height: 28px; padding: 0 6px; font-size: 12px; line-height: 28px; }
+  .card-index { width: 30px; height: 30px; font-size: 12px; border-radius: 8px; }
+  .score-badge { min-width: 36px; height: 30px; padding: 0 8px; font-size: 13px; line-height: 30px; }
+  .tab-btn { padding: 8px 10px; font-size: 12px; border-radius: 8px; }
+  .tab-btn .tab-count { font-size: 10px; }
+  .tab-nav { gap: 4px; padding: 10px 0; margin-bottom: 18px; }
 }
 
 @media (min-width: 768px) {
   .container { padding: 0 24px; }
-  .header-title { font-size: 32px; }
-  .news-card { padding: 28px; }
+  .header-title { font-size: 34px; }
+  .news-card { padding: 32px; }
 }
 
 @media (min-width: 1440px) {
-  body { font-size: 17px; }
+  body { font-size: 17.5px; }
 }
 </style>
 </head>
@@ -501,17 +661,116 @@ summary:focus-visible {
         Selected {{ selected_count }} items from {{ total_fetched }}
       {% endif %}
     </div>
+    {% if tabs is defined and selected_count > 0 %}
+    <div class="header-stats-tabs">
+      {% for tab_key, tab in tabs.items() %}
+      <span class="tab-stat">{{ tab.label }} {{ tab['items']|length }}</span>{% if not loop.last %}<span class="tab-stat-sep">·</span>{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+    <button class="theme-toggle" id="theme-toggle" aria-label="切换主题 / Toggle theme" title="切换深浅色模式">
+      <span id="theme-icon">🌙</span>
+    </button>
   </div>
 </header>
 
 {% if is_demo|default(false) %}
 <div class="demo-banner">
-  ⚠️ 演示数据 — 非真实新闻内容 / DEMO DATA — Not real news content
+  &#x26a0;&#xfe0f; 演示数据 — 非真实新闻内容 / DEMO DATA — Not real news content
 </div>
 {% endif %}
 
+{% macro news_card(item) %}
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">{{ item.index }}</div>
+    {% set score_int = item.score|int %}
+    {% if score_int >= 9 %}
+      {% set score_class = "score-9" %}
+    {% elif score_int >= 7 %}
+      {% set score_class = "score-7" %}
+    {% else %}
+      {% set score_class = "score-5" %}
+    {% endif %}
+    <div class="score-badge {{ score_class }}">{{ "{:.1f}".format(item.score) }}</div>
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">{{ item.source_type }}</span>
+        <span>{{ item.source_label }}</span>
+        <span class="dot">&#183;</span>
+        <span>{{ item.published_at[:10] if item.published_at else "" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    {% if item.whats_new %}
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> {% if language == "zh" %}发生了什么{% else %}What's New{% endif %}</div>
+      <div class="section-content">{{ item.whats_new }}</div>
+    </div>
+    {% endif %}
+
+    {% if item.why_it_matters %}
+    <div>
+      <div class="section-label"><i class="emoji">&#128200;</i> {% if language == "zh" %}为什么重要{% else %}Why It Matters{% endif %}</div>
+      <div class="section-content">{{ item.why_it_matters }}</div>
+    </div>
+    {% endif %}
+
+    {% if item.background %}
+    <div class="details-section">
+      <details>
+        <summary>{% if language == "zh" %}背景知识{% else %}Background{% endif %}</summary>
+        <div class="details-content">{{ item.background }}</div>
+      </details>
+    </div>
+    {% endif %}
+
+    {% if item.community_discussion %}
+    <div class="details-section">
+      <details>
+        <summary>{% if language == "zh" %}社区讨论{% else %}Community Discussion{% endif %}</summary>
+        <div class="details-content">{{ item.community_discussion }}</div>
+      </details>
+    </div>
+    {% endif %}
+
+    {% if item.images and item.images|length > 0 %}
+    <div class="images">
+      {% for img in item.images %}
+      <img src="{{ img.url }}" alt="{{ img.alt or '' }}" loading="lazy">
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if item.tags and item.tags|length > 0 %}
+    <div class="tags">
+      {% for tag in item.tags %}
+      <span class="tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if item.references and item.references|length > 0 %}
+    <div class="references">
+      <div class="references-title">{% if language == "zh" %}参考来源{% else %}References{% endif %}</div>
+      <ul class="references-list">
+        {% for ref in item.references %}
+        <li><a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</article>
+{% endmacro %}
+
 <main class="container">
-  {% if items|length == 0 %}
+  {% if selected_count == 0 %}
   <div class="empty-state">
     <h2>
       {% if language == "zh" %}今日暂无重要动态{% else %}No significant developments today{% endif %}
@@ -526,99 +785,66 @@ summary:focus-visible {
   </div>
   {% else %}
 
-  {% for item in items %}
-  <article class="news-card">
-    <div class="card-header">
-      <div class="card-index">{{ item.index }}</div>
-      {% set score_int = item.score|int %}
-      {% if score_int >= 9 %}
-        {% set score_class = "score-9" %}
-      {% elif score_int >= 7 %}
-        {% set score_class = "score-7" %}
-      {% else %}
-        {% set score_class = "score-5" %}
-      {% endif %}
-      <div class="score-badge {{ score_class }}">{{ "{:.1f}".format(item.score) }}</div>
-      <div class="card-title-area">
-        <h2 class="card-title">
-          <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
-        </h2>
-        <div class="card-source">
-          <span class="card-source-type">{{ item.source_type }}</span>
-          <span>{{ item.source_label }}</span>
-          <span class="dot">&#183;</span>
-          <span>{{ item.published_at[:10] if item.published_at else "" }}</span>
-        </div>
-      </div>
+  {% if tabs is defined %}
+  <div class="tab-nav" role="tablist">
+    {% for tab_key, tab in tabs.items() %}
+    <button class="tab-btn{% if tab_key == active_tab %} active{% endif %}"
+            role="tab"
+            data-tab="{{ tab_key }}"
+            aria-selected="{% if tab_key == active_tab %}true{% else %}false{% endif %}">
+      {% if language == "zh" %}{{ tab.label }}{% else %}{{ tab.label_en }}{% endif %}
+      <span class="tab-count">{{ tab['items']|length }}</span>
+    </button>
+    {% endfor %}
+  </div>
+
+  {% for tab_key, tab in tabs.items() %}
+  <div class="tab-panel{% if tab_key == active_tab %} active{% endif %}"
+       id="tab-{{ tab_key }}"
+       role="tabpanel">
+    {% if tab['items']|length == 0 %}
+    <div class="empty-state">
+      <div class="empty-icon">&#x1f4ed;</div>
+      <h2>
+        {% if language == "zh" %}
+          今日暂无{{ tab.label }}相关资讯
+        {% else %}
+          No {{ tab.label_en }} items today
+        {% endif %}
+      </h2>
+      <p>
+        {% if language == "zh" %}
+          该分类下暂无内容，可切换其他标签页浏览
+        {% else %}
+          Nothing here yet &mdash; try switching to another tab
+        {% endif %}
+      </p>
     </div>
-
-    <div class="card-body">
-      {% if item.whats_new %}
-      <div>
-        <div class="section-label"><i class="emoji">&#128240;</i> {% if language == "zh" %}发生了什么{% else %}What's New{% endif %}</div>
-        <div class="section-content">{{ item.whats_new }}</div>
-      </div>
-      {% endif %}
-
-      {% if item.why_it_matters %}
-      <div>
-        <div class="section-label"><i class="emoji">&#128200;</i> {% if language == "zh" %}为什么重要{% else %}Why It Matters{% endif %}</div>
-        <div class="section-content">{{ item.why_it_matters }}</div>
-      </div>
-      {% endif %}
-
-      {% if item.background %}
-      <div class="details-section">
-        <details>
-          <summary>{% if language == "zh" %}背景知识{% else %}Background{% endif %}</summary>
-          <div class="details-content">{{ item.background }}</div>
-        </details>
-      </div>
-      {% endif %}
-
-      {% if item.community_discussion %}
-      <div class="details-section">
-        <details>
-          <summary>{% if language == "zh" %}社区讨论{% else %}Community Discussion{% endif %}</summary>
-          <div class="details-content">{{ item.community_discussion }}</div>
-        </details>
-      </div>
-      {% endif %}
-
-      {% if item.images and item.images|length > 0 %}
-      <div class="images">
-        {% for img in item.images %}
-        <img src="{{ img.url }}" alt="{{ img.alt or '' }}" loading="lazy">
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {% if item.tags and item.tags|length > 0 %}
-      <div class="tags">
-        {% for tag in item.tags %}
-        <span class="tag">{{ tag }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {% if item.references and item.references|length > 0 %}
-      <div class="references">
-        <div class="references-title">{% if language == "zh" %}参考来源{% else %}References{% endif %}</div>
-        <ul class="references-list">
-          {% for ref in item.references %}
-          <li><a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-    </div>
-  </article>
+    {% else %}
+    {% for item in tab['items'] %}
+    {{ news_card(item) }}
+    {% endfor %}
+    {% endif %}
+  </div>
   {% endfor %}
+  {% else %}
+  {# Backward-compat: render flat items list #}
+  {% for item in items %}
+  {{ news_card(item) }}
+  {% endfor %}
+  {% endif %}
   {% endif %}
 </main>
 
 <footer class="footer">
   <div class="container">
+    <div class="footer-tagline">
+      {% if language == "zh" %}
+        AI 驱动 &middot; 每日更新 &middot; 仅供个人阅读
+      {% else %}
+        AI-powered &middot; Daily updates &middot; Personal reading
+      {% endif %}
+    </div>
     <div>
       {% if language == "zh" %}
         下次更新：{{ next_update }}
@@ -633,9 +859,80 @@ summary:focus-visible {
         This page is for personal reading only, not indexed for search
       {% endif %}
     </div>
-    <div>Generated by Daily Focus</div>
+    <div class="footer-meta">Daily Focus &middot; {{ date }}</div>
   </div>
 </footer>
+
+<script>
+(function() {
+  var tabsNav = document.querySelector('.tab-nav');
+  if (!tabsNav) return;
+
+  var tabBtns = tabsNav.querySelectorAll('.tab-btn');
+
+  function switchTab(tabKey) {
+    tabBtns.forEach(function(btn) {
+      var isActive = btn.dataset.tab === tabKey;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+      panel.classList.toggle('active', panel.id === 'tab-' + tabKey);
+    });
+    if (window.location.hash !== '#' + tabKey) {
+      history.replaceState(null, '', '#' + tabKey);
+    }
+  }
+
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  var hash = window.location.hash.slice(1);
+  if (hash && document.querySelector('.tab-btn[data-tab="' + hash + '"]')) {
+    switchTab(hash);
+  }
+})();
+</script>
+
+<script>
+(function() {
+  var toggle = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+  var icon = document.getElementById('theme-icon');
+  if (!toggle || !icon) return;
+
+  function getTheme() {
+    if (root.getAttribute('data-theme')) return root.getAttribute('data-theme');
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function updateIcon() {
+    var theme = getTheme();
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  function saveTheme(val) {
+    try { localStorage.setItem('theme', val); } catch(e) {}
+  }
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    saveTheme(t);
+    updateIcon();
+  }
+
+  // Simple two-state toggle: dark <-> light, persisted
+  toggle.addEventListener('click', function() {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+
+  try { var saved = localStorage.getItem('theme'); if (saved) root.setAttribute('data-theme', saved); } catch(e) {}
+  updateIcon();
+})();
+</script>
 
 </body>
 </html>

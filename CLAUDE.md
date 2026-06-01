@@ -117,6 +117,25 @@ CEO (用户)
 
 **If anything needs changing, change it, then restart the review from Step 1.**
 
+## Access Control (IRON RULE)
+
+### Access Control (IRON RULE)
+
+Role-based write permissions. Violations are not permitted under any circumstance.
+
+| Role | Write Access | Read-Only |
+|------|-------------|-----------|
+| **CTO (Main Agent)** | NONE — decision-making and coordination only | All files |
+| **RD Team (Builders)** | `src/`, `data/`, `docs/`, `scripts/`, `.github/`, `pyproject.toml`, `CLAUDE.md` | `tests/` |
+| **QA Team (Reviewers)** | `tests/` ONLY | All source files |
+
+- CTO must NEVER edit source code, config, templates, or tests directly.
+- RD must NEVER write or modify test files.
+- QA must NEVER write or modify source code.
+- Cross-boundary changes must be delegated to the appropriate team via Agent.
+
+The CTO's role is to: read code to understand state, make architectural decisions, assign tasks to RD/QA agents, collect reports, and escalate to CEO when needed. Think of CTO as the manager who reviews code but never commits.
+
 ---
 
 ## Important Guidelines

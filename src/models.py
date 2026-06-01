@@ -96,6 +96,7 @@ class RSSSourceConfig(BaseModel):
     url: HttpUrl
     enabled: bool = True
     category: Optional[str] = None
+    topic: str = "ai-tech"  # "ai-tech" | "ai-markets" | "economy"
 
 
 class RedditSubredditConfig(BaseModel):
