@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Daily Focus 早报 - 2026-06-01">
+<title>Daily Focus 早报 — 2026-06-01</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --tag-bg: #f3f4f6;
+  --tag-text: #4b5563;
+  --score-9plus: #dc2626;
+  --score-7to8: #ea580c;
+  --score-5to6: #6b7280;
+  --score-bg: #f3f4f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+  --details-bg: #f9fafb;
+  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --footer-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --tag-bg: #334155;
+    --tag-text: #e2e8f0;
+    --score-bg: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+    --details-bg: #1e293b;
+    --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --footer-bg: #1e293b;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  background: var(--header-gradient);
+  color: #fff;
+  padding: 40px 0 32px;
+  margin-bottom: 32px;
+}
+
+.header .container {
+  padding: 0 20px;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.header-meta {
+  font-size: 14px;
+  opacity: 0.85;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.header-stats {
+  font-size: 13px;
+  opacity: 0.75;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.period-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Demo data banner */
+.demo-banner {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .demo-banner {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* News Cards */
+.news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.news-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-index {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--score-bg);
+  color: var(--text-secondary);
+}
+
+.score-badge {
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 32px;
+}
+
+.score-9 { background: #fef2f2; color: var(--score-9plus); }
+.score-7 { background: #fff7ed; color: var(--score-7to8); }
+.score-5 { background: var(--score-bg); color: var(--score-5to6); }
+
+@media (prefers-color-scheme: dark) {
+  .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+  .score-5 { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+}
+
+.card-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.card-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.card-source {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.card-source .dot {
+  font-size: 10px;
+  opacity: 0.35;
+  line-height: 1;
+}
+
+.card-source-type {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  text-transform: uppercase;
+}
+
+.card-body {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.card-body > * + * {
+  margin-top: 16px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-label .emoji {
+  font-style: normal;
+}
+
+.section-content {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.details-section {
+  margin-top: 16px;
+}
+
+.details-section details {
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+
+.details-section details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 2px 0;
+  user-select: none;
+}
+
+.details-section details summary:hover {
+  color: var(--accent);
+}
+
+.details-section details[open] {
+  padding-bottom: 16px;
+}
+
+.details-section details[open] summary {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.details-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  white-space: nowrap;
+}
+
+/* Images */
+.images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.images img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* References */
+.references {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.references-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.references-list {
+  list-style: none;
+  padding: 0;
+}
+
+.references-list li {
+  margin-bottom: 4px;
+}
+
+.references-list a {
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* Footer */
+.footer {
+  margin-top: 48px;
+  padding: 32px 0;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 2;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .header { padding: 28px 0 24px; }
+  .header-title { font-size: 22px; }
+  .header-meta { font-size: 13px; gap: 8px; }
+  .news-card { padding: 18px; border-radius: 10px; }
+  .card-title { font-size: 16px; }
+  .card-body { font-size: 14px; }
+  .card-header { gap: 10px; }
+}
+
+@media (max-width: 375px) {
+  .container { padding: 0 16px; }
+  .header .container { padding: 0 16px; }
+  .header { padding: 24px 0 18px; }
+  .header-title { font-size: 20px; }
+  .header-meta { font-size: 12px; gap: 6px; }
+  .header-stats { font-size: 12px; }
+  .news-card { padding: 14px; border-radius: 8px; }
+  .card-title { font-size: 15px; }
+  .card-body { font-size: 13px; }
+  .card-header { gap: 8px; }
+  .card-index { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
+  .score-badge { min-width: 32px; height: 28px; padding: 0 6px; font-size: 12px; line-height: 28px; }
+}
+
+@media (min-width: 768px) {
+  .container { padding: 0 24px; }
+  .header-title { font-size: 32px; }
+  .news-card { padding: 28px; }
+}
+
+@media (min-width: 1440px) {
+  body { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <div class="header-title">
+      
+        Daily Focus 早报
+      
+    </div>
+    <div class="header-meta">
+      <span>2026-06-01</span>
+      <span class="period-badge">
+        
+          早报
+        
+      </span>
+    </div>
+    <div class="header-stats">
+      
+        从 78 条内容中精选 7 条
+      
+    </div>
+  </div>
+</header>
+
+<div class="demo-banner">
+  ⚠️ 演示数据 — 非真实新闻内容 / DEMO DATA — Not real news content
+</div>
+
+<main class="container">
+  
+
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">1</div>
+      
+      
+        
+      
+      <div class="score-badge score-9">9.4</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://techcrunch.com/2026/06/01/openai-releases-gpt5" target="_blank" rel="noopener noreferrer">OpenAI 正式发布 GPT-5：推理能力突破性提升，多模态全面升级，上下文窗口扩展至 100 万 Token</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>TechCrunch</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">OpenAI 于 2026 年 6 月 1 日正式发布 GPT-5，在 MATH 数学推理基准上达到 96.7%（GPT-4 为 52.9%），HumanEval 98.2%，GPQA 87.3%。模型原生支持文本、图像、音频、视频四种模态，上下文窗口扩展至 100 万 Token。API 定价为输入 $3/M Token、输出 $15/M Token。训练使用了约 10 万块 NVIDIA H200 GPU，总计算量约 4×10²⁶ FLOP。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">GPT-5 的推理能力飞跃将 AI Agent 从辅助工具升级为自主执行者——可以独立完成全栈开发、IMO 金牌级数学竞赛题、以及阅读 arXiv 论文后提出可行研究方向。这一升级将深刻重塑软件开发、金融分析、药物研发等知识密集型行业。OpenAI CEO Sam Altman 称其为通向 AGI 的关键一步，预计推动全球 AI 应用市场在 2027 年突破 5000 亿美元。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">GPT 系列自 2018 年 GPT-1 发布历经 8 年迭代。GPT-3（2020）展示了涌现能力，ChatGPT（2022）引爆 AI 浪潮，GPT-4（2023）引入多模态。GPT-5 是首个全新设计的后 GPT-4 模型，代号 Project Orion，研发超 2 年，核心突破是 Transformer 注意力与状态空间模型（SSM）的深度融合——这一思路源自 2023 年 Mamba 论文。</div>
+        </details>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>社区讨论</summary>
+          <div class="details-content">HackerNews 和 r/MachineLearning 讨论热烈。主流认为 MATH 从 52.9% 到 96.7% 是里程碑式的质变。争议：(1) $15/M token 对中小企业偏高；(2) MoE 可解释性和安全性研究不足；(3) MATH 基准可能被数据污染。OpenAI CTO 回应将在 Q3 推出 GPT-5 Mini 并发布独立安全审计。</div>
+        </details>
+      </div>
+      
+
+      
+      <div class="images">
+        
+        <img src="https://picsum.photos/seed/gpt5bench/600/400" alt="GPT-5 与 GPT-4 各基准性能对比" loading="lazy">
+        
+      </div>
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">模型发布</span>
+        
+        <span class="tag">OpenAI</span>
+        
+        <span class="tag">GPT-5</span>
+        
+        <span class="tag">多模态</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://openai.com/blog/introducing-gpt-5" target="_blank" rel="noopener noreferrer">OpenAI Blog: Introducing GPT-5</a></li>
+          
+          <li><a href="https://techcrunch.com/2026/06/01/openai-releases-gpt5" target="_blank" rel="noopener noreferrer">TechCrunch: GPT-5 launch coverage</a></li>
+          
+          <li><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener noreferrer">Mamba Paper (arXiv 2023)</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">2</div>
+      
+      
+        
+      
+      <div class="score-badge score-7">8.8</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://www.cnbc.com/2026/06/01/anthropic-raises-15b" target="_blank" rel="noopener noreferrer">Anthropic 完成 150 亿美元 E 轮融资，估值 1050 亿美元，成为全球第二大 AI 公司</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>CNBC</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">Anthropic 完成由 UAE 主权基金 MGX 领投的 150 亿美元 E 轮融资，估值 1050 亿美元，超越 Google DeepMind 成为全球第二大 AI 公司。Silver Lake、淡马锡、软银愿景基金 III 期跟投。资金用于：Claude 5 训练（10 万+ H200 GPU）、国际市场扩张、AI 安全团队从 300 人扩至 1000 人。2025 年营收约 12 亿美元。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">AI 资本竞争进入新阶段——OpenAI+Anthropic 合计估值超 3500 亿美元，形成双寡头格局。中东主权基金贡献了 2026 年 AI 融资总额的约 35%，全球 AI 话语权正从硅谷 VC 向主权资本转移。150 亿美元单笔融资额仅次于 OpenAI 2025 年的 400 亿。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">Anthropic 由 OpenAI 前安全 VP Dario Amodei 兄妹于 2021 年创立，核心团队包括 GPT-3/4 开发者。公司首创 Constitutional AI 和 RLHF 2.0。Claude 系列在企业长文档理解、代码审查方面优于 GPT-4。Dario Amodei 多次在国会听证会呼吁 AI 安全监管。</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+      <div class="images">
+        
+        <img src="https://picsum.photos/seed/anthropicfund/600/400" alt="Anthropic 估值增长趋势 2023-2026" loading="lazy">
+        
+      </div>
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">融资</span>
+        
+        <span class="tag">Anthropic</span>
+        
+        <span class="tag">市场</span>
+        
+        <span class="tag">独角兽</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://www.cnbc.com/2026/06/01/anthropic-raises-15b" target="_blank" rel="noopener noreferrer">CNBC: Anthropic $15B funding round</a></li>
+          
+          <li><a href="https://www.anthropic.com/blog/series-e" target="_blank" rel="noopener noreferrer">Anthropic Blog: Series E Announcement</a></li>
+          
+          <li><a href="https://www.bloomberg.com/news/articles/2026-05-28/sovereign-funds-ai-investment" target="_blank" rel="noopener noreferrer">Bloomberg: Sovereign Funds Dominate AI Investment</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">3</div>
+      
+      
+        
+      
+      <div class="score-badge score-7">8.5</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://www.cnbc.com/2026/06/01/fed-pause-rate-hike" target="_blank" rel="noopener noreferrer">美联储 6 月 FOMC 会议纪要暗示暂停加息：核心 PCE 降至 2.4%，纳指单日上涨 3.2%</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>CNBC</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">美联储 5 月 FOMC 纪要暗示 6 月暂停加息——「大多数与会者认为 4.25%-4.50% 的利率已达到限制性水平」。核心 PCE 降至 2.4%，距 2% 目标仅差 0.4 个百分点。纳指当日涨 3.2%，标普 +2.1%，道指 +1.5%。10 年期美债收益率降至 3.89%。市场定价 9 月降息概率 78%，全年降息预期 75 基点。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">利率是 AI 融资环境的核心变量。2022 年加息周期曾导致 AI 融资从 950 亿骤降至 380 亿美元。暂停加息意味着：(1) AI 公司债务融资成本下降；(2) VC 募资改善，早期 AI 投资增加；(3) 微软/Meta/Amazon 等巨头 AI 基础设施支出能力增强。高盛测算：利率每降 100bp，美国科技行业年度资本支出增约 200 亿美元。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">美联储 2022 年 3 月起在 16 个月内加息 525bp（1980 年代以来最激进）。2024 年 9 月通胀从 9.1% 降至 2.4% 后开始降息，已累计降息 100bp。鲍威尔强调「数据依赖性」——不预设降息路径，根据每次会议前的数据灵活调整。</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+      <div class="images">
+        
+        <img src="https://picsum.photos/seed/fedchart/600/400" alt="联邦基金利率走势 2022-2026" loading="lazy">
+        
+      </div>
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">经济</span>
+        
+        <span class="tag">美联储</span>
+        
+        <span class="tag">利率</span>
+        
+        <span class="tag">科技股</span>
+        
+        <span class="tag">宏观经济</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://www.federalreserve.gov/monetarypolicy/fomcminutes20260501.htm" target="_blank" rel="noopener noreferrer">Federal Reserve: May 2026 FOMC Minutes</a></li>
+          
+          <li><a href="https://www.cnbc.com/2026/06/01/fed-pause-rate-hike" target="_blank" rel="noopener noreferrer">CNBC: Fed pause signal, markets rally</a></li>
+          
+          <li><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener noreferrer">CME FedWatch Tool</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">4</div>
+      
+      
+        
+      
+      <div class="score-badge score-7">8.2</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://www.theverge.com/2026/06/01/meta-llama4-open-source" target="_blank" rel="noopener noreferrer">Meta 开源 Llama 4 系列模型：400B 参数 MoE 架构，性能逼近 GPT-4，推理成本仅为其 1/5</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>The Verge</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">Meta 发布 Llama 4 系列：Scout（12B）、Maverick（80B）和 Behemoth（400B MoE，激活 80B）。Behemoth 在 MMLU 上 86.4 分（追平 GPT-4），HumanEval 92.1%，MATH 83.7%，推理成本仅 GPT-4 的 1/5（~$6 vs $30/M token）。Llama 4 Community License 允许商用、微调和再分发。权重已上传 HuggingFace，配套发布 18T Token 训练数据配方。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">开源 AI 首次在性能上比肩闭源顶级模型（MMLU 持平 GPT-4）。企业可在私有云部署 GPT-4 级模型而无需 API 数据外传；大规模 API 调用场景成本降 80%+；全球研究社区可在 Llama 4 上微调和蒸馏。Mark Zuckerberg：开源是「确保 AI 不被少数公司垄断的关键」。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">Llama 1（2023.2）→Llama 2（2023.7，1.8 亿次下载）→Llama 3（2024.4，首次接近 GPT-4）→Llama 4（2025.6，追平）。Llama 系列总下载超 3 亿次。Meta 开源策略旨在制衡 Google/OpenAI 闭源生态，确保自身产品不被竞争对手 API 锁定。Yann LeCun 暗示 Llama 5 已在训练中。</div>
+        </details>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>社区讨论</summary>
+          <div class="details-content">HuggingFace 24 小时内 300+ 微调变体。焦点：(1) MoE 长上下文注意力均匀性；(2) 与 GPT-5 的 MATH 差距（83.7% vs 96.7%）仍显著；(3) Community License 限制条款（禁止用输出训练竞争模型）。Yann LeCun：「这只是开始。」</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">开源</span>
+        
+        <span class="tag">Meta</span>
+        
+        <span class="tag">Llama 4</span>
+        
+        <span class="tag">MoE</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://ai.meta.com/blog/llama-4" target="_blank" rel="noopener noreferrer">Meta AI: Introducing Llama 4</a></li>
+          
+          <li><a href="https://www.theverge.com/2026/06/01/meta-llama4-open-source" target="_blank" rel="noopener noreferrer">The Verge: Llama 4 matches GPT-4</a></li>
+          
+          <li><a href="https://huggingface.co/meta-llama" target="_blank" rel="noopener noreferrer">HuggingFace: Llama 4 Collection</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">5</div>
+      
+      
+        
+      
+      <div class="score-badge score-7">7.8</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://techcrunch.com/2026/06/01/deepmind-alphafold3" target="_blank" rel="noopener noreferrer">Google DeepMind 发布 AlphaFold 3：预测全部生物分子相互作用，药物研发模式迎来变革</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>TechCrunch</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">DeepMind 在 Nature 封面发表 AlphaFold 3，从蛋白质结构扩展到全部生物分子（DNA、RNA、配体、离子、修饰残基）。蛋白质-配体界面预测精度提高 50%（RMSD 3.5→1.5Å）。用扩散模型替代 SE(3) 等变架构，在 3D 原子坐标空间直接去噪。代码开源，配套免费 AlphaFold Server 无需本地 GPU。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">将药物发现从试错科学变为计算科学——几分钟内以原子精度预测任意蛋白-分子结合模式，替代数月湿实验（单靶点成本 $10-50 万）。5 家 Top 20 药企宣布启动新药管线。Nature Biotech 估算：临床前周期从 4.5 年压缩至 18 个月，行业年省 R&amp;D 约 150 亿美元。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">AlphaFold 1（2018/CASP13 夺冠）→AlphaFold 2（2020/CASP14，解决蛋白质折叠）→2024 年 Hassabis 和 Jumper 获诺贝尔化学奖。AlphaFold DB 含 2 亿+ 结构，被 190 国 200 万+ 研究人员使用。Isomorphic Labs（Alphabet 2021 年成立）负责商业化。</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+      <div class="images">
+        
+        <img src="https://picsum.photos/seed/alphafold3/600/400" alt="AlphaFold 3 蛋白质-药物分子结合预测" loading="lazy">
+        
+      </div>
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">科研</span>
+        
+        <span class="tag">DeepMind</span>
+        
+        <span class="tag">AlphaFold</span>
+        
+        <span class="tag">生物科技</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://www.nature.com/articles/s41586-026-xxxxx" target="_blank" rel="noopener noreferrer">Nature: AlphaFold 3 (封面论文)</a></li>
+          
+          <li><a href="https://deepmind.google/blog/alphafold-3" target="_blank" rel="noopener noreferrer">DeepMind Blog: AlphaFold 3</a></li>
+          
+          <li><a href="https://alphafoldserver.com/" target="_blank" rel="noopener noreferrer">AlphaFold Server</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">6</div>
+      
+      
+        
+      
+      <div class="score-badge score-7">7.5</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://www.cnbc.com/2026/06/01/nvidia-q1-earnings" target="_blank" rel="noopener noreferrer">NVIDIA Q1 FY2027 财报：数据中心营收 420 亿美元，同比增长 210%，Blackwell 系列 Q3 量产</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>CNBC</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">NVIDIA Q1 FY2027 营收 460 亿美元（+178% YoY），超预期 420 亿。数据中心 420 亿（+210% YoY），超过 Intel+AMD 数据中心业务总和的 2 倍。毛利率 78.4%。Q2 指引 490 亿 ±2%。黄仁勋宣布 Blackwell B200（台积电 3nm，3000 亿+ 晶体管，4x H200 性能）Q3 量产，ASP $40-50K。下一代 Rubin 架构（2nm + 硅光子）2028 年推出。盘后涨 8.2%，市值破 5 万亿美元。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">NVIDIA 财报是 AI 基础设施最大风向标。210% 增速信号：AI 算力需求仍在加速。三大云厂商 2026 年 AI 资本支出预计超 2000 亿美元。B200 4 倍性能跳跃将大幅降低大模型训练/推理单位成本。黄仁勋关键判断：「推理需求正在超越训练需求」——AI 正从训练军备赛转向应用规模化。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">NVIDIA 1993 年创立。2012 年 AlexNet 首个用 GPU 训练 DNN。2016 年黄仁勋赠予 OpenAI 首台 DGX-1，标志全面押注 AI。2023 年以来股价从 $140 升至 $1250（+800%），市值从 3500 亿升至 5 万亿。AI 训练芯片市场占比约 85%。</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">财报</span>
+        
+        <span class="tag">NVIDIA</span>
+        
+        <span class="tag">芯片</span>
+        
+        <span class="tag">数据中心</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://investor.nvidia.com/financial-info/" target="_blank" rel="noopener noreferrer">NVIDIA Q1 FY2027 Earnings</a></li>
+          
+          <li><a href="https://www.cnbc.com/2026/06/01/nvidia-q1-earnings" target="_blank" rel="noopener noreferrer">CNBC: NVIDIA beats estimates</a></li>
+          
+          <li><a href="https://www.nvidia.com/en-us/data-center/blackwell-architecture/" target="_blank" rel="noopener noreferrer">NVIDIA Blackwell Architecture</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">7</div>
+      
+      
+        
+      
+      <div class="score-badge score-5">6.8</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="https://www.theverge.com/2026/06/01/apple-perplexity-acquisition" target="_blank" rel="noopener noreferrer">消息称 Apple 拟以 40-50 亿美元收购 AI 搜索初创公司 Perplexity，布局 AI 搜索对抗 Google</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">rss</span>
+          <span>The Verge</span>
+          <span class="dot">&#183;</span>
+          <span>2026-05-31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+        <div class="section-content">据 The Verge、Bloomberg、Financial Times 多方消息证实，Apple 正与 Perplexity AI 进行深入收购谈判，金额预计 40-50 亿美元。Perplexity 由前 Google AI 研究员 Aravind Srinivas 于 2022 年创立，50M+ MAU，年收入 ~$1.2 亿，上一轮估值 120 亿美元（2025.11 C 轮）。40-50 亿成交价将是一笔 &#39;down round&#39;——在与 Google Gemini Search 和 Microsoft Copilot Search 的竞争中增长不及预期。</div>
+      </div>
+      
+
+      
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> 为什么重要</div>
+        <div class="section-content">将是 Apple 自 2014 年 30 亿收购 Beats 以来最大交易，标志从「端侧 AI」向「云侧 AI 服务」转向。若将 Perplexity 深度整合至 Siri 和 Spotlight，可能逐步减少对 Google 搜索协议（~$200 亿/年）的依赖——这是重大战略赌注。也意味着 Apple 跨入 AI 搜索赛道，直接与 Google、Microsoft、Meta 竞争。</div>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>背景知识</summary>
+          <div class="details-content">AI 搜索是 2024-26 年最激烈赛道。Google Gemini Search（2024）、Microsoft Copilot Search（2025）、Perplexity 三分天下。Perplexity 凭「答案优先、引用透明」差异化获早期用户。但自 2025 年增速放缓（从每季翻倍降至 +30%/季）。Apple 搜索技术积累少——Siri 长期依赖 Google/Wikipedia，此次收购本质是「购买技术+团队」的战略补课。</div>
+        </details>
+      </div>
+      
+
+      
+      <div class="details-section">
+        <details>
+          <summary>社区讨论</summary>
+          <div class="details-content">硅谷和华尔街看法分歧。乐观（Ben Thompson）：Apple 必须摆脱 Google 依赖，40-50 亿相对于 Apple 3000 亿年收入微不足道。怀疑（Matt Levine）：(1) 120 亿估值 6 个月缩水 60% 是危险信号；(2) Apple 整合社交/搜索服务记录不佳；(3) FTC 审查可能拖延 12-18 月。Google 可能加价竞购或提升搜索授权费施压 Apple。</div>
+        </details>
+      </div>
+      
+
+      
+
+      
+      <div class="tags">
+        
+        <span class="tag">AI</span>
+        
+        <span class="tag">收购</span>
+        
+        <span class="tag">Apple</span>
+        
+        <span class="tag">Perplexity</span>
+        
+        <span class="tag">搜索</span>
+        
+      </div>
+      
+
+      
+      <div class="references">
+        <div class="references-title">参考来源</div>
+        <ul class="references-list">
+          
+          <li><a href="https://www.theverge.com/2026/06/01/apple-perplexity-acquisition" target="_blank" rel="noopener noreferrer">The Verge: Apple-Perplexity talks</a></li>
+          
+          <li><a href="https://www.bloomberg.com/news/articles/2026-06-01/apple-perplexity-acquisition-talks" target="_blank" rel="noopener noreferrer">Bloomberg: Apple&#39;s AI search ambitions</a></li>
+          
+          <li><a href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer">Perplexity AI</a></li>
+          
+        </ul>
+      </div>
+      
+    </div>
+  </article>
+  
+  
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div>
+      
+        下次更新：今晚 20:00
+      
+    </div>
+    <div>
+      
+        本页面仅供个人阅读，不对外开放索引
+      
+    </div>
+    <div>Generated by Daily Focus</div>
+  </div>
+</footer>
+
+</body>
+</html>

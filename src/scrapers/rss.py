@@ -2,14 +2,18 @@
 
 import calendar
 import hashlib
+import json
 import logging
 import os
 import re
 from datetime import datetime, timezone
-from typing import List
+from pathlib import Path
+from typing import Dict, List
 from email.utils import parsedate_to_datetime
+from urllib.parse import urljoin
 import httpx
 import feedparser
+from bs4 import BeautifulSoup
 
 from .base import BaseScraper
 from ..models import ContentItem, SourceType, RSSSourceConfig
@@ -63,6 +67,8 @@ class RSSScraper(BaseScraper):
             List[ContentItem]: Feed content items
         """
         items = []
+        image_cache = self._load_image_cache()
+        feed_url_str = str(source.url)
 
         try:
             # Expand environment variables in URL (e.g. ${LWN_TOKEN})
@@ -95,6 +101,9 @@ class RSSScraper(BaseScraper):
                 # Extract content
                 content = self._extract_content(entry)
 
+                # Extract candidate images from content HTML
+                candidate_images = self._extract_candidate_images(entry, image_cache, feed_url_str)
+
                 item = ContentItem(
                     id=self._generate_id("rss", feed_id, entry_hash),
                     source_type=SourceType.RSS,
@@ -107,6 +116,7 @@ class RSSScraper(BaseScraper):
                         "feed_name": source.name,
                         "category": source.category,
                         "tags": [tag.term for tag in entry.get("tags", [])],
+                        "candidate_images": candidate_images,
                     },
                 )
                 items.append(item)
@@ -116,6 +126,7 @@ class RSSScraper(BaseScraper):
         except Exception as e:
             logger.warning("Error parsing RSS feed %s: %s", source.name, e)
 
+        self._save_image_cache(image_cache)
         return items
 
     def _parse_date(self, entry: dict) -> datetime:
@@ -163,3 +174,127 @@ class RSSScraper(BaseScraper):
             return entry.content[0].get("value", "")
 
         return ""
+
+    def _load_image_cache(self) -> Dict[str, int]:
+        """Load image URL frequency cache from data/image_cache.json.
+
+        Returns:
+            dict mapping image URL -> number of times seen
+        """
+        cache_path = Path(__file__).resolve().parents[2] / "data" / "image_cache.json"
+        if cache_path.exists():
+            try:
+                return json.loads(cache_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                pass
+        return {}
+
+    def _save_image_cache(self, cache: Dict[str, int]) -> None:
+        """Persist image URL frequency cache to data/image_cache.json."""
+        cache_path = Path(__file__).resolve().parents[2] / "data" / "image_cache.json"
+        try:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            logger.debug("Failed to write image cache", exc_info=True)
+
+    def _extract_candidate_images(self, entry: dict, cache: Dict[str, int], feed_url: str) -> List[dict]:
+        """Extract candidate images from feed entry content HTML.
+
+        Parses the content HTML with BeautifulSoup, finds all img tags,
+        applies rule-based filtering (logo/avatar/icon/headshot/button),
+        checks URL dedup cache, resolves relative URLs, and returns at
+        most 5 candidates per entry. Updates the cache in-place for
+        extracted URLs.
+
+        Args:
+            entry: Feed entry data
+            cache: Image URL frequency cache (mutated in-place)
+            feed_url: Base URL for resolving relative image URLs
+
+        Returns:
+            List of dicts with keys: url, alt, before, after
+        """
+        # Get HTML content (same field resolution as _extract_content)
+        html = ""
+        if "summary" in entry:
+            html = entry.summary
+        elif "description" in entry:
+            html = entry.description
+        elif "content" in entry and entry.content:
+            html = entry.content[0].get("value", "")
+
+        if not html:
+            return []
+
+        soup = BeautifulSoup(html, "html.parser")
+        img_tags = soup.find_all("img")
+        if not img_tags:
+            return []
+
+        # Patterns that indicate decorative/non-informational images
+        skip_patterns = ["logo", "avatar", "icon", "headshot", "button"]
+
+        candidates: List[dict] = []
+        for img in img_tags:
+            raw_src = img.get("src", "")
+            if not raw_src:
+                continue
+
+            # Resolve relative URLs against the feed URL
+            src = urljoin(feed_url, raw_src)
+
+            # Rule-based pre-filter: skip decorative URLs
+            src_lower = src.lower()
+            if any(p in src_lower for p in skip_patterns):
+                continue
+
+            # URL dedup: skip URLs seen more than 3 times
+            if cache.get(src, 0) > 3:
+                continue
+
+            # Track URL frequency in dedup cache
+            cache[src] = cache.get(src, 0) + 1
+
+            alt = img.get("alt", "") or ""
+
+            # Extract surrounding context by locating the img tag
+            # in the original HTML via its src attribute. Search for
+            # the original (possibly relative) URL first, since the
+            # HTML contains the raw attribute value from the feed.
+            src_idx = html.find(raw_src)
+            if src_idx == -1:
+                src_idx = html.find(src)  # fallback: try resolved URL
+            before_text = ""
+            after_text = ""
+            if src_idx != -1:
+                # Estimate img tag boundaries in the original HTML
+                tag_start = html.rfind("<img", 0, src_idx)
+                if tag_start == -1:
+                    tag_start = src_idx
+                tag_end = html.find(">", tag_start) + 1
+                if tag_end <= 0:
+                    tag_end = tag_start + len(src)
+
+                before_html = html[max(0, tag_start - 200) : tag_start]
+                after_html = html[tag_end : tag_end + 200]
+                before_text = (
+                    BeautifulSoup(before_html, "html.parser")
+                    .get_text(separator=" ", strip=True)[-100:]
+                )
+                after_text = (
+                    BeautifulSoup(after_html, "html.parser")
+                    .get_text(separator=" ", strip=True)[:100]
+                )
+
+            candidates.append({
+                "url": src,
+                "alt": alt,
+                "before": before_text,
+                "after": after_text,
+            })
+
+            if len(candidates) >= 5:
+                break
+
+        return candidates

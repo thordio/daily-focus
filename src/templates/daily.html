@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="{{ "zh-CN" if language == "zh" else "en" }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Daily Focus{% if period == "morning" %} 早报{% else %} 晚报{% endif %} - {{ date }}">
+<title>Daily Focus{% if period == "morning" %} 早报{% else %} 晚报{% endif %} — {{ date }}</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --tag-bg: #f3f4f6;
+  --tag-text: #4b5563;
+  --score-9plus: #dc2626;
+  --score-7to8: #ea580c;
+  --score-5to6: #6b7280;
+  --score-bg: #f3f4f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+  --details-bg: #f9fafb;
+  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --footer-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --tag-bg: #334155;
+    --tag-text: #e2e8f0;
+    --score-bg: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+    --details-bg: #1e293b;
+    --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --footer-bg: #1e293b;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  background: var(--header-gradient);
+  color: #fff;
+  padding: 40px 0 32px;
+  margin-bottom: 32px;
+}
+
+.header .container {
+  padding: 0 20px;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.header-meta {
+  font-size: 14px;
+  opacity: 0.85;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.header-stats {
+  font-size: 13px;
+  opacity: 0.75;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.period-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Demo data banner */
+.demo-banner {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .demo-banner {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* News Cards */
+.news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.news-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-index {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--score-bg);
+  color: var(--text-secondary);
+}
+
+.score-badge {
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 32px;
+}
+
+.score-9 { background: #fef2f2; color: var(--score-9plus); }
+.score-7 { background: #fff7ed; color: var(--score-7to8); }
+.score-5 { background: var(--score-bg); color: var(--score-5to6); }
+
+@media (prefers-color-scheme: dark) {
+  .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+  .score-5 { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+}
+
+.card-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.card-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.card-source {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.card-source .dot {
+  font-size: 10px;
+  opacity: 0.35;
+  line-height: 1;
+}
+
+.card-source-type {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  text-transform: uppercase;
+}
+
+.card-body {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.card-body > * + * {
+  margin-top: 16px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-label .emoji {
+  font-style: normal;
+}
+
+.section-content {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.details-section {
+  margin-top: 16px;
+}
+
+.details-section details {
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+
+.details-section details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 2px 0;
+  user-select: none;
+}
+
+.details-section details summary:hover {
+  color: var(--accent);
+}
+
+.details-section details[open] {
+  padding-bottom: 16px;
+}
+
+.details-section details[open] summary {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.details-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  white-space: nowrap;
+}
+
+/* Images */
+.images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.images img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* References */
+.references {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.references-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.references-list {
+  list-style: none;
+  padding: 0;
+}
+
+.references-list li {
+  margin-bottom: 4px;
+}
+
+.references-list a {
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* Footer */
+.footer {
+  margin-top: 48px;
+  padding: 32px 0;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 2;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .header { padding: 28px 0 24px; }
+  .header-title { font-size: 22px; }
+  .header-meta { font-size: 13px; gap: 8px; }
+  .news-card { padding: 18px; border-radius: 10px; }
+  .card-title { font-size: 16px; }
+  .card-body { font-size: 14px; }
+  .card-header { gap: 10px; }
+}
+
+@media (max-width: 375px) {
+  .container { padding: 0 16px; }
+  .header .container { padding: 0 16px; }
+  .header { padding: 24px 0 18px; }
+  .header-title { font-size: 20px; }
+  .header-meta { font-size: 12px; gap: 6px; }
+  .header-stats { font-size: 12px; }
+  .news-card { padding: 14px; border-radius: 8px; }
+  .card-title { font-size: 15px; }
+  .card-body { font-size: 13px; }
+  .card-header { gap: 8px; }
+  .card-index { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
+  .score-badge { min-width: 32px; height: 28px; padding: 0 6px; font-size: 12px; line-height: 28px; }
+}
+
+@media (min-width: 768px) {
+  .container { padding: 0 24px; }
+  .header-title { font-size: 32px; }
+  .news-card { padding: 28px; }
+}
+
+@media (min-width: 1440px) {
+  body { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <div class="header-title">
+      {% if period == "morning" %}
+        {% if language == "zh" %}Daily Focus 早报{% else %}Daily Focus Morning{% endif %}
+      {% else %}
+        {% if language == "zh" %}Daily Focus 晚报{% else %}Daily Focus Evening{% endif %}
+      {% endif %}
+    </div>
+    <div class="header-meta">
+      <span>{{ date }}</span>
+      <span class="period-badge">
+        {% if period == "morning" %}
+          {% if language == "zh" %}早报{% else %}Morning{% endif %}
+        {% else %}
+          {% if language == "zh" %}晚报{% else %}Evening{% endif %}
+        {% endif %}
+      </span>
+    </div>
+    <div class="header-stats">
+      {% if language == "zh" %}
+        从 {{ total_fetched }} 条内容中精选 {{ selected_count }} 条
+      {% else %}
+        Selected {{ selected_count }} items from {{ total_fetched }}
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% if is_demo|default(false) %}
+<div class="demo-banner">
+  ⚠️ 演示数据 — 非真实新闻内容 / DEMO DATA — Not real news content
+</div>
+{% endif %}
+
+<main class="container">
+  {% if items|length == 0 %}
+  <div class="empty-state">
+    <h2>
+      {% if language == "zh" %}今日暂无重要动态{% else %}No significant developments today{% endif %}
+    </h2>
+    <p>
+      {% if language == "zh" %}
+        可能原因：今日关注的信息源较平静，或 AI 评分阈值设置过高。
+      {% else %}
+        Possible reasons: a quiet day in your tracked sources, or the AI score threshold is too high.
+      {% endif %}
+    </p>
+  </div>
+  {% else %}
+
+  {% for item in items %}
+  <article class="news-card">
+    <div class="card-header">
+      <div class="card-index">{{ item.index }}</div>
+      {% set score_int = item.score|int %}
+      {% if score_int >= 9 %}
+        {% set score_class = "score-9" %}
+      {% elif score_int >= 7 %}
+        {% set score_class = "score-7" %}
+      {% else %}
+        {% set score_class = "score-5" %}
+      {% endif %}
+      <div class="score-badge {{ score_class }}">{{ "{:.1f}".format(item.score) }}</div>
+      <div class="card-title-area">
+        <h2 class="card-title">
+          <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+        </h2>
+        <div class="card-source">
+          <span class="card-source-type">{{ item.source_type }}</span>
+          <span>{{ item.source_label }}</span>
+          <span class="dot">&#183;</span>
+          <span>{{ item.published_at[:10] if item.published_at else "" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      {% if item.whats_new %}
+      <div>
+        <div class="section-label"><i class="emoji">&#128240;</i> {% if language == "zh" %}发生了什么{% else %}What's New{% endif %}</div>
+        <div class="section-content">{{ item.whats_new }}</div>
+      </div>
+      {% endif %}
+
+      {% if item.why_it_matters %}
+      <div>
+        <div class="section-label"><i class="emoji">&#128200;</i> {% if language == "zh" %}为什么重要{% else %}Why It Matters{% endif %}</div>
+        <div class="section-content">{{ item.why_it_matters }}</div>
+      </div>
+      {% endif %}
+
+      {% if item.background %}
+      <div class="details-section">
+        <details>
+          <summary>{% if language == "zh" %}背景知识{% else %}Background{% endif %}</summary>
+          <div class="details-content">{{ item.background }}</div>
+        </details>
+      </div>
+      {% endif %}
+
+      {% if item.community_discussion %}
+      <div class="details-section">
+        <details>
+          <summary>{% if language == "zh" %}社区讨论{% else %}Community Discussion{% endif %}</summary>
+          <div class="details-content">{{ item.community_discussion }}</div>
+        </details>
+      </div>
+      {% endif %}
+
+      {% if item.images and item.images|length > 0 %}
+      <div class="images">
+        {% for img in item.images %}
+        <img src="{{ img.url }}" alt="{{ img.alt or '' }}" loading="lazy">
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if item.tags and item.tags|length > 0 %}
+      <div class="tags">
+        {% for tag in item.tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if item.references and item.references|length > 0 %}
+      <div class="references">
+        <div class="references-title">{% if language == "zh" %}参考来源{% else %}References{% endif %}</div>
+        <ul class="references-list">
+          {% for ref in item.references %}
+          <li><a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+  {% endif %}
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div>
+      {% if language == "zh" %}
+        下次更新：{{ next_update }}
+      {% else %}
+        Next update: {{ next_update }}
+      {% endif %}
+    </div>
+    <div>
+      {% if language == "zh" %}
+        本页面仅供个人阅读，不对外开放索引
+      {% else %}
+        This page is for personal reading only, not indexed for search
+      {% endif %}
+    </div>
+    <div>Generated by Daily Focus</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -248,6 +248,131 @@ class DailySummarizer:
 
         return "\n".join(lines) + "\n\n"
 
+    def get_structured_data(
+        self,
+        items: List[ContentItem],
+        date: str,
+        total_fetched: int,
+        language: str = "en",
+        period: str = "morning",
+    ) -> Dict:
+        """Return structured dict for Jinja2 HTML rendering.
+
+        Produces a dict matching the schema defined in ``daily-focus-design.md``
+        Section 5, Work Area C, Step 1.
+
+        Args:
+            items: High-scoring content items (already enriched).
+            date: Date string (YYYY-MM-DD).
+            total_fetched: Total items fetched before filtering.
+            language: Output language, either "en" or "zh".
+            period: "morning" for 早报 or "evening" for 晚报.
+
+        Returns:
+            A dict ready to pass to ``DailyRenderer.render_html()``.
+        """
+        # Next update string
+        if period == "morning":
+            next_update = "今晚 20:00" if language == "zh" else "Tonight 20:00"
+        else:
+            next_update = "明早 08:00" if language == "zh" else "Tomorrow 08:00"
+
+        data = {
+            "date": date,
+            "period": period,
+            "language": language,
+            "total_fetched": total_fetched,
+            "selected_count": len(items),
+            "next_update": next_update,
+            "items": [],
+        }
+
+        for i, item in enumerate(items):
+            meta = item.metadata
+
+            # source_label: most descriptive display name
+            source_label = (
+                meta.get("feed_name")
+                or meta.get("subreddit", "")
+                or item.author
+                or item.source_type.value
+            )
+            if meta.get("subreddit"):
+                source_label = f"r/{meta['subreddit']}"
+
+            # whats_new: try design-doc field first, then enricher output, then AI summary
+            whats_new = (
+                meta.get(f"whats_new_{language}")
+                or meta.get("whats_new")
+                or meta.get(f"detailed_summary_{language}")
+                or meta.get("detailed_summary")
+                or item.ai_summary
+                or ""
+            )
+
+            # why_it_matters: try design-doc field first, then AI reason, then enricher output
+            why_it_matters = (
+                meta.get(f"why_it_matters_{language}")
+                or meta.get("why_it_matters")
+                or meta.get(f"detailed_summary_{language}")
+                or item.ai_reason
+                or ""
+            )
+
+            # key_details: try language-suffixed field first, then generic, then detailed_summary
+            key_details = (
+                meta.get(f"key_details_{language}")
+                or meta.get("key_details")
+                or ""
+            )
+
+            # background
+            background = (
+                meta.get(f"background_{language}")
+                or meta.get("background")
+                or ""
+            )
+
+            # community_discussion (separate from why_it_matters)
+            community_discussion = (
+                meta.get(f"community_discussion_{language}")
+                or meta.get("community_discussion")
+                or ""
+            )
+
+            tags = item.ai_tags or []
+
+            # images from selected_images
+            images = meta.get("selected_images") or []
+
+            # references from sources (also support "references" for manual/demo data)
+            references = meta.get("sources") or meta.get("references") or []
+
+            # title_en: try metadata first, then item.title
+            title_en = str(meta.get("title_en") or item.title)
+
+            item_data = {
+                "index": i + 1,
+                "title": str(meta.get(f"title_{language}") or item.title),
+                "title_en": title_en,
+                "url": str(item.url),
+                "score": item.ai_score or 0.0,
+                "source_label": source_label,
+                "source_type": item.source_type.value,
+                "published_at": item.published_at.isoformat() if item.published_at else "",
+                "whats_new": whats_new,
+                "why_it_matters": why_it_matters,
+                "key_details": key_details,
+                "background": background,
+                "community_discussion": community_discussion,
+                "tags": tags,
+                "images": images,
+                "references": references,
+            }
+            data["items"].append(item_data)
+
+        return data
+
     def _generate_empty_summary(self, date: str, total_fetched: int, labels: dict) -> str:
         """Generate summary when no high-scoring items were found."""
         return (

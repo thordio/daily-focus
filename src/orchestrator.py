@@ -24,6 +24,7 @@ from .ai.client import create_ai_client
 from .ai.analyzer import ContentAnalyzer
 from .ai.summarizer import DailySummarizer
 from .ai.enricher import ContentEnricher
+from .ai.image_selector import ImageSelector
 from .ai.tokens import get_usage_snapshot
 
 
@@ -47,11 +48,12 @@ class HorizonOrchestrator:
             else None
         )
 
-    async def run(self, force_hours: int = None) -> None:
+    async def run(self, force_hours: int = None, period: str = "morning") -> None:
         """Execute the complete workflow.
 
         Args:
             force_hours: Optional override for time window in hours
+            period: Edition period, either "morning" or "evening"
         """
         self.console.print("[bold cyan]🌅 Horizon - Starting aggregation...[/bold cyan]\n")
 
@@ -126,50 +128,49 @@ class HorizonOrchestrator:
             # 6. Search related stories + enrich with background knowledge (2nd AI pass)
             await self._enrich_important_items(important_items)
 
+            # 6.5 Select informative images for high-scoring items
+            await self._select_images(important_items)
+
             # 7. Generate and save daily summaries for each configured language
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             for lang in self.config.ai.languages:
                 summarizer = DailySummarizer()
+
+                # 7a. Render HTML via structured data -> Jinja2 template
+                structured = await summarizer.get_structured_data(
+                    important_items, today, len(all_items),
+                    language=lang, period=period,
+                )
+
+                from .renderer import DailyRenderer
+
+                renderer = DailyRenderer()
+                html = renderer.render_html(structured)
+
+                from pathlib import Path
+
+                docs_dir = Path("docs")
+                docs_dir.mkdir(parents=True, exist_ok=True)
+
+                output_path = docs_dir / "index.html"
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write(html)
+                self.console.print(f"📄 Rendered HTML to: {output_path}")
+
+                # Also save a dated copy for archival linking
+                daily_dir = docs_dir / "daily"
+                daily_dir.mkdir(parents=True, exist_ok=True)
+                daily_path = daily_dir / f"{today}-{period}.html"
+                with open(daily_path, "w", encoding="utf-8") as f:
+                    f.write(html)
+                self.console.print(f"📄 Archived HTML to: {daily_path}\n")
+
+                # 7b. Generate Markdown summary for email/webhook compatibility
                 summary = await summarizer.generate_summary(important_items, today, len(all_items), language=lang)
 
                 # Save to data/summaries/
-                summary_path = self.storage.save_daily_summary(today, summary, language=lang)
+                summary_path = self.storage.save_daily_summary(today, summary, language=lang, period=period)
                 self.console.print(f"💾 Saved {lang.upper()} summary to: {summary_path}\n")
-
-                # Copy to docs/ for GitHub Pages
-                try:
-                    from pathlib import Path
-
-                    post_filename = f"{today}-summary-{lang}.md"
-                    posts_dir = Path("docs/_posts")
-                    posts_dir.mkdir(parents=True, exist_ok=True)
-
-                    dest_path = posts_dir / post_filename
-
-                    # Add Jekyll front matter
-                    front_matter = (
-                        "---\n"
-                        "layout: default\n"
-                        f"title: \"Horizon Summary: {today} ({lang.upper()})\"\n"
-                        f"date: {today}\n"
-                        f"lang: {lang}\n"
-                        "---\n\n"
-                    )
-
-                    # Strip leading H1 header to avoid duplication with Jekyll title
-                    summary_content = summary
-                    first_line = summary_content.strip().split("\n")[0]
-                    if first_line.startswith("# "):
-                        parts = summary_content.split("\n", 1)
-                        if len(parts) > 1:
-                            summary_content = parts[1].strip()
-
-                    with open(dest_path, "w", encoding="utf-8") as f:
-                        f.write(front_matter + summary_content)
-
-                    self.console.print(f"📄 Copied {lang.upper()} summary to GitHub Pages: {dest_path}\n")
-                except Exception as e:
-                    self.console.print(f"[yellow]⚠️  Failed to copy {lang.upper()} summary to docs/: {e}[/yellow]\n")
 
                 # Send email if configured
                 if self.email_manager and self.config.email and self.config.email.enabled:
@@ -532,6 +533,21 @@ class HorizonOrchestrator:
         await enricher.enrich_batch(items)
         self.console.print(f"   Enriched {len(items)} items\n")
 
+    async def _select_images(self, items: List[ContentItem]) -> None:
+        """Select informative images for high-scoring items.
+
+        Args:
+            items: Content items to process (modified in-place)
+        """
+        if not items:
+            return
+        self.console.print("🖼️  Selecting informative images...")
+        ai_client = create_ai_client(self.config.ai)
+        selector = ImageSelector(ai_client)
+        await selector.select_images(items)
+        selected = sum(1 for item in items if item.metadata.get("selected_images"))
+        self.console.print(f"   Selected images for {selected} items\n")
+
     async def _analyze_content(self, items: List[ContentItem]) -> List[ContentItem]:
         """Analyze content items with AI.
 
@@ -547,27 +563,3 @@ class HorizonOrchestrator:
         analyzer = ContentAnalyzer(ai_client)
 
         return await analyzer.analyze_batch(items)
-
-    async def _generate_summary(
-        self,
-        items: List[ContentItem],
-        date: str,
-        total_fetched: int,
-        language: str = "en",
-    ) -> str:
-        """Generate daily summary.
-
-        Args:
-            items: Important items to include (already enriched with background/related)
-            date: Date string
-            total_fetched: Total items fetched
-            language: Output language ("en" or "zh")
-
-        Returns:
-            str: Markdown summary
-        """
-        self.console.print("📝 Generating daily summary...")
-
-        summarizer = DailySummarizer()
-
-        return await summarizer.generate_summary(items, date, total_fetched, language=language)

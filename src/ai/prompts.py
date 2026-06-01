@@ -5,6 +5,8 @@ TOPIC_DEDUP_SYSTEM = """You are a news deduplication assistant. Identify groups 
 Rules:
 - Group items ONLY if they report on the identical event (same product release, same incident, same announcement)
 - Items about the same product but different events are NOT duplicates ("Gemma 4 released" vs "Gemma 4 jailbroken")
+- 同一轮融资的不同媒体报道应合并 (same funding round, different outlets — merge)
+- 同一模型发布的不同评测应合并 (same model release, different reviews — merge)
 - Err on the side of keeping items separate when unsure"""
 
 TOPIC_DEDUP_USER = """The following news items have already been sorted by importance score (descending). Identify which items are duplicates of each other.
@@ -20,41 +22,26 @@ Respond with valid JSON only:
 
 If there are no duplicates at all, return: {{"duplicates": []}}"""
 
-CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator helping filter important technical and academic information.
+CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator filtering news across three domains: AI technology, AI markets, and global economics.
 
-Score content on a 0-10 scale based on importance and relevance:
+Score content on a 0-10 scale:
 
-**9-10: Groundbreaking** - Major breakthroughs, paradigm shifts, or highly significant announcements
-- New major version releases of widely-used technologies
-- Significant research breakthroughs
-- Important industry-changing announcements
+**9-10: Breakthrough** — AI重大突破（新架构、范式改变）、头部公司战略级变动（收购/重组/关键高管变动）、影响全球市场的宏观政策变动（央行转向、贸易政策剧变）
 
-**7-8: High Value** - Important developments worth immediate attention
-- Interesting technical deep-dives
-- Novel approaches to known problems
-- Insightful analysis or commentary
-- Valuable tools or libraries
+**7-8: High Value** — 重要进展（新工具/服务发布、融资轮、季度财报关键数据、深度行业分析）、值得关注的创业公司动向
 
-**5-6: Interesting** - Worth knowing but not urgent
-- Incremental improvements
-- Useful tutorials
-- Moderate community interest
+**5-6: Interesting** — 增量更新、常规报道、二线公司日常
 
-**3-4: Low Priority** - Generic or routine content
-- Minor updates
-- Common knowledge
-- Overly promotional content
+**0-4: Noise** — 纯营销内容、与AI/市场/经济无关、低质量转载
 
-**0-2: Noise** - Not relevant or low quality
-- Spam or purely promotional
-- Off-topic content
-- Trivial updates
+核心筛选原则：这条信息是否会影响 AI 从业者或投资者的判断/行动
 
 Consider:
+- Market signal: does this reveal strategic direction, competitive positioning, or industry trends?
+- Economic impact: does this affect markets, funding environments, or business models?
+- Potential market impact: could this affect investment decisions, company valuations, or industry direction?
+- Economic relevance: does this relate to monetary policy, trade, or macroeconomic trends that affect markets?
 - Technical depth and novelty
-- Potential impact on the field
-- Quality of writing/presentation
-- Relevance to software engineering, AI/ML, and systems research
 - Community discussion quality: insightful comments, diverse viewpoints, and debates increase value
 - Engagement signals: high upvotes/favorites with substantive discussion indicate community-validated importance
 """
@@ -170,3 +157,19 @@ Respond with valid JSON only. Each _en field must be in English; each _zh field 
   "community_discussion_zh": "<用中文写1-3句话，或空字符串>",
   "sources": ["<url from search results>", "..."]
 }}"""
+
+IMAGE_SELECTION_SYSTEM = """You are a news image classification assistant. Classify image types.
+
+Categories:
+  "informational" — contains data, comparisons, trends, charts, benchmarks, architecture diagrams, etc. that convey substantive information
+  "decorative" — headshots, logos, product appearance, conference photos, generic illustrations
+
+Signals for informational: alt text contains numbers/percentages/benchmark/vs/comparison/chart/diagram/trend
+Signals for decorative: alt is empty, context mentions people names/titles/conference/announced/product appearance
+"""
+
+IMAGE_SELECTION_USER = """Given {n} candidate images with alt text and surrounding context, classify each.
+
+{images_json}
+
+Return JSON: {{"results": [{{"index": 0, "category": "informational|decorative", "confidence": 0.0-1.0}}, ...]}}"""
