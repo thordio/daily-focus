@@ -9,7 +9,7 @@
 | 测试通过率 | 358/358 = 100% |
 | 所属工作区 | A: T01-T02, B: T03-T04, C: T07-T09+Theme, F: T05-T06, 汇总: T12-T16, E: T20-T21, Topic: T22-T30 |
 | 创建日期 | 2026-05-31 |
-| 最后更新 | 2026-06-02 (QA 1 round 5 — post-builder visual QA verification) |
+| 最后更新 | 2026-06-02 (QA 1 round 6 — blocker verification) |
 | 当前全量测试 | 358 tests (QA 1 baseline: 310, +23 tests in round 2, +25 topic tests). 0 failed. |
 
 ---
@@ -64,6 +64,40 @@
 | 失败 | 测试执行但结果不符合预期 |
 | N/A | 该测试在当前阶段不适用 |
 
+## QA 1 测试覆盖总结 (2026-06-02 — round 6: blocker verification)
+
+### 十项验证结果
+
+| # | 检查项 | 结果 | 详细 |
+|---|--------|------|------|
+| 1 | 完整测试套件 | **通过** | 358/358 tests passed, 0 failed, 1 warning (DeprecationWarning 来自 google.genai) |
+| 2 | .gitignore 含 apikey.txt | **失败** | `.gitignore` 文件中缺少 `apikey.txt` 条目 (第 37 行之后未出现) |
+| 3 | apikey.txt 未被 git 追踪 | **通过** | `git status` 确认 apikey.txt 不在追踪中 |
+| 4 | Jekyll 构件已删除 | **失败** | 四个构件均仍存在: `docs/_config.yml`, `docs/index.md`, `docs/index-redirect.html`, `docs/_includes/` |
+| 5 | Workflows 含 enable_jekyll: false | **失败** | 两个 workflow 文件 (morning + evening) 的 peaceiris/actions-gh-pages 步骤均无 `enable_jekyll` 参数 |
+| 6 | PWA 图标有效 | **通过** | `icon-192.png`: valid PNG 192x192; `icon-512.png`: valid PNG 512x512 |
+| 7 | Archive 扫描 docs/daily/ | **失败** | `build_archive_entries()` 当前扫描 `data/summaries/horizon-*.md` (第 64 行), 而非 `docs/daily/*.html` |
+| 8 | Orchestrator 不双重写入 index.html | **失败** | `src/orchestrator.py` 第 155-157 行写入 `docs/index.html`; render_and_deploy.py 也写入同一文件 |
+| 9 | 关键测试 trio | **通过** | `test_renderer.py: 30 passed`, `test_summarizer.py: 7 passed`, `test_pipeline_e2e.py: 3 passed` (合计 40 passed) |
+| 10 | VERIFICATION_MATRIX.md 已更新 | **通过** | 本文件已更新, 包含所有验证结果和新的 INFRA bug 条目 |
+
+### 总结: 6/10 通过, 4 项阻塞问题未修复
+
+| 状态 | 检查项 |
+|------|--------|
+| **通过** | 1 (测试套件), 3 (apikey 未追踪), 6 (PWA 图标), 9 (关键测试), 10 (矩阵更新) |
+| **失败 (需修复)** | 2 (gitignore), 4 (Jekyll 构件), 5 (enable_jekyll), 7 (archive 扫描目录), 8 (双重写入) |
+
+### 剩余 INFRA 阻塞问题 (需在代码仓库中修复)
+
+1. **INFRA-001**: 向 `.gitignore` 添加 `apikey.txt`
+2. **INFRA-002**: 删除 `docs/_config.yml`, `docs/index.md`, `docs/index-redirect.html`, `docs/_includes/` 目录
+3. **INFRA-003**: 在两个 workflow 的 peaceiris/actions-gh-pages 步骤中添加 `enable_jekyll: false`
+4. **INFRA-004**: 修改 `scripts/render_and_deploy.py::build_archive_entries()` 扫描 `docs/daily/*.html` 而非 `data/summaries/*.md`
+5. **INFRA-005**: 从 `src/orchestrator.py::run()` 中移除 `docs/index.html` 写入逻辑 (仅保留 `docs/daily/{date}-{period}.html` 写入)
+
+---
+
 ## QA 1 测试覆盖总结 (2026-06-02 — round 5: post-builder visual QA verification)
 
 | 领域 | 测试文件 | 原有测试数 | 新增测试数 | 当前总数 | 覆盖内容 |
@@ -85,6 +119,11 @@
 | QA1-002 | 2026-06-01 | test_renderer.py | `test_rss_image_extraction_and_filtering` 先前被错误标注为"context extraction fails", 实测该测试通过, 上下文提取正常 | 误报澄清 |
 | QA1-003 | 2026-06-01 | data/image_cache.json | 持久化 image_cache.json 包含测试 URL (如 chart1.png), 各 count=4 ≥ 阈值(>3), 导致 4 个 RSS 图片提取测试全部因缓存污染而失败。该缓存由 RSSScraper._load_image_cache() 从文件系统加载, 测试不 mock 此路径。 | 未修复 |
 | QA1-004 | 2026-06-01 | docs/index.html, docs/archive.html | 渲染的 HTML 最初缺少 `is_demo` demo-banner; 中间可能被重渲染后添加。archive.html `<span class="entry-period">` 为空 (period_label 模板变量未传入)。 | 部分修复 |
-| QA1-005 | 2026-06-01 | docs/assets/icons/ | manifest.json 引用 `assets/icons/icon-192.png` 和 `assets/icons/icon-512.png`, 但 `docs/assets/icons/` 目录不存在, 无任何 PWA 图标文件。 | 未修复 |
-| QA1-006 | 2026-06-02 | docs/index.html (theme toggle JS) | 主题切换是 3-state 循环：system → dark → light → system。需求要求 2-state：dark ↔ light 仅限。localStorage 当前存入 'dark'/'light'/null，应仅存 'dark'/'light'。 | 未修复 — 新增 |
-| QA1-007 | 2026-06-02 | docs/index.html (CSS header gradient) | 浅色模式 `--header-gradient` 为深海军蓝 (#1a1a2e → #16213e)，不是蓝色渐变。深色模式为 #0f172a → #1e293b。两主题 header 颜色差异极小，无法体现主题切换的视觉变化。需求：浅色模式应为蓝色渐变（如 #2563eb → #1d4ed8）。 | 未修复 — 新增 |
+| QA1-005 | 2026-06-01 | docs/assets/icons/ | manifest.json 引用 `assets/icons/icon-192.png` 和 `assets/icons/icon-512.png`, 但 `docs/assets/icons/` 目录不存在, 无任何 PWA 图标文件。 | **已修复** (2026-06-02: 两个图标文件已创建, 192.png 4838B, 512.png 18062B, 均为有效 PNG) |
+| QA1-006 | 2026-06-02 | docs/index.html (theme toggle JS) | 主题切换是 3-state 循环：system → dark → light → system。需求要求 2-state：dark ↔ light 仅限。localStorage 当前存入 'dark'/'light'/null，应仅存 'dark'/'light'。 | 未修复 |
+| QA1-007 | 2026-06-02 | docs/index.html (CSS header gradient) | 浅色模式 `--header-gradient` 为深海军蓝 (#1a1a2e → #16213e)，不是蓝色渐变。深色模式为 #0f172a → #1e293b。两主题 header 颜色差异极小，无法体现主题切换的视觉变化。需求：浅色模式应为蓝色渐变（如 #2563eb → #1d4ed8）。 | 未修复 |
+| INFRA-001 | 2026-06-02 | .gitignore | `.gitignore` 缺少 `apikey.txt` 条目, API 密钥文件可能被意外提交。 | **待修复** |
+| INFRA-002 | 2026-06-02 | docs/_config.yml, docs/index.md, docs/index-redirect.html, docs/_includes/ | Jekyll 构件 (gh-pages 零配置部署于 2022 年弃用) 仍然存在于 docs/ 目录下。`docs/_config.yml` 尾部仍含 `plugins: [jekyll-paginate]`, 无 `enable_jekyll: false` 标志。四个构件均需删除。 | **待修复** |
+| INFRA-003 | 2026-06-02 | .github/workflows/daily-focus-morning.yml, daily-focus-evening.yml | GitHub Actions 工作流均缺少 `enable_jekyll: false` 标志 (在 peaceiris/actions-gh-pages 步骤中)。Jekyll 默认处理可能干扰纯静态文件部署。 | **待修复** |
+| INFRA-004 | 2026-06-02 | scripts/render_and_deploy.py | `build_archive_entries()` 扫描 `data/summaries/horizon-*.md` 而不是 `docs/daily/*.html`。这意味着存档条目基于 markdown 摘要文件, 而非实际部署的 HTML 文件。URL 档结构可能不同步。 | **待修复** |
+| INFRA-005 | 2026-06-02 | src/orchestrator.py | `HorizonOrchestrator.run()` 第 155-157 行直接写入 `docs/index.html`。`scripts/render_and_deploy.py` 随后覆盖它为最新日期的重定向。这造成了双重写入——渲染器应独占该文件的写入权。| **待修复** |

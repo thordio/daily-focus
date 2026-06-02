@@ -152,12 +152,7 @@ class HorizonOrchestrator:
                 docs_dir = Path("docs")
                 docs_dir.mkdir(parents=True, exist_ok=True)
 
-                output_path = docs_dir / "index.html"
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(html)
-                self.console.print(f"📄 Rendered HTML to: {output_path}")
-
-                # Also save a dated copy for archival linking
+                # Save a dated copy for archival linking
                 daily_dir = docs_dir / "daily"
                 daily_dir.mkdir(parents=True, exist_ok=True)
                 daily_path = daily_dir / f"{today}-{period}.html"
