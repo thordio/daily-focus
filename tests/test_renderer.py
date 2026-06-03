@@ -142,8 +142,10 @@ def test_structured_data_item_fields():
         "index", "title", "title_en", "url", "score",
         "source_label", "source_type", "published_at",
         "whats_new", "why_it_matters", "key_details",
+        "ai_reason",
         "background", "community_discussion",
         "tags", "images", "references",
+        "language_mismatch",
     }
 
     for item in data["items"]:
@@ -377,6 +379,7 @@ def test_structured_data_field_types():
                 assert isinstance(item["whats_new"], str)
                 assert isinstance(item["why_it_matters"], str)
                 assert isinstance(item["key_details"], str)
+                assert isinstance(item["ai_reason"], str)
                 assert isinstance(item["background"], str)
                 assert isinstance(item["community_discussion"], str)
                 assert isinstance(item["tags"], list)

@@ -15,31 +15,33 @@ from typing import Dict, List, Optional
 
 
 def _parse_daily_html_path(path: Path) -> Optional[Dict[str, str]]:
-    """Parse a daily HTML filename into {date, period}.
+    """Parse a daily HTML filename into {date, period, lang}.
 
-    Expected pattern::
+    Expected patterns::
 
-        2026-06-01-morning.html
-        2026-06-01-evening.html
+        2026-06-01-morning.html          (no lang — legacy)
+        2026-06-01-morning-zh.html        (with lang code)
 
     Returns None for non-matching files.
     """
     stem = path.stem
-    # Date is first 10 chars: YYYY-MM-DD
-    if len(stem) < 10 or stem[4] != "-" or stem[7] != "-":
+    parts = stem.split("-")
+    # parts must be: [YYYY, MM, DD, period] or [YYYY, MM, DD, period, lang]
+    if len(parts) < 4 or len(parts) > 5:
         return None
-    date = stem[:10]
-    period = stem[11:] if len(stem) > 11 else ""
-    return {"date": date, "period": period}
+    date = "-".join(parts[:3])
+    if len(date) != 10 or date[4] != "-" or date[7] != "-":
+        return None
+    period = parts[3]
+    if period not in ("morning", "evening"):
+        return None
+    lang = parts[4] if len(parts) == 5 else None
+    return {"date": date, "period": period, "lang": lang}
 
 
 def _period_label(period: str) -> str:
     """Translate period key to a label for display."""
-    if period == "morning":
-        return "Morning"
-    if period == "evening":
-        return "Evening"
-    return "Morning"
+    return "Morning" if period == "morning" else "Evening"
 
 
 def build_archive_entries(daily_dir: Path) -> List[Dict[str, str]]:
@@ -47,28 +49,50 @@ def build_archive_entries(daily_dir: Path) -> List[Dict[str, str]]:
 
     Returns entries sorted newest-first.  Each entry has keys:
         date, period_label, title, url
+
+    When both ``zh`` and ``en`` versions exist for the same date+period,
+    only one entry is emitted (preferring ``zh``, the default language).
     """
     if not daily_dir.exists():
         return []
 
-    entries: List[Dict[str, str]] = []
-    for path in sorted(daily_dir.glob("*.html"), reverse=True):
+    raw: list[dict] = []
+    for path in daily_dir.glob("*.html"):
         parsed = _parse_daily_html_path(path)
         if parsed is None:
             continue
         date = parsed["date"]
         period = parsed["period"]
-
-        title = f"Daily Focus — {date}"
-        period_label = _period_label(period)
-        url = f"daily/{date}-{period}.html" if period else f"daily/{date}.html"
-        entries.append({
+        lang = parsed.get("lang")  # None for legacy files (no language suffix)
+        if lang:
+            url = f"daily/{date}-{period}-{lang}.html"
+        elif period:
+            url = f"daily/{date}-{period}.html"
+        else:
+            url = f"daily/{date}.html"
+        raw.append({
             "date": date,
-            "period_label": period_label,
-            "title": title,
+            "period": period,
+            "period_label": _period_label(period),
+            "title": f"Daily Focus — {date}",
             "url": url,
+            "lang": lang,
         })
 
+    # Deduplicate by (date, period), preferring zh over en
+    best: dict[tuple[str, str], dict] = {}
+    for e in raw:
+        key = (e["date"], e["period"])
+        # zh is the default/primary language; prefer it
+        if key not in best or (e["lang"] == "zh" and best[key]["lang"] != "zh"):
+            best[key] = e
+
+    # Sort newest-first by date, then morning before evening within same date
+    entries = sorted(
+        best.values(),
+        key=lambda x: (x["date"], {"morning": 0, "evening": 1}.get(x["period"], 0)),
+        reverse=True,
+    )
     return entries
 
 

@@ -113,6 +113,39 @@ class HorizonOrchestrator:
                 )
             important_items = deduped_items
 
+            # 5.5b Per-topic minimums: ensure each topic has at least MIN_ITEMS items
+            # If a topic has fewer than its minimum after threshold + dedup, take the
+            # highest-scored remaining items for that topic from the full analyzed set.
+            MIN_ITEMS: Dict[str, int] = {"ai-tech": 4, "ai-markets": 6, "economy": 6}
+            topic_pool: Dict[str, List[ContentItem]] = defaultdict(list)
+            for item in analyzed_items:
+                topic_pool[item.metadata.get("topic", "ai-tech")].append(item)
+            # Sort each topic pool by score descending for quick top-N selection
+            for pool in topic_pool.values():
+                pool.sort(key=lambda x: x.ai_score or 0, reverse=True)
+            # Track IDs we already have
+            have_ids = {id(item) for item in important_items}
+            # Count per topic in the current important_items set
+            topic_counts: Dict[str, int] = defaultdict(int)
+            for item in important_items:
+                topic_counts[item.metadata.get("topic", "ai-tech")] += 1
+            for topic, min_n in MIN_ITEMS.items():
+                need = min_n - topic_counts.get(topic, 0)
+                if need > 0:
+                    for candidate in topic_pool.get(topic, []):
+                        if need <= 0:
+                            break
+                        if id(candidate) not in have_ids:
+                            important_items.append(candidate)
+                            have_ids.add(id(candidate))
+                            topic_counts[topic] += 1
+                            need -= 1
+                            self.console.print(
+                                f"   Added below-threshold item for topic '{topic}': {candidate.title[:60]}"
+                            )
+            if important_items:
+                important_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
+
             # 5.6 Optional second-stage Twitter reply expansion + targeted re-analysis
             await self._expand_twitter_discussion(important_items)
 
@@ -137,9 +170,10 @@ class HorizonOrchestrator:
                 summarizer = DailySummarizer()
 
                 # 7a. Render HTML via structured data -> Jinja2 template
-                structured = await summarizer.get_structured_data(
+                structured = summarizer.get_structured_data(
                     important_items, today, len(all_items),
                     language=lang, period=period,
+                    score_threshold=self.config.filtering.ai_score_threshold,
                 )
 
                 from .renderer import DailyRenderer
@@ -155,7 +189,7 @@ class HorizonOrchestrator:
                 # Save a dated copy for archival linking
                 daily_dir = docs_dir / "daily"
                 daily_dir.mkdir(parents=True, exist_ok=True)
-                daily_path = daily_dir / f"{today}-{period}.html"
+                daily_path = daily_dir / f"{today}-{period}-{lang}.html"
                 with open(daily_path, "w", encoding="utf-8") as f:
                     f.write(html)
                 self.console.print(f"📄 Archived HTML to: {daily_path}\n")
@@ -330,6 +364,21 @@ class HorizonOrchestrator:
         if meta.get("watchlist"):
             return meta["watchlist"]
         return item.author or "unknown"
+
+    @staticmethod
+    def _compute_avg_whats_new_length(items: List[ContentItem]) -> float | None:
+        """Compute the average length of whats_new_zh field across enriched items.
+
+        Returns the average character count, or None if no items have the field.
+        """
+        lengths = []
+        for item in items:
+            val = item.metadata.get("whats_new_zh", "")
+            if val:
+                lengths.append(len(str(val)))
+        if not lengths:
+            return None
+        return sum(lengths) / len(lengths)
 
     def merge_cross_source_duplicates(self, items: List[ContentItem]) -> List[ContentItem]:
         """Merge items that point to the same URL from different sources.
@@ -526,6 +575,12 @@ class HorizonOrchestrator:
         ai_client = create_ai_client(self.config.ai)
         enricher = ContentEnricher(ai_client)
         await enricher.enrich_batch(items)
+        # Log content richness metric
+        avg_whats_new_len = self._compute_avg_whats_new_length(items)
+        if avg_whats_new_len is not None:
+            if avg_whats_new_len < 80:
+                self.console.print(f"[yellow]⚠️ Content richness low, consider adjusting prompts[/yellow]")
+            self.console.print(f"   Average whats_new length: {avg_whats_new_len:.0f} chars\n")
         self.console.print(f"   Enriched {len(items)} items\n")
 
     async def _select_images(self, items: List[ContentItem]) -> None:

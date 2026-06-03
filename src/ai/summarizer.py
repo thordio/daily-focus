@@ -9,6 +9,12 @@ from ..models import ContentItem
 
 _CJK = r"[\u4e00-\u9fff\u3400-\u4dbf]"
 _ASCII = r"[A-Za-z0-9]"
+_CJK_RE = re.compile(_CJK)
+
+
+def _has_cjk(text: str) -> bool:
+    """Check if text contains any CJK (Chinese) characters."""
+    return bool(_CJK_RE.search(text))
 
 
 def _pangu(text: str) -> str:
@@ -321,6 +327,16 @@ class DailySummarizer:
         # title_en: try metadata first, then item.title
         title_en = str(meta.get("title_en") or item.title)
 
+        # Detect language mismatch: when language is "zh", flag if displayed text
+        # fields are non-empty but contain no CJK characters (AI returned English
+        # despite being asked for Chinese).
+        language_mismatch = False
+        if language == "zh":
+            _texts = [whats_new, why_it_matters, background, community_discussion]
+            _non_empty = [t for t in _texts if t.strip()]
+            if _non_empty and not any(_has_cjk(t) for t in _non_empty):
+                language_mismatch = True
+
         return {
             "index": index + 1,
             "title": str(meta.get(f"title_{language}") or item.title),
@@ -333,11 +349,13 @@ class DailySummarizer:
             "whats_new": whats_new,
             "why_it_matters": why_it_matters,
             "key_details": key_details,
+            "ai_reason": item.ai_reason or "",
             "background": background,
             "community_discussion": community_discussion,
             "tags": tags,
             "images": images,
             "references": references,
+            "language_mismatch": language_mismatch,
         }
 
     def get_structured_data(
@@ -347,6 +365,7 @@ class DailySummarizer:
         total_fetched: int,
         language: str = "en",
         period: str = "morning",
+        score_threshold: float = 7.0,
     ) -> Dict:
         """Return structured dict for Jinja2 HTML rendering.
 
@@ -363,6 +382,7 @@ class DailySummarizer:
             total_fetched: Total items fetched before filtering.
             language: Output language, either "en" or "zh".
             period: "morning" for 早报 or "evening" for 晚报.
+            score_threshold: AI score threshold used for filtering.
 
         Returns:
             A dict ready to pass to ``DailyRenderer.render_html()``.
@@ -390,16 +410,22 @@ class DailySummarizer:
                 "items": grouped.get(tab_key, []),
             }
 
+        # Alternate-language URL for the language switcher link
+        other_lang = "en" if language == "zh" else "zh"
+        alternate_url = f"{date}-{period}-{other_lang}.html"
+
         return {
             "date": date,
             "period": period,
             "language": language,
             "total_fetched": total_fetched,
             "selected_count": len(items),
+            "score_threshold": score_threshold,
             "next_update": next_update,
             "items": flat_items,  # backward-compat flat list
             "tabs": tabs,
             "active_tab": "ai-tech",
+            "alternate_url": alternate_url,
         }
 
     def _generate_empty_summary(self, date: str, total_fetched: int, labels: dict) -> str:

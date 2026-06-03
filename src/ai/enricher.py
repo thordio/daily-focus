@@ -197,17 +197,24 @@ class ContentEnricher:
             print(f"Warning: could not parse enrichment response for {item.id}, skipping enrichment")
             return
 
-        # Combine structured sub-fields into per-language detailed_summary
+        # Store structured fields individually per language
         for lang in ("en", "zh"):
             if result.get(f"title_{lang}"):
                 val = result[f"title_{lang}"]
                 item.metadata[f"title_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
 
+            # Store EACH field separately so summarizer can read them independently
             parts = []
             for field in ("whats_new", "why_it_matters", "key_details"):
-                text = result.get(f"{field}_{lang}", "").strip()
-                if text:
-                    parts.append(text)
+                val = result.get(f"{field}_{lang}")
+                if val is not None:
+                    text = val.get("text") or str(val) if isinstance(val, dict) else str(val)
+                    text = text.strip()
+                    if text:
+                        item.metadata[f"{field}_{lang}"] = text
+                        parts.append(text)
+
+            # Also build detailed_summary_{lang} for backward compat (Markdown path)
             if parts:
                 item.metadata[f"detailed_summary_{lang}"] = " ".join(parts)
 

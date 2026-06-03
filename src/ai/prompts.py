@@ -101,19 +101,20 @@ Provide EACH text field in BOTH English and Chinese. Use the following key namin
 Field definitions:
 0. **title** (one short phrase, ≤15 words): A clear, accurate headline for the news item.
 
-1. **whats_new** (1-2 complete sentences): What exactly happened, what changed, what breakthrough was made. Be specific — mention names, versions, numbers, dates when available.
+1. **whats_new** (3-4 complete sentences with specific details, numbers, and context): What exactly happened, what changed, what breakthrough was made. Be specific — mention names, versions, numbers, dates when available. Include concrete figures, milestones, or statistics that give the reader a precise understanding of the event.
 
-2. **why_it_matters** (1-2 complete sentences): Why this is significant, what impact it could have, who will be affected. Connect to the broader ecosystem or industry trends.
+2. **why_it_matters** (2-3 sentences connecting to broader trends and implications): Why this is significant, what impact it could have, who will be affected. Connect to the broader ecosystem or industry trends. Explain the strategic or market implications — who benefits, who loses, what changes as a result.
 
-3. **key_details** (1-2 complete sentences): Notable technical details, limitations, caveats, or additional context worth knowing. Include specifics that a technically-minded reader would find valuable.
+3. **key_details** (2-3 sentences with technical specifics): Notable technical details, limitations, caveats, or additional context worth knowing. Include specifics that a technically-minded reader would find valuable — architecture choices, performance numbers, benchmarks, or design tradeoffs.
 
-4. **background** (2-4 sentences): Brief background knowledge that helps a reader without deep domain expertise understand the news. Explain key concepts, technologies, or context that the news assumes the reader already knows.
+4. **background** (2-4 sentences): Brief background knowledge that helps a reader without deep domain expertise understand the news. Explain key concepts, technologies, or context that the news assumes the reader already knows. Go beyond surface definitions to provide useful context.
 
 5. **community_discussion** (1-3 sentences): If community comments are provided, summarize the overall sentiment and key viewpoints from the discussion — agreements, disagreements, concerns, additional insights, or notable counterarguments. If no comments are provided, return an empty string.
 
 **CRITICAL — Language rules (MUST follow):**
 - All *_en fields MUST be written in English.
 - All *_zh fields MUST be written in Simplified Chinese (简体中文). 绝对不能用英文写 _zh 字段的内容。Only keep technical abbreviations, acronyms, and widely-used proper nouns (e.g. "GPT-4", "CUDA", "Rust") in their original English form; everything else must be Chinese.
+- This is a HARD REQUIREMENT: even if the source article is entirely in English, all _zh fields must be Chinese translations. Do not output English text in any _zh field. 即使原文是英文, _zh 字段也必须是中文。
 
 Guidelines:
 - EVERY field (except community_discussion when no comments exist) must contain at least one complete sentence — no field may be empty or contain just a phrase
@@ -145,12 +146,12 @@ Respond with valid JSON only. Each _en field must be in English; each _zh field 
 {{
   "title_en": "<short headline in English, ≤15 words>",
   "title_zh": "<用中文写一个简短标题，不超过15个词>",
-  "whats_new_en": "<1-2 sentences in English>",
-  "whats_new_zh": "<用中文写1-2句话>",
-  "why_it_matters_en": "<1-2 sentences in English>",
-  "why_it_matters_zh": "<用中文写1-2句话>",
-  "key_details_en": "<1-2 sentences in English>",
-  "key_details_zh": "<用中文写1-2句话>",
+  "whats_new_en": "<3-4 sentences in English with specific details>",
+  "whats_new_zh": "<用中文写3-4句话，包含具体细节和数据>",
+  "why_it_matters_en": "<2-3 sentences in English connecting to broader trends>",
+  "why_it_matters_zh": "<用中文写2-3句话，联系更广泛的趋势和影响>",
+  "key_details_en": "<2-3 sentences in English with technical specifics>",
+  "key_details_zh": "<用中文写2-3句话，包含技术细节>",
   "background_en": "<2-4 sentences in English, or empty string>",
   "background_zh": "<用中文写2-4句话，或空字符串>",
   "community_discussion_en": "<1-3 sentences in English, or empty string>",

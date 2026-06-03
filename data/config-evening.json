@@ -2,15 +2,18 @@
   "version": "1.0",
   "ai": {
     "provider": "deepseek",
-    "model": "deepseek-chat",
+    "model": "deepseek-v4-pro",
     "base_url": "https://api.deepseek.com",
     "api_key_env": "DEEPSEEK_API_KEY",
     "temperature": 0.3,
     "max_tokens": 4096,
     "throttle_sec": 0,
-    "analysis_concurrency": 1,
-    "enrichment_concurrency": 1,
-    "languages": ["zh", "en"]
+    "analysis_concurrency": 5,
+    "enrichment_concurrency": 3,
+    "languages": [
+      "zh",
+      "en"
+    ]
   },
   "email": {
     "enabled": false,
@@ -27,15 +30,29 @@
     "hackernews": {
       "enabled": true,
       "fetch_top_stories": 30,
-      "min_score": 150
+      "min_score": 100
     },
     "rss": [
       {
         "name": "HuggingFace Daily Papers",
         "url": "https://huggingface.co/papers/feed.xml",
-        "enabled": true,
+        "enabled": false,
         "category": "ai-research",
         "topic": "ai-tech"
+      },
+      {
+        "name": "MarketWatch Top Stories",
+        "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+        "enabled": true,
+        "category": "business",
+        "topic": "economy"
+      },
+      {
+        "name": "SeekingAlpha All Articles",
+        "url": "https://seekingalpha.com/feed.xml",
+        "enabled": true,
+        "category": "investing",
+        "topic": "economy"
       },
       {
         "name": "ArXiv cs.AI",
@@ -150,8 +167,18 @@
     "ossinsight": {
       "enabled": true,
       "period": "past_24_hours",
-      "languages": ["All", "Python", "TypeScript", "Rust"],
-      "keywords": ["ai", "machine-learning", "llm", "deep-learning"],
+      "languages": [
+        "All",
+        "Python",
+        "TypeScript",
+        "Rust"
+      ],
+      "keywords": [
+        "ai",
+        "machine-learning",
+        "llm",
+        "deep-learning"
+      ],
       "min_stars": 10,
       "max_items": 30
     },

@@ -345,6 +345,7 @@ def test_tab_render_fallback_flat_when_no_tabs() -> None:
                 "whats_new": "Test",
                 "why_it_matters": "Test",
                 "key_details": "",
+                "ai_reason": "",
                 "background": "",
                 "community_discussion": "",
                 "tags": [],
