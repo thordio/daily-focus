@@ -165,6 +165,7 @@ class GitHubScraper(BaseScraper):
             metadata={
                 "event_type": event_type,
                 "repo": repo_name,
+                "topic": "ai-tech",
             }
         )
 
@@ -212,6 +213,7 @@ class GitHubScraper(BaseScraper):
                         "repo": f"{owner}/{repo}",
                         "tag": release["tag_name"],
                         "prerelease": release.get("prerelease", False),
+                        "topic": "ai-tech",
                     }
                 )
                 items.append(item)

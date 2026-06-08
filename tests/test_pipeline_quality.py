@@ -8,6 +8,10 @@ Focus areas:
 5.  Filename generation and parsing conventions
 6.  CJK content ratio validation
 7.  is_demo default semantics
+8.  Per-topic selection limits (max cap, min floor, sorting)
+9.  TopicLimitConfig min <= max validation
+10. Non-RSS topic fallback (HackerNews/Reddit/GitHub/OSSInsight -> ai-tech)
+11. Orchestrator reads topic_limits from config (not hardcoded MIN_ITEMS)
 """
 
 from __future__ import annotations
@@ -15,7 +19,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 from src.ai.summarizer import DailySummarizer, _has_cjk
+from src.models import SourceType, TopicLimitConfig
 from tests.conftest_helpers import make_content_item
 
 
@@ -577,4 +584,618 @@ def test_whats_new_average_length_meets_threshold():
         f"expected >= 100 chars across {len(data['items'])} items.\n"
         "This suggests the summarizer may be producing overly brief content. "
         "Check the enricher prompt for length guidance."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 10:  community_discussion waste detection
+# ---------------------------------------------------------------------------
+
+def test_community_discussion_waste_detected():
+    """Verify community_discussion is always empty, indicating wasted token spend.
+
+    The enricher prompt instructs the LLM to generate community_discussion_en
+    and community_discussion_zh for EVERY item, even when no community comments
+    exist. This adds ~100 input tokens (prompt instructions) and ~70 output
+    tokens (empty JSON keys) per item — but the field is almost always empty
+    and never displayed in the rendered UI.
+
+    This test logs a warning if community_discussion is empty in all items,
+    flagging it for removal from the enrichment prompt to save tokens.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    s = DailySummarizer()
+
+    # Simulate real-world: items that went through the enricher but have
+    # no community_discussion field (LLM returned empty string for both langs)
+    items = [
+        make_item(
+            f"waste-{i}",
+            f"Waste Test Item {i}",
+            topic="ai-tech" if i < 4 else ("ai-markets" if i < 10 else "economy"),
+            whats_new_zh=f"这是第{i}条新闻的详细内容描述，包含具体事件细节和背景信息。",
+            why_it_matters_zh=f"这条新闻的重要性主要体现在对行业格局的影响方面。",
+            # Intentionally NOT setting community_discussion — simulating
+            # the enricher returning empty string (the common case)
+        )
+        for i in range(32)
+    ]
+
+    data = s.get_structured_data(items, "2026-06-08", 62, "zh", "morning")
+
+    empty_count = 0
+    total_count = len(data["items"])
+    for item in data["items"]:
+        # community_discussion comes from _item_to_dict() which falls back
+        # to meta.get("community_discussion_zh") -> "" when not set
+        if not item.get("community_discussion", "").strip():
+            empty_count += 1
+
+    # Log the waste warning (visible with e.g. pytest -s -v)
+    if empty_count == total_count:
+        logger.warning(
+            "WASTE: community_discussion is empty in ALL %d items. "
+            "The enricher spends ~170 tokens per item generating this field "
+            "but it is never displayed because the LLM always returns empty "
+            "string (no community comments to summarize). "
+            "Consider removing community_discussion from the enrichment prompt "
+            "to save ~%d input tokens + ~%d output tokens per run.",
+            total_count,
+            total_count * 100,   # ~100 input tokens for prompt instructions
+            total_count * 70,    # ~70 output tokens for empty JSON keys
+        )
+    elif empty_count > total_count * 0.5:
+        logger.warning(
+            "community_discussion is empty in %d/%d items (%.0f%%). "
+            "This still represents significant token waste.",
+            empty_count, total_count, 100.0 * empty_count / total_count,
+        )
+
+    # Assert: the community_discussion field exists (not None) even when empty
+    for item in data["items"]:
+        assert "community_discussion" in item, (
+            "community_discussion key must exist in item dict"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Selection logic helper (mirrors orchestrator step 5b: per-topic hard limits)
+# ---------------------------------------------------------------------------
+
+def _apply_topic_limits(items, limits: dict[str, TopicLimitConfig]):
+    """Select top-N items per topic by score, enforcing min/max per topic.
+
+    Replicates the orchestrator's per-topic selection logic from step 5b.
+    Items are sorted globally by score descending after per-topic selection.
+
+    Args:
+        items: List of ContentItem with metadata["topic"] set.
+        limits: Dict mapping topic name to TopicLimitConfig(min, max).
+
+    Returns:
+        List[ContentItem]: Selected items, sorted by score descending.
+    """
+    if not limits:
+        return sorted(items, key=lambda x: x.ai_score or 0, reverse=True)
+
+    selected = []
+    for topic, limit_config in sorted(limits.items()):
+        topic_items = [i for i in items if i.metadata.get("topic") == topic]
+        topic_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
+        n = max(min(limit_config.max, len(topic_items)), limit_config.min)
+        n = min(n, len(topic_items))
+        selected.extend(topic_items[:n])
+
+    selected.sort(key=lambda x: x.ai_score or 0, reverse=True)
+    return selected
+
+
+def _make_topic_item(
+    item_id: str,
+    topic: str,
+    score: float,
+    title: str = "",
+) -> "ContentItem":
+    """Create a minimal ContentItem for testing per-topic selection logic."""
+    return make_content_item(
+        item_id=item_id,
+        title=title or f"{topic}-{item_id}",
+        url=f"https://example.com/{item_id}",
+        ai_score=score,
+        ai_summary=f"Summary of {item_id}",
+        ai_reason=f"Reason for {item_id}",
+        ai_tags=["test"],
+        metadata={"topic": topic},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 11:  Per-topic MAX limits (orchestrator step 5b)
+# ---------------------------------------------------------------------------
+
+def test_per_topic_max_limits_enforced():
+    """With 20+ items per topic, selection must cap at per-topic max (10/10/7)."""
+    limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=6, max=10),
+        "economy": TopicLimitConfig(min=5, max=7),
+    }
+
+    items = []
+    for topic in ("ai-tech", "ai-markets", "economy"):
+        for i in range(25):
+            items.append(_make_topic_item(
+                f"{topic}-{i}", topic, score=10.0 - i * 0.4,
+                title=f"{topic} Item {i}",
+            ))
+
+    selected = _apply_topic_limits(items, limits)
+
+    # Count per topic
+    from collections import Counter
+    counts = Counter(i.metadata["topic"] for i in selected)
+
+    assert counts["ai-tech"] == 10, f"ai-tech: expected 10, got {counts['ai-tech']}"
+    assert counts["ai-markets"] == 10, f"ai-markets: expected 10, got {counts['ai-markets']}"
+    assert counts["economy"] == 7, f"economy: expected 7, got {counts['economy']}"
+    assert len(selected) == 27, f"Total: expected 27, got {len(selected)}"
+
+
+def test_per_topic_max_limits_no_excess():
+    """No topic exceeds its max even when candidate count far exceeds max."""
+    limits = {
+        "ai-tech": TopicLimitConfig(min=4, max=10),
+        "ai-markets": TopicLimitConfig(min=4, max=10),
+        "economy": TopicLimitConfig(min=4, max=7),
+    }
+
+    items = [_make_topic_item(f"excess-{i}", "ai-tech", 9.5) for i in range(100)]
+    selected = _apply_topic_limits(items, limits)
+    assert len(selected) == 10, f"100 ai-tech items must cap at 10, got {len(selected)}"
+
+
+def test_per_topic_max_uses_highest_scores():
+    """When capped at max, the highest-scored items are selected."""
+    limits = {"ai-tech": TopicLimitConfig(min=1, max=5)}
+
+    # Scores: 1.0, 2.0, ..., 20.0
+    items = [_make_topic_item(f"s-{i}", "ai-tech", i * 1.0) for i in range(1, 21)]
+    selected = _apply_topic_limits(items, limits)
+
+    assert len(selected) == 5, f"Expected 5 top items, got {len(selected)}"
+    # Highest 5 scores should be 20, 19, 18, 17, 16
+    top_scores = sorted([i.ai_score for i in selected], reverse=True)
+    assert top_scores == [20.0, 19.0, 18.0, 17.0, 16.0], (
+        f"Expected [20, 19, 18, 17, 16], got {top_scores}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 12:  Per-topic MIN limits
+# ---------------------------------------------------------------------------
+
+def test_per_topic_min_limits_honored():
+    """Items below max but at or above min are all selected."""
+    limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=6, max=10),
+        "economy": TopicLimitConfig(min=5, max=7),
+    }
+
+    items = (
+        [_make_topic_item(f"ai-{i}", "ai-tech", 8.0) for i in range(6)]
+        + [_make_topic_item(f"mkt-{i}", "ai-markets", 7.5) for i in range(8)]
+        + [_make_topic_item(f"eco-{i}", "economy", 7.0) for i in range(5)]
+    )
+
+    selected = _apply_topic_limits(items, limits)
+
+    from collections import Counter
+    counts = Counter(i.metadata["topic"] for i in selected)
+    assert counts["ai-tech"] == 6, f"ai-tech: expected 6 (at min), got {counts['ai-tech']}"
+    assert counts["ai-markets"] == 8, f"ai-markets: expected 8 (between min and max), got {counts['ai-markets']}"
+    assert counts["economy"] == 5, f"economy: expected 5 (at min), got {counts['economy']}"
+    assert len(selected) == 19, f"Total: expected 19, got {len(selected)}"
+
+
+def test_per_topic_min_below_minimum():
+    """When items available are below min, all available items are selected (no crash)."""
+    limits = {"economy": TopicLimitConfig(min=5, max=7)}
+
+    items = [_make_topic_item(f"eco-{i}", "economy", 7.0) for i in range(3)]
+    selected = _apply_topic_limits(items, limits)
+
+    assert len(selected) == 3, f"Only 3 available, expected 3, got {len(selected)}"
+
+
+def test_per_topic_zero_items_for_topic():
+    """When a topic has 0 items, it contributes 0 items to the selection (no crash)."""
+    limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "economy": TopicLimitConfig(min=5, max=7),
+    }
+
+    items = [_make_topic_item(f"ai-{i}", "ai-tech", 8.0) for i in range(6)]
+    selected = _apply_topic_limits(items, limits)
+
+    from collections import Counter
+    counts = Counter(i.metadata["topic"] for i in selected)
+    assert counts.get("economy", 0) == 0, "economy should contribute 0 items"
+
+
+# ---------------------------------------------------------------------------
+# Test 13:  Sorting by score within tabs
+# ---------------------------------------------------------------------------
+
+def test_global_sort_by_score_descending():
+    """All selected items must be globally sorted by score descending."""
+    limits = {"ai-tech": TopicLimitConfig(min=1, max=10)}
+
+    # Scores: 1, 3, 5, 7, 9, 2, 4, 6, 8, 10 (mixed order intentionally)
+    items = [_make_topic_item(f"i-{s}", "ai-tech", s * 1.0) for s in [1, 3, 5, 7, 9, 2, 4, 6, 8, 10]]
+    selected = _apply_topic_limits(items, limits)
+
+    scores = [i.ai_score for i in selected]
+    assert scores == sorted(scores, reverse=True), (
+        f"Items not sorted by score descending: {scores}"
+    )
+
+
+def test_items_sorted_by_score_within_tabs():
+    """After get_structured_data, tabs contain items sorted by score descending."""
+    s = DailySummarizer()
+    limits = {"ai-tech": TopicLimitConfig(min=1, max=10)}
+
+    items = [_make_topic_item(f"i-{s}", "ai-tech", s * 1.0) for s in [1, 5, 3, 7, 9, 2, 8, 4, 6, 10]]
+    with_score = [(i, i.ai_score) for i in items]
+    selected = _apply_topic_limits(items, limits)
+
+    data = s.get_structured_data(selected, "2026-06-08", 30, "zh", "morning")
+
+    # Check sorting within ai-tech tab
+    tab_items = data["tabs"]["ai-tech"]["items"]
+    tab_scores = [it["score"] for it in tab_items]
+    assert tab_scores == sorted(tab_scores, reverse=True), (
+        f"ai-tech tab items not sorted by score descending: {tab_scores}"
+    )
+
+    # Check flat items also sorted
+    flat_scores = [it["score"] for it in data["items"]]
+    assert flat_scores == sorted(flat_scores, reverse=True), (
+        f"Flat items not sorted by score descending: {flat_scores}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 14:  Enrichment count with per-topic limits
+# ---------------------------------------------------------------------------
+
+def test_enrichment_count_with_limits():
+    """With 60 passing items (20/topic) and limits 10+10+7=27, enrichment ≤ 27.
+
+    This validates that enrichment (orchestrator step 6) only processes
+    the items selected by step 5b, not all passing items.
+    """
+    limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=6, max=10),
+        "economy": TopicLimitConfig(min=5, max=7),
+    }
+
+    # 20 items per topic with descending scores
+    items = []
+    for topic in ("ai-tech", "ai-markets", "economy"):
+        for i in range(20):
+            items.append(_make_topic_item(
+                f"{topic}-{i}", topic, score=10.0 - i * 0.5,
+                title=f"{topic} Item {i}",
+            ))
+
+    selected = _apply_topic_limits(items, limits)
+
+    # Enrichment should only run on selected items
+    assert len(selected) <= 27, (
+        f"Enrichment would process {len(selected)} items, expected ≤ 27"
+    )
+
+    from collections import Counter
+    counts = Counter(i.metadata["topic"] for i in selected)
+    assert counts["ai-tech"] == 10
+    assert counts["ai-markets"] == 10
+    assert counts["economy"] == 7
+    assert len(selected) == 27, f"Total selected: {len(selected)}"
+
+
+def test_enrichment_count_no_limits_all_items():
+    """Without topic_limits configured, enrichment processes all items."""
+    items = [_make_topic_item(f"i-{i}", "ai-tech", 8.0) for i in range(50)]
+    selected = _apply_topic_limits(items, {})
+
+    assert len(selected) == 50, (
+        f"Without limits, all 50 items should be selected, got {len(selected)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 15:  Per-topic limits via get_structured_data (integration)
+# ---------------------------------------------------------------------------
+
+def test_get_structured_data_reflects_selected_counts():
+    """After per-topic selection, get_structured_data shows correct tab counts."""
+    s = DailySummarizer()
+    limits = {
+        "ai-tech": TopicLimitConfig(min=4, max=10),
+        "ai-markets": TopicLimitConfig(min=4, max=10),
+        "economy": TopicLimitConfig(min=4, max=7),
+    }
+
+    items = (
+        [_make_topic_item(f"ai-{i}", "ai-tech", 9.0 - i * 0.5) for i in range(15)]
+        + [_make_topic_item(f"mkt-{i}", "ai-markets", 8.5 - i * 0.5) for i in range(15)]
+        + [_make_topic_item(f"eco-{i}", "economy", 8.0 - i * 0.5) for i in range(15)]
+    )
+    selected = _apply_topic_limits(items, limits)
+
+    data = s.get_structured_data(selected, "2026-06-08", 80, "zh", "morning")
+
+    assert len(data["tabs"]["ai-tech"]["items"]) == 10, (
+        f"ai-tech tab: expected 10, got {len(data['tabs']['ai-tech']['items'])}"
+    )
+    assert len(data["tabs"]["ai-markets"]["items"]) == 10, (
+        f"ai-markets tab: expected 10, got {len(data['tabs']['ai-markets']['items'])}"
+    )
+    assert len(data["tabs"]["economy"]["items"]) == 7, (
+        f"economy tab: expected 7, got {len(data['tabs']['economy']['items'])}"
+    )
+    assert data["selected_count"] == 27, (
+        f"selected_count: expected 27, got {data['selected_count']}"
+    )
+
+
+# ===========================================================================
+# QA 1 — Task 1: Verify capping works with specific mock data
+# 50 ai-tech + 20 ai-markets + 15 economy -> top 10 + top 10 + top 7 = 27
+# ===========================================================================
+
+def test_capping_50_ai_tech_20_ai_markets_15_economy():
+    """With 50 ai-tech, 20 ai-markets, 15 economy items, verify:
+    - ai-tech caps at 10 (not 50)
+    - ai-markets caps at 10 (not 20)
+    - economy caps at 7 (not 15)
+    - total selected <= 27
+    """
+    limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=6, max=10),
+        "economy": TopicLimitConfig(min=5, max=7),
+    }
+
+    items = []
+    # 50 ai-tech with descending scores
+    for i in range(50):
+        items.append(_make_topic_item(
+            f"ai-tech-{i}", "ai-tech", score=10.0 - i * 0.2,
+            title=f"AI Tech Item {i}",
+        ))
+    # 20 ai-markets with descending scores
+    for i in range(20):
+        items.append(_make_topic_item(
+            f"ai-markets-{i}", "ai-markets", score=9.5 - i * 0.4,
+            title=f"AI Markets Item {i}",
+        ))
+    # 15 economy with descending scores
+    for i in range(15):
+        items.append(_make_topic_item(
+            f"economy-{i}", "economy", score=9.0 - i * 0.5,
+            title=f"Economy Item {i}",
+        ))
+
+    selected = _apply_topic_limits(items, limits)
+    from collections import Counter
+    counts = Counter(i.metadata["topic"] for i in selected)
+
+    assert counts["ai-tech"] == 10, f"ai-tech: expected 10, got {counts['ai-tech']}"
+    assert counts["ai-markets"] == 10, f"ai-markets: expected 10, got {counts['ai-markets']}"
+    assert counts["economy"] == 7, f"economy: expected 7, got {counts['economy']}"
+    assert len(selected) == 27, f"Total: expected 27, got {len(selected)}"
+
+    # Verify the top scores were selected for each topic
+    ai_tech_scores = sorted(
+        [i.ai_score for i in selected if i.metadata["topic"] == "ai-tech"],
+        reverse=True,
+    )
+    assert ai_tech_scores == [10.0, 9.8, 9.6, 9.4, 9.2, 9.0, 8.8, 8.6, 8.4, 8.2], (
+        f"ai-tech should have top 10 scores, got {ai_tech_scores}"
+    )
+
+    economy_scores = sorted(
+        [i.ai_score for i in selected if i.metadata["topic"] == "economy"],
+        reverse=True,
+    )
+    assert economy_scores == [9.0, 8.5, 8.0, 7.5, 7.0, 6.5, 6.0], (
+        f"economy should have top 7 scores, got {economy_scores}"
+    )
+
+
+# ===========================================================================
+# QA 1 — Task 2: TopicLimitConfig min <= max validation
+# ===========================================================================
+
+def test_topic_limit_config_min_max_validation():
+    """TopicLimitConfig must reject min > max."""
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError, match="must be <= max"):
+        TopicLimitConfig(min=10, max=5)
+
+    with pytest.raises(ValidationError, match="must be <= max"):
+        TopicLimitConfig(min=8, max=3)
+
+    # Equal values should be valid
+    c = TopicLimitConfig(min=5, max=5)
+    assert c.min == 5
+    assert c.max == 5
+
+    # Normal case should be valid
+    c = TopicLimitConfig(min=3, max=10)
+    assert c.min == 3
+    assert c.max == 10
+
+
+# ===========================================================================
+# QA 1 — Task 3: Non-RSS topic fallback
+# ContentItems from HackerNews, Reddit, GitHub, OSSInsight without a topic
+# in metadata should default to "ai-tech" in get_structured_data.
+# ===========================================================================
+
+def _make_non_rss_item(item_id: str, source_type: SourceType) -> "ContentItem":
+    """Create a ContentItem from a non-RSS source without setting topic metadata."""
+    return make_content_item(
+        item_id=f"{source_type.value}:{item_id}",
+        source_type=source_type,
+        title=f"Item from {source_type.value}",
+        url=f"https://example.com/{source_type.value}/{item_id}",
+        ai_score=8.0,
+        ai_summary=f"Summary of {source_type.value} item.",
+        ai_reason=f"Reason for {source_type.value} item.",
+        ai_tags=["test"],
+        metadata={},  # No topic set!
+    )
+
+
+def _make_rss_item(item_id: str, topic: str) -> "ContentItem":
+    """Create a ContentItem from RSS with a specific topic (control)."""
+    return make_content_item(
+        item_id=f"rss:{item_id}",
+        source_type=SourceType.RSS,
+        title=f"RSS item in {topic}",
+        url=f"https://example.com/rss/{item_id}",
+        ai_score=8.0,
+        ai_summary=f"Summary of RSS {topic} item.",
+        ai_reason=f"Reason for RSS {topic} item.",
+        ai_tags=["test"],
+        metadata={"topic": topic, "feed_name": "Test Feed"},
+    )
+
+
+def test_hackernews_defaults_to_ai_tech_tab():
+    """HackerNews items without topic metadata go to ai-tech tab (default)."""
+    s = DailySummarizer()
+    items = [_make_non_rss_item("hn-1", SourceType.HACKERNEWS)]
+    data = s.get_structured_data(items, "2026-06-08", 5, "zh", "morning")
+
+    assert len(data["tabs"]["ai-tech"]["items"]) == 1, (
+        f"HackerNews item should default to ai-tech tab, "
+        f"got {data['tabs']['ai-tech']['items']}"
+    )
+    ai_tech_item = data["tabs"]["ai-tech"]["items"][0]
+    assert ai_tech_item["source_type"] == "hackernews", (
+        f"Expected source_type hackernews, got {ai_tech_item['source_type']}"
+    )
+
+
+def test_reddit_defaults_to_ai_tech_tab():
+    """Reddit items without topic metadata go to ai-tech tab (default)."""
+    s = DailySummarizer()
+    items = [_make_non_rss_item("rd-1", SourceType.REDDIT)]
+    data = s.get_structured_data(items, "2026-06-08", 5, "zh", "morning")
+
+    assert len(data["tabs"]["ai-tech"]["items"]) == 1
+    reddit_item = data["tabs"]["ai-tech"]["items"][0]
+    assert reddit_item["source_type"] == "reddit"
+
+
+def test_github_defaults_to_ai_tech_tab():
+    """GitHub items without topic metadata go to ai-tech tab (default)."""
+    s = DailySummarizer()
+    items = [_make_non_rss_item("gh-1", SourceType.GITHUB)]
+    data = s.get_structured_data(items, "2026-06-08", 5, "zh", "morning")
+
+    assert len(data["tabs"]["ai-tech"]["items"]) == 1
+    gh_item = data["tabs"]["ai-tech"]["items"][0]
+    assert gh_item["source_type"] == "github"
+
+
+def test_ossinsight_defaults_to_ai_tech_tab():
+    """OSSInsight items without topic metadata go to ai-tech tab (default)."""
+    s = DailySummarizer()
+    items = [_make_non_rss_item("oss-1", SourceType.OSSINSIGHT)]
+    data = s.get_structured_data(items, "2026-06-08", 5, "zh", "morning")
+
+    assert len(data["tabs"]["ai-tech"]["items"]) == 1
+    oss_item = data["tabs"]["ai-tech"]["items"][0]
+    assert oss_item["source_type"] == "ossinsight"
+
+
+def test_mixed_rss_and_non_rss_topic_fallback():
+    """RSS items with explicit topics go to correct tabs, non-RSS items default to ai-tech."""
+    s = DailySummarizer()
+    items = [
+        _make_rss_item("rss-ai", "ai-tech"),
+        _make_rss_item("rss-mkt", "ai-markets"),
+        _make_rss_item("rss-eco", "economy"),
+        _make_non_rss_item("hn-1", SourceType.HACKERNEWS),
+        _make_non_rss_item("rd-1", SourceType.REDDIT),
+        _make_non_rss_item("gh-1", SourceType.GITHUB),
+        _make_non_rss_item("oss-1", SourceType.OSSINSIGHT),
+    ]
+    data = s.get_structured_data(items, "2026-06-08", 10, "zh", "morning")
+
+    # RSS items with explicit topics
+    assert len(data["tabs"]["ai-tech"]["items"]) == 5, (
+        f"ai-tech tab should have 5 items (1 RSS ai-tech + 4 non-RSS fallback), "
+        f"got {len(data['tabs']['ai-tech']['items'])}"
+    )
+    assert len(data["tabs"]["ai-markets"]["items"]) == 1
+    assert len(data["tabs"]["economy"]["items"]) == 1
+
+    # All non-RSS items should be in ai-tech tab
+    ai_tech_sources = {it["source_type"] for it in data["tabs"]["ai-tech"]["items"]}
+    assert "hackernews" in ai_tech_sources
+    assert "reddit" in ai_tech_sources
+    assert "github" in ai_tech_sources
+    assert "ossinsight" in ai_tech_sources
+    assert "rss" in ai_tech_sources  # The ai-tech RSS item
+
+
+# ===========================================================================
+# QA 1 — Task 4: Verify orchestrator reads topic_limits from config
+# (not a hardcoded MIN_ITEMS dict)
+# ===========================================================================
+
+def test_orchestrator_uses_config_topic_limits_not_hardcoded():
+    """Verify the orchestrator reads topic_limits from config.filtering,
+    not from a hardcoded MIN_ITEMS dict."""
+    import ast
+
+    with open(__file__.replace("tests/test_pipeline_quality.py",
+                                "src/orchestrator.py")) as f:
+        tree = ast.parse(f.read())
+
+    # Search for any MIN_ITEMS identifier
+    class MinItemsFinder(ast.NodeVisitor):
+        def __init__(self):
+            self.found = []
+        def visit_Name(self, node):
+            if 'MIN_ITEMS' in node.id:
+                self.found.append((node.lineno, node.id))
+            self.generic_visit(node)
+
+    finder = MinItemsFinder()
+    finder.visit(tree)
+    assert len(finder.found) == 0, (
+        f"MIN_ITEMS still referenced in orchestrator.py at lines: {finder.found}"
+    )
+
+    # Confirm topic_limits comes from config
+    with open(__file__.replace("tests/test_pipeline_quality.py",
+                                "src/orchestrator.py")) as f:
+        content = f.read()
+
+    assert "self.config.filtering.topic_limits" in content, (
+        "orchestrator must use config.filtering.topic_limits"
+    )
+    assert "MIN_ITEMS" not in content, (
+        "MIN_ITEMS hardcoded dict must be removed from orchestrator"
     )

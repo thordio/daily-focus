@@ -131,7 +131,7 @@ class TelegramScraper(BaseScraper):
             content=text,
             author=channel,
             published_at=published_at,
-            metadata={"msg_url": msg_url, "channel": channel},
+            metadata={"msg_url": msg_url, "channel": channel, "topic": "ai-tech"},
         )
 
     @staticmethod

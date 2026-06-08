@@ -17,7 +17,6 @@ from ddgs import DDGS
 
 from .client import AIClient
 from .prompts import (
-    CONCEPT_EXTRACTION_SYSTEM, CONCEPT_EXTRACTION_USER,
     CONTENT_ENRICHMENT_SYSTEM, CONTENT_ENRICHMENT_USER,
 )
 from .utils import parse_json_response
@@ -26,6 +25,11 @@ from ..models import ContentItem
 
 class ContentEnricher:
     """Enriches high-scoring content items with background knowledge."""
+
+    # Items at or above this score get web search + full background enrichment.
+    # Items below it skip web search (saving ~9s + API cost) and get enrichment
+    # from article content alone.
+    _MIN_SCORE_FOR_WEB_SEARCH = 7.0
 
     def __init__(self, ai_client: AIClient):
         self.client = ai_client
@@ -98,35 +102,37 @@ class ContentEnricher:
         """
         return parse_json_response(response)
 
-    async def _extract_concepts(self, item: ContentItem, content_text: str) -> List[str]:
-        """Ask AI to identify concepts that need explanation.
+    @staticmethod
+    def _build_enrichment_schema(languages: List[str]) -> str:
+        """Build JSON schema for enrichment prompt based on configured languages.
+
+        Only includes fields for languages that are configured, reducing output
+        tokens when a single language suffices.
 
         Args:
-            item: Content item
-            content_text: Extracted content text
+            languages: List of language codes (e.g. ["en"], ["zh"], ["en", "zh"])
 
         Returns:
-            List of search queries for concepts that need explanation
+            str: JSON schema for the enrichment prompt
         """
-        user_prompt = CONCEPT_EXTRACTION_USER.format(
-            title=item.title,
-            summary=item.ai_summary or item.title,
-            tags=", ".join(item.ai_tags) if item.ai_tags else "",
-            content=content_text[:1000],
-        )
-
-        try:
-            response = await self.client.complete(
-                system=CONCEPT_EXTRACTION_SYSTEM,
-                user=user_prompt,
-            )
-            result = self._parse_json_response(response)
-            if result is None:
-                return []
-            queries = result.get("queries", [])
-            return queries[:3]
-        except Exception:
-            return []
+        fields = ["title", "whats_new", "why_it_matters", "key_details", "background"]
+        lines = ["{"]
+        for lang in languages:
+            for field in fields:
+                if field == "title":
+                    desc = "<short headline in English, ≤15 words>" if lang == "en" else "<用中文写一个简短标题，不超过15个词>"
+                elif field == "whats_new":
+                    desc = "<3-4 sentences with specific details>" if lang == "en" else "<用中文写3-4句话，包含具体细节和数据>"
+                elif field == "why_it_matters":
+                    desc = "<2-3 sentences connecting to broader trends>" if lang == "en" else "<用中文写2-3句话，联系更广泛的趋势和影响>"
+                elif field == "key_details":
+                    desc = "<2-3 sentences with technical specifics>" if lang == "en" else "<用中文写2-3句话，包含技术细节>"
+                elif field == "background":
+                    desc = "<2-4 sentences in English, or empty string>" if lang == "en" else "<用中文写2-4句话，或空字符串>"
+                lines.append(f'  "{field}_{lang}": "{desc}",')
+        lines.append('  "sources": ["<url from search results>", "..."]')
+        lines.append("}")
+        return "\n".join(lines)
 
     @retry(
         stop=stop_after_attempt(3),
@@ -135,10 +141,13 @@ class ContentEnricher:
     async def _enrich_item(self, item: ContentItem) -> None:
         """Enrich a single item with background knowledge.
 
-        Steps:
-        1. Ask AI which concepts in the news need explanation
-        2. Search the web for those concepts
-        3. Ask AI to generate background based on search results
+        For items below ``_MIN_SCORE_FOR_WEB_SEARCH`` (7.0), the web search is
+        skipped entirely — enrichment is generated from article content alone.
+        This saves ~9s of web search time for borderline-interesting items.
+
+        For items at or above the threshold:
+        1. Search the web using the item title and tags (parallelized, no LLM call)
+        2. Ask AI to generate background based on article content + search results
 
         Args:
             item: Content item to enrich (modified in-place via metadata)
@@ -154,34 +163,52 @@ class ContentEnricher:
             else:
                 content_text = item.content[:4000]
 
-        # Step 1: AI identifies concepts to explain
-        queries = await self._extract_concepts(item, content_text)
+        # Decide whether this item warrants the cost of web search
+        score = item.ai_score or 0.0
+        needs_web_search = score >= self._MIN_SCORE_FOR_WEB_SEARCH
 
-        # Step 2: Search web for each concept
+        # Web search: use item title + tags as queries (no separate LLM call needed)
         all_results = []
-        web_sections = []
-        for query in queries:
-            results = await self._web_search(query)
-            all_results.extend(results)
-            if results:
-                lines = [f"- [{r['title']}]({r['url']}): {r['body']}" for r in results]
-                web_sections.append(f"**{query}:**\n" + "\n".join(lines))
-        web_context = "\n\n".join(web_sections) if web_sections else ""
+        web_context = ""
+        available_urls = {}
 
-        # Index of available URLs for citation validation
-        available_urls = {r["url"]: r["title"] for r in all_results if r.get("url")}
+        if needs_web_search:
+            queries = [q for q in [item.title, ", ".join(item.ai_tags)] if q]
+            if queries:
+                search_results = await asyncio.gather(
+                    *(self._web_search(query) for query in queries),
+                    return_exceptions=True,
+                )
+                web_sections = []
+                for query, results in zip(queries, search_results):
+                    if isinstance(results, Exception):
+                        continue
+                    all_results.extend(results)
+                    if results:
+                        lines = [f"- [{r['title']}]({r['url']}): {r['body']}" for r in results]
+                        web_sections.append(f"**{query}:**\n" + "\n".join(lines))
+                web_context = "\n\n".join(web_sections) if web_sections else ""
+                available_urls = {r["url"]: r["title"] for r in all_results if r.get("url")}
 
-        # Step 3: AI generates background grounded in search results
+        # Determine which languages to generate
+        config = getattr(self.client, "config", None)
+        languages = getattr(config, "languages", ["en"])
+
+        # Build the JSON schema dynamically based on configured languages
+        json_schema = self._build_enrichment_schema(languages)
+
+        # Step 3: AI generates enrichment grounded in article content (and web search if available)
         user_prompt = CONTENT_ENRICHMENT_USER.format(
             title=item.title,
             url=str(item.url),
             summary=item.ai_summary or item.title,
-            score=item.ai_score or 0,
+            score=score,
             reason=item.ai_reason or "",
             tags=", ".join(item.ai_tags) if item.ai_tags else "",
             content=content_text,
             comments_section=f"\n**Community Comments:**\n{comments_text}" if comments_text else "",
             web_context=web_context or "No web search results available.",
+            json_schema=json_schema,
         )
 
         response = await self.client.complete(
@@ -198,7 +225,7 @@ class ContentEnricher:
             return
 
         # Store structured fields individually per language
-        for lang in ("en", "zh"):
+        for lang in languages:
             if result.get(f"title_{lang}"):
                 val = result[f"title_{lang}"]
                 item.metadata[f"title_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
@@ -222,10 +249,6 @@ class ContentEnricher:
                 val = result[f"background_{lang}"]
                 item.metadata[f"background_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
 
-            if result.get(f"community_discussion_{lang}"):
-                val = result[f"community_discussion_{lang}"]
-                item.metadata[f"community_discussion_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
-
         # Store citation sources — only URLs that actually came from our search results
         if result.get("sources") and available_urls:
             valid = [
@@ -239,4 +262,3 @@ class ContentEnricher:
         # Backward-compatible fallback fields (English as default)
         item.metadata["detailed_summary"] = item.metadata.get("detailed_summary_en", "")
         item.metadata["background"] = item.metadata.get("background_en", "")
-        item.metadata["community_discussion"] = item.metadata.get("community_discussion_en", "")

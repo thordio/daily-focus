@@ -125,6 +125,7 @@ class OSSInsightScraper(BaseScraper):
                 "period": self.cfg.period,
                 "collection_names": collections,
                 "description": description,
+                "topic": "ai-tech",
             },
         )
 

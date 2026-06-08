@@ -152,6 +152,7 @@ class RedditScraper(BaseScraper):
                         "flair": None,
                         "discussion_url": link,
                         "fallback": "rss",
+                        "topic": "ai-tech",
                     },
                 )
             )
@@ -321,6 +322,7 @@ class RedditScraper(BaseScraper):
                 "is_self": is_self,
                 "flair": post.get("link_flair_text"),
                 "discussion_url": discussion_url,
+                "topic": "ai-tech",
             },
         )
 

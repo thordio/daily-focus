@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
-from pydantic import BaseModel, HttpUrl, Field, field_validator
+from pydantic import BaseModel, HttpUrl, Field, field_validator, model_validator
 
 
 class SourceType(str, Enum):
@@ -310,11 +310,27 @@ class EmailConfig(BaseModel):
     enabled: bool = False
 
 
+class TopicLimitConfig(BaseModel):
+    """Per-topic hard limit configuration."""
+
+    min: int = 4
+    max: int = 10
+
+    @model_validator(mode="after")
+    def validate_min_max(self) -> "TopicLimitConfig":
+        if self.min > self.max:
+            raise ValueError(
+                f"min ({self.min}) must be <= max ({self.max})"
+            )
+        return self
+
+
 class FilteringConfig(BaseModel):
     """Content filtering configuration."""
 
     ai_score_threshold: float = 7.0
     time_window_hours: int = 24
+    topic_limits: Dict[str, TopicLimitConfig] = Field(default_factory=dict)
 
 
 class Config(BaseModel):

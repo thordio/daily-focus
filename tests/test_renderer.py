@@ -144,8 +144,10 @@ def test_structured_data_item_fields():
         "whats_new", "why_it_matters", "key_details",
         "ai_reason",
         "background", "community_discussion",
+        "related_events",
         "tags", "images", "references",
         "language_mismatch",
+        "key_facts",
     }
 
     for item in data["items"]:
@@ -365,6 +367,15 @@ def test_structured_data_field_types():
             assert isinstance(data["selected_count"], int)
             assert isinstance(data["next_update"], str)
             assert isinstance(data["items"], list)
+            assert isinstance(data["topic_stats"], list)
+
+            # topic_stats entries
+            for ts in data["topic_stats"]:
+                assert isinstance(ts["key"], str)
+                assert isinstance(ts["label"], str)
+                assert isinstance(ts["count"], int)
+                assert isinstance(ts["range_low"], int)
+                assert isinstance(ts["range_high"], int)
 
             # Item-level types
             for item in data["items"]:
@@ -382,9 +393,11 @@ def test_structured_data_field_types():
                 assert isinstance(item["ai_reason"], str)
                 assert isinstance(item["background"], str)
                 assert isinstance(item["community_discussion"], str)
+                assert isinstance(item["related_events"], list)
                 assert isinstance(item["tags"], list)
                 assert isinstance(item["images"], list)
                 assert isinstance(item["references"], list)
+                assert isinstance(item["key_facts"], list)
 
                 # Numeric bounds
                 assert 0 <= item["score"] <= 10
@@ -449,9 +462,9 @@ def test_render_html_missing_optional_fields():
     r = DailyRenderer()
     html = r.render_html(data)
     assert "Sparse Item" in html
-    # Should not contain community_discussion section
-    assert "社区讨论" not in html
-    assert "Community Discussion" not in html
+    # Should not contain community_discussion section header
+    assert '<summary>社区讨论</summary>' not in html
+    assert '<summary>Community Discussion</summary>' not in html
 
 
 def test_render_html_very_long_title():
@@ -582,3 +595,238 @@ def test_html_card_styling():
 
     # Tags: pill/badge style (border-radius: 100px = full pill)
     assert "border-radius: 100px" in html or "border-radius:100px" in html
+
+
+# --- Bug-regression tests for dynamic minimums and depth-indicator threshold ---
+
+
+def test_selection_info_dynamic_minimums():
+    """Selection-info shows dynamic per-topic minimums, not hardcoded values.
+
+    Regression test: the bug was hardcoded "AI 技术 &ge; 4 条" in the template.
+    The fix iterates over ``topic_stats`` so minimums reflect the actual config.
+    """
+    from src.ai.summarizer import DailySummarizer
+    from src.renderer import DailyRenderer
+    from src.models import TopicLimitConfig
+
+    s = DailySummarizer()
+    r = DailyRenderer()
+
+    items = [
+        make_content_item(
+            item_id="rss:test:ai1",
+            title="AI Item",
+            ai_score=8.0,
+            ai_tags=["AI"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "AI Item",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+    ]
+
+    # Set custom topic_limits with non-default range_low values
+    topic_limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=3, max=8),
+    }
+
+    data = s.get_structured_data(
+        items, "2026-06-01", 50, "zh", "morning",
+        score_threshold=6.0, topic_limits=topic_limits,
+    )
+
+    html = r.render_html(data)
+
+    # Check dynamic values appear (not the old hardcoded "&ge; 4")
+    msg = (
+        "Expected dynamic minimum from topic_limits, not hardcoded value.\n"
+        "If this fails, the template likely still has hardcoded '≥ 4' instead of "
+        "using {{ ts.range_low }} from topic_stats."
+    )
+    assert ("AI 技术 ≥ 6 条" in html or "AI 技术 &ge; 6 条" in html), msg
+    assert ("AI 市场 ≥ 3 条" in html or "AI 市场 &ge; 3 条" in html), msg
+    # Economy tab exists in TAB_DEFS but has no topic_limit entry → defaults to min=4
+    assert ("经济动向 ≥ 4 条" in html or "经济动向 &ge; 4 条" in html), (
+        "Economy should fall back to default min=4 when no topic_limit is set"
+    )
+
+
+def test_selection_info_dynamic_minimums_english():
+    """English variant of dynamic minimums test."""
+    from src.ai.summarizer import DailySummarizer
+    from src.renderer import DailyRenderer
+    from src.models import TopicLimitConfig
+
+    s = DailySummarizer()
+    r = DailyRenderer()
+
+    items = [
+        make_content_item(
+            item_id="rss:test:ai1",
+            title="AI Item",
+            ai_score=8.0,
+            ai_tags=["AI"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "AI Item",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+    ]
+
+    topic_limits = {
+        "ai-tech": TopicLimitConfig(min=6, max=10),
+        "ai-markets": TopicLimitConfig(min=3, max=8),
+    }
+
+    data = s.get_structured_data(
+        items, "2026-06-01", 50, "en", "morning",
+        score_threshold=6.0, topic_limits=topic_limits,
+    )
+
+    html = r.render_html(data)
+
+    # English labels from TAB_DEFS: AI Tech, AI Markets, Economy
+    assert "AI Tech ≥ 6" in html or "AI Tech &ge; 6" in html
+    assert "AI Markets ≥ 3" in html or "AI Markets &ge; 3" in html
+    assert "Economy ≥ 4" in html or "Economy &ge; 4" in html
+
+
+def test_depth_indicator_threshold():
+    """Depth-indicator title matches enricher's ``_MIN_SCORE_FOR_WEB_SEARCH``.
+
+    Enricher web-searches items with ``ai_score >= 7.0``.
+    Template should show 🔍 (web search) for ``score >= 7`` and
+    📝 (article-based) for ``score < 7``.
+
+    Regression test: ensures the threshold stays in sync between
+    ``src/ai/enricher.py`` and ``src/templates/daily.html``.
+    """
+    from src.ai.summarizer import DailySummarizer
+    from src.renderer import DailyRenderer
+
+    s = DailySummarizer()
+    r = DailyRenderer()
+
+    items = [
+        make_content_item(
+            item_id="rss:test:low",
+            title="Low Score",
+            ai_score=6.9,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "Low Score",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+        make_content_item(
+            item_id="rss:test:threshold",
+            title="At Threshold",
+            ai_score=7.0,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "At Threshold",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+        make_content_item(
+            item_id="rss:test:high1",
+            title="High Score 1",
+            ai_score=7.9,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "High Score 1",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+        make_content_item(
+            item_id="rss:test:high2",
+            title="High Score 2",
+            ai_score=8.0,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "High Score 2",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+    ]
+
+    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning")
+    html = r.render_html(data)
+
+    # Items are sorted by score descending: 8.0, 7.9, 7.0, 6.9
+    # score >= 7 → 🔍  (title: "含网络搜索" for zh)
+    # score < 7  → 📝 (title: "基于文章内容" for zh)
+    #
+    # We check the title attribute of the depth-indicator span because
+    # the emoji icon itself is rendered via HTML entity.
+
+    # 3 items with score >= 7.0 → should show web-search indicator
+    assert html.count("含网络搜索") == 3, (
+        f"Expected 3 items showing web-search indicator, "
+        f"found {html.count('含网络搜索')}.\n"
+        "Check that the template uses 'score_int >= 7' for the depth indicator."
+    )
+
+    # 1 item with score 6.9 → should show article-based indicator
+    assert html.count("基于文章内容") == 1, (
+        f"Expected 1 item showing article-based indicator, "
+        f"found {html.count('基于文章内容')}.\n"
+        "Check that items with score < 7 correctly show the standard enrichment indicator."
+    )
+
+
+def test_depth_indicator_threshold_english():
+    """English variant: depth-indicator title reflects web search threshold."""
+    from src.ai.summarizer import DailySummarizer
+    from src.renderer import DailyRenderer
+
+    s = DailySummarizer()
+    r = DailyRenderer()
+
+    items = [
+        make_content_item(
+            item_id="rss:test:low",
+            title="Low Score",
+            ai_score=6.5,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "Low Score",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+        make_content_item(
+            item_id="rss:test:high",
+            title="High Score",
+            ai_score=8.5,
+            ai_tags=["test"],
+            metadata={
+                "topic": "ai-tech",
+                "title_en": "High Score",
+                "detailed_summary_zh": "测试",
+                "detailed_summary_en": "Test",
+            },
+        ),
+    ]
+
+    data = s.get_structured_data(items, "2026-06-01", 50, "en", "morning")
+    html = r.render_html(data)
+
+    # English title text
+    assert "web search" in html
+    assert "article-based" in html

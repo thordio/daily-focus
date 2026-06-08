@@ -24,9 +24,8 @@ def test_resolve_horizon_path_accepts_explicit_repo() -> None:
 def test_resolve_config_path_defaults_to_repo_data_config() -> None:
     repo_root = Path(__file__).resolve().parents[1]
 
-    assert (
-        resolve_config_path(repo_root) == (repo_root / "data" / "config.json").resolve()
-    )
+    resolved = resolve_config_path(repo_root)
+    assert resolved == (repo_root / "data" / "config-morning.json").resolve()
 
 
 def test_load_mcp_secrets_loads_generic_env_keys(tmp_path: Path, monkeypatch) -> None:
@@ -107,3 +106,4 @@ def test_apply_source_filter_handles_twitter_and_openbb() -> None:
     assert filtered.sources.twitter.enabled is True
     assert filtered.sources.openbb.enabled is False
     assert filtered.sources.openbb.watchlists == []
+

@@ -156,7 +156,7 @@ class ContentAnalyzer:
             return
 
         # Update item with analysis results
-        item.ai_score = float(result.get("score", 0))
+        item.ai_score = max(0.0, min(10.0, float(result.get("score", 0))))
         item.ai_reason = result.get("reason", "")
         item.ai_summary = result.get("summary", item.title)
         item.ai_tags = result.get("tags", [])

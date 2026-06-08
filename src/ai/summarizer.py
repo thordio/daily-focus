@@ -2,7 +2,7 @@
 
 import re
 from collections import defaultdict
-from typing import List, Dict
+from typing import Any, Dict, List, Optional
 
 from ..models import ContentItem
 
@@ -10,6 +10,44 @@ from ..models import ContentItem
 _CJK = r"[\u4e00-\u9fff\u3400-\u4dbf]"
 _ASCII = r"[A-Za-z0-9]"
 _CJK_RE = re.compile(_CJK)
+
+_NUMBER_RE = re.compile(r"[-+]?\d*\.?\d+\s*%?")
+
+def _extract_key_facts(text: str, max_items: int = 3) -> list[str]:
+    """Extract the first *max_items* notable numbers/percentages from *text*.
+
+    Matches sequences like ``96.7%``, ``$3/$15``, ``100 万``, ``8,000``
+    with enough surrounding context to make them readable as pills.
+    """
+    if not text:
+        return []
+    pills: list[str] = []
+    # Try percentages first (e.g. "96.7%", "34.5%")
+    for m in re.finditer(r"[-+]?\d*\.?\d+\s*%", text):
+        if len(pills) >= max_items:
+            break
+        pills.append(m.group().strip())
+    # Then dollar amounts
+    if len(pills) < max_items:
+        for m in re.finditer(r"\$\d[\d.,/]*(\s*[MBK])?", text):
+            if len(pills) >= max_items:
+                break
+            pills.append(m.group().strip())
+    # Then any remaining notable numbers (≥1000 or with decimal)
+    if len(pills) < max_items:
+        for m in re.finditer(r"(?<![$.\d])\d{1,3}(?:,\d{3})*(?:\.\d+)?(?:\s*(?:万|亿|M|B|K|ms|GB))?(?=\s*[^%\d]|$)", text):
+            raw = m.group().strip()
+            # convert to numeric for threshold
+            cleaned = raw.replace(",", "")
+            try:
+                val = float(cleaned)
+            except ValueError:
+                continue
+            if val >= 1000 or "." in cleaned:
+                if raw not in pills:
+                    if len(pills) < max_items:
+                        pills.append(raw)
+    return pills
 
 
 def _has_cjk(text: str) -> bool:
@@ -290,7 +328,6 @@ class DailySummarizer:
         why_it_matters = (
             meta.get(f"why_it_matters_{language}")
             or meta.get("why_it_matters")
-            or meta.get(f"detailed_summary_{language}")
             or item.ai_reason
             or ""
         )
@@ -315,6 +352,10 @@ class DailySummarizer:
             or meta.get("community_discussion")
             or ""
         )
+
+        # related_events: cross-references to other items in the same digest.
+        # Populated later by the orchestrator after cross-item analysis.
+        related_events = meta.get("related_events") or []
 
         tags = item.ai_tags or []
 
@@ -352,10 +393,12 @@ class DailySummarizer:
             "ai_reason": item.ai_reason or "",
             "background": background,
             "community_discussion": community_discussion,
+            "related_events": related_events,
             "tags": tags,
             "images": images,
             "references": references,
             "language_mismatch": language_mismatch,
+            "key_facts": _extract_key_facts(whats_new),
         }
 
     def get_structured_data(
@@ -366,6 +409,7 @@ class DailySummarizer:
         language: str = "en",
         period: str = "morning",
         score_threshold: float = 7.0,
+        topic_limits: Optional[Dict[str, Any]] = None,
     ) -> Dict:
         """Return structured dict for Jinja2 HTML rendering.
 
@@ -383,6 +427,7 @@ class DailySummarizer:
             language: Output language, either "en" or "zh".
             period: "morning" for 早报 or "evening" for 晚报.
             score_threshold: AI score threshold used for filtering.
+            topic_limits: Per-topic limit config from FilteringConfig.
 
         Returns:
             A dict ready to pass to ``DailyRenderer.render_html()``.
@@ -402,6 +447,7 @@ class DailySummarizer:
             topic = item.metadata.get("topic", "ai-tech")
             grouped[topic].append(item_dict)
 
+        # Build tabs from TAB_DEFS first, then auto-create for any extra topics
         tabs = {}
         for tab_key, tab_def in self.TAB_DEFS.items():
             tabs[tab_key] = {
@@ -409,10 +455,41 @@ class DailySummarizer:
                 "label_en": tab_def["label_en"],
                 "items": grouped.get(tab_key, []),
             }
+        # Auto-create tabs for any topics found in data that are not in TAB_DEFS
+        for topic_key in grouped:
+            if topic_key not in tabs:
+                label = topic_key.replace("-", " ").title()
+                tabs[topic_key] = {
+                    "label": label,
+                    "label_en": label,
+                    "items": grouped[topic_key],
+                }
 
         # Alternate-language URL for the language switcher link
         other_lang = "en" if language == "zh" else "zh"
         alternate_url = f"{date}-{period}-{other_lang}.html"
+
+        # Per-topic stats for the header display
+        tl = topic_limits or {}
+        topic_stats: list[dict] = []
+        for tab_key in tabs:
+            count = len(grouped.get(tab_key, []))
+            limit_cfg = tl.get(tab_key)
+            low = limit_cfg.min if limit_cfg else 4
+            high = limit_cfg.max if limit_cfg else 10
+            tab_def = self.TAB_DEFS.get(tab_key)
+            if tab_def:
+                label = tab_def["label"] if language == "zh" else tab_def["label_en"]
+            else:
+                label = tab_key.replace("-", " ").title()
+            topic_stats.append({
+                "key": tab_key,
+                "label": label,
+                "label_en": tab_def["label_en"] if tab_def else tab_key.replace("-", " ").title(),
+                "count": count,
+                "range_low": low,
+                "range_high": high,
+            })
 
         return {
             "date": date,
@@ -426,6 +503,7 @@ class DailySummarizer:
             "tabs": tabs,
             "active_tab": "ai-tech",
             "alternate_url": alternate_url,
+            "topic_stats": topic_stats,
         }
 
     def _generate_empty_summary(self, date: str, total_fetched: int, labels: dict) -> str:

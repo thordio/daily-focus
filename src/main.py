@@ -48,8 +48,12 @@ def main():
         # Ensure we're in the project directory or use data/ in current dir
         data_dir = Path("data")
 
-        # Initialize storage manager
-        storage = StorageManager(data_dir=str(data_dir))
+        # Auto-select config file based on --period flag
+        config_path = data_dir / f"config-{args.period}.json"
+        if config_path.exists():
+            storage = StorageManager(data_dir=str(data_dir), config_path=str(config_path))
+        else:
+            storage = StorageManager(data_dir=str(data_dir))
 
         # Load configuration
         try:
@@ -79,7 +83,7 @@ def main():
         asyncio.run(orchestrator.run(force_hours=args.hours, period=args.period))
 
     except KeyboardInterrupt:
-        console.print("\n[yellow]⚠️  Interrupted by user[/yellow]")
+        console.print("\n[yellow]⚙  Interrupted by user[/yellow]")
         sys.exit(0)
     except Exception as e:
         console.print(f"\n[bold red]❌ Fatal error: {e}[/bold red]")
@@ -137,3 +141,4 @@ GITHUB_TOKEN=your_github_token_here (optional but recommended)
 
 if __name__ == "__main__":
     main()
+

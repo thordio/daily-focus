@@ -92,61 +92,99 @@ class HorizonOrchestrator:
             analyzed_items = await self._analyze_content(merged_items)
             self.console.print(f"🤖 Analyzed {len(analyzed_items)} items with AI\n")
 
-            # 5. Filter by score threshold
+            # 5. Filter by score threshold + per-topic hard limits
             threshold = self.config.filtering.ai_score_threshold
-            important_items = [
+            above_threshold = [
                 item for item in analyzed_items
                 if item.ai_score and item.ai_score >= threshold
             ]
-            important_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
 
             self.console.print(
-                f"⭐️ {len(important_items)} items scored ≥ {threshold}\n"
+                f"⭐️ {len(above_threshold)} items scored ≥ {threshold}\n"
             )
 
-            # 5.5 Semantic deduplication: drop items covering the same topic
-            deduped_items = await self.merge_topic_duplicates(important_items)
-            if len(deduped_items) < len(important_items):
+            # 5a. Semantic deduplication: drop items covering the same topic
+            deduped_items = await self.merge_topic_duplicates(above_threshold)
+            deduped_ids = {item.id for item in deduped_items}
+            if len(deduped_items) < len(above_threshold):
                 self.console.print(
-                    f"🧹 Removed {len(important_items) - len(deduped_items)} topic duplicates "
+                    f"🧹 Removed {len(above_threshold) - len(deduped_items)} topic duplicates "
                     f"→ {len(deduped_items)} unique items\n"
                 )
-            important_items = deduped_items
 
-            # 5.5b Per-topic minimums: ensure each topic has at least MIN_ITEMS items
-            # If a topic has fewer than its minimum after threshold + dedup, take the
-            # highest-scored remaining items for that topic from the full analyzed set.
-            MIN_ITEMS: Dict[str, int] = {"ai-tech": 4, "ai-markets": 6, "economy": 6}
-            topic_pool: Dict[str, List[ContentItem]] = defaultdict(list)
-            for item in analyzed_items:
-                topic_pool[item.metadata.get("topic", "ai-tech")].append(item)
-            # Sort each topic pool by score descending for quick top-N selection
-            for pool in topic_pool.values():
-                pool.sort(key=lambda x: x.ai_score or 0, reverse=True)
-            # Track IDs we already have
-            have_ids = {id(item) for item in important_items}
-            # Count per topic in the current important_items set
-            topic_counts: Dict[str, int] = defaultdict(int)
-            for item in important_items:
-                topic_counts[item.metadata.get("topic", "ai-tech")] += 1
-            for topic, min_n in MIN_ITEMS.items():
-                need = min_n - topic_counts.get(topic, 0)
-                if need > 0:
-                    for candidate in topic_pool.get(topic, []):
-                        if need <= 0:
-                            break
-                        if id(candidate) not in have_ids:
-                            important_items.append(candidate)
-                            have_ids.add(id(candidate))
-                            topic_counts[topic] += 1
-                            need -= 1
-                            self.console.print(
-                                f"   Added below-threshold item for topic '{topic}': {candidate.title[:60]}"
-                            )
-            if important_items:
-                important_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
+            # 5b. Per-topic hard limits: cap at max, fill to min, log dropped
+            #     Items outside configured topics also pass through.
+            limits = self.config.filtering.topic_limits
+            selected: List[ContentItem] = []
+            dropped_counts: Dict[str, int] = {}
+            for topic_key, limit_config in limits.items():
+                topic_items = [
+                    i for i in deduped_items
+                    if i.metadata.get("topic") == topic_key
+                ]
+                topic_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
 
-            # 5.6 Optional second-stage Twitter reply expansion + targeted re-analysis
+                # Cap at max
+                cap = min(limit_config.max, len(topic_items))
+                selected.extend(topic_items[:cap])
+
+                # Fill to min if needed (from below-threshold pool, excluding dedup-removed items)
+                if cap < limit_config.min:
+                    selected_ids = {item.id for item in selected}
+                    below = [
+                        i for i in analyzed_items
+                        if i.metadata.get("topic") == topic_key
+                        and i.id not in selected_ids
+                        and ((i.ai_score or 0) < threshold or i.id in deduped_ids)
+                    ]
+                    below.sort(key=lambda x: x.ai_score or 0, reverse=True)
+                    needed = limit_config.min - cap
+                    selected.extend(below[:needed])
+
+                dropped = len(topic_items) - cap
+                if dropped > 0:
+                    dropped_counts[topic_key] = dropped
+                    self.console.print(f"  📊 {topic_key}: {len(topic_items)} candidates → kept top {cap} (dropped {dropped})")
+
+            # Log total
+            total_dropped = sum(dropped_counts.values())
+            if total_dropped > 0:
+                self.console.print(f"  ✂️  Capped {total_dropped} items across all topics")
+
+            # Handle items without topic limits: add them all (backward compat)
+            if not limits:
+                selected = deduped_items  # no limits configured, keep all
+            else:
+                # Also include items that belong to topics NOT in limits config
+                limited_topics = set(limits.keys())
+                for item in deduped_items:
+                    topic = item.metadata.get("topic", "ai-tech")
+                    if topic not in limited_topics:
+                        selected.append(item)
+
+            # Remove duplicates (different topics shouldn't overlap, but safe)
+            seen_ids = set()
+            unique_selected = []
+            for item in selected:
+                if item.id not in seen_ids:
+                    seen_ids.add(item.id)
+                    unique_selected.append(item)
+            selected = unique_selected
+
+            # Sort by score descending
+            selected.sort(key=lambda x: x.ai_score or 0, reverse=True)
+            important_items = selected
+
+            # 5c. Show per-topic breakdown
+            from collections import Counter
+            topic_breakdown = Counter(
+                i.metadata.get("topic", "ai-tech") for i in important_items
+            )
+            for topic, count in sorted(topic_breakdown.items()):
+                self.console.print(f"      • {topic}: {count} items")
+            self.console.print("")
+
+            # 5d. Optional second-stage Twitter reply expansion + targeted re-analysis
             await self._expand_twitter_discussion(important_items)
 
             # Show per-sub-source selection breakdown
@@ -174,6 +212,7 @@ class HorizonOrchestrator:
                     important_items, today, len(all_items),
                     language=lang, period=period,
                     score_threshold=self.config.filtering.ai_score_threshold,
+                    topic_limits=limits,
                 )
 
                 from .renderer import DailyRenderer

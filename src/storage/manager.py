@@ -14,7 +14,7 @@ from ..models import Config
 
 # Matches ${VAR_NAME} in string config values. Names follow env-var rules
 # (ASCII letters, digits, underscore; must not start with a digit).
-_ENV_VAR_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
+_ENV_VAR_PATTERN = re.compile(r"\${([A-Za-z_][A-Za-z0-9_]*)}")
 
 
 def _expand_env_vars(value: Any) -> Any:
@@ -53,9 +53,12 @@ class ConfigError(ValueError):
 class StorageManager:
     """Manages file-based storage for configuration and state."""
 
-    def __init__(self, data_dir: str = "data"):
+    def __init__(self, data_dir: str = "data", config_path: str | None = None):
         self.data_dir = Path(data_dir)
-        self.config_path = self.data_dir / "config.json"
+        if config_path:
+            self.config_path = Path(config_path)
+        else:
+            self.config_path = self.data_dir / "config.json"
         self.summaries_dir = self.data_dir / "summaries"
 
         self.data_dir.mkdir(parents=True, exist_ok=True)

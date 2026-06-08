@@ -169,6 +169,7 @@ class OpenBBScraper(BaseScraper):
             "provider": watchlist.provider,
             "symbols": symbols,
             "category": watchlist.category,
+            "topic": "ai-tech",
         }
 
         return ContentItem(

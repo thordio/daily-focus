@@ -47,7 +47,7 @@
     --score-bg: #334155;
     --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
     --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
-    --details-bg: #1e293b;
+    --details-bg: #1a2332;
     --header-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     --footer-bg: #1e293b;
     --card-radius: 14px;
@@ -73,7 +73,7 @@
   --score-bg: #334155;
   --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
   --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
-  --details-bg: #1e293b;
+  --details-bg: #1a2332;
   --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   --footer-bg: #1e293b;
   --card-radius: 14px;
@@ -172,10 +172,29 @@ summary:focus-visible {
 
 .header-stats {
   font-size: 13px;
-  opacity: 0.75;
+  opacity: 0.85;
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.topic-stats {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  line-height: 1.6;
+}
+
+.topic-stat {
+  white-space: nowrap;
+}
+
+.topic-stat-sep {
+  white-space: pre;
+  opacity: 0.5;
 }
 
 .theme-toggle {
@@ -295,6 +314,18 @@ summary:focus-visible {
   padding: 0 20px;
 }
 
+.selection-rationale {
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: var(--details-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+
 .selection-info details {
   font-size: 12.5px;
   color: var(--text-secondary);
@@ -376,8 +407,8 @@ summary:focus-visible {
   border: 1px solid var(--border);
   border-left: 4px solid var(--border);
   border-radius: var(--card-radius);
-  padding: 28px;
-  margin-bottom: 24px;
+  padding: 32px 32px 36px;
+  margin-bottom: 36px;
   box-shadow: var(--shadow);
   transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
 }
@@ -443,16 +474,38 @@ summary:focus-visible {
   opacity: 0.7;
 }
 
+.depth-indicator {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 10px;
+  background: var(--score-bg);
+  cursor: help;
+}
+
+/* Light card for medium-interest items (5.0-6.9) */
+.news-card.card-light {
+  padding: 20px;
+  border-left: none;
+}
+.card-light .card-title {
+  font-size: 17px;
+}
+
 .card-title-area {
   flex: 1;
   min-width: 0;
 }
 
 .card-title {
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 700;
-  line-height: 1.35;
-  margin-bottom: 4px;
+  line-height: 1.4;
+  margin-bottom: 6px;
 }
 
 .card-title a {
@@ -466,12 +519,13 @@ summary:focus-visible {
 }
 
 .card-source {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
+  opacity: 0.95;
 }
 
 .card-source .dot {
@@ -491,13 +545,13 @@ summary:focus-visible {
 }
 
 .card-body {
-  font-size: 15px;
-  line-height: 1.85;
+  font-size: 16px;
+  line-height: 1.9;
   color: var(--text);
 }
 
 .card-body > * + * {
-  margin-top: 18px;
+  margin-top: 20px;
 }
 
 .section-label {
@@ -514,8 +568,94 @@ summary:focus-visible {
 }
 
 .section-content {
-  font-size: 15px;
-  line-height: 1.85;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+/* Compact Why It Matters — one-liner with accent */
+.why-matters-compact {
+  padding: 12px 16px;
+  background: var(--details-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.why-matters-prefix {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* Key Facts bar — quick-scan stats pills */
+.key-facts-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.key-facts-label {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.key-fact-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Related Events — cross-references between articles */
+.related-events {
+  margin-top: 18px;
+}
+
+.related-events-label {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.related-events-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+
+.related-events-list li {
+  position: relative;
+  padding: 5px 0 5px 20px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.related-events-list li::before {
+  content: "\2192";
+  position: absolute;
+  left: 2px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.related-events-list li + li {
+  margin-top: 2px;
 }
 
 .details-section {
@@ -535,12 +675,21 @@ summary:focus-visible {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
-  padding: 2px 0;
+  padding: 4px 0;
   user-select: none;
+  opacity: 0.85;
+  transition: opacity 0.15s, color 0.15s;
 }
 
 .details-section details summary:hover {
   color: var(--accent);
+  opacity: 1;
+}
+
+.details-section details summary::before {
+  content: "\1f4d6";
+  margin-right: 6px;
+  font-size: 13px;
 }
 
 .details-section details[open] {
@@ -725,12 +874,17 @@ summary:focus-visible {
   .header-meta { font-size: 13px; gap: 8px; }
   .theme-toggle { top: 12px; right: 12px; width: 44px; height: 44px; font-size: 18px; }
   .lang-toggle { top: 12px; right: 66px; height: 44px; padding: 0 12px; font-size: 13px; }
-  .news-card { padding: 20px; border-radius: 12px; }
-  .card-title { font-size: 17px; }
-  .card-body { font-size: 14px; }
+  .news-card { padding: 24px; border-radius: 12px; }
+  .card-title { font-size: 18px; }
+  .card-body { font-size: 15px; }
   .card-header { gap: 10px; }
   .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 10px; }
   .tab-nav { gap: 6px; margin-bottom: 22px; padding: 12px 0; }
+  .depth-indicator { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+  .key-facts-bar { font-size: 12px; }
+  .key-fact-pill { font-size: 12px; padding: 2px 8px; }
+  .news-card.card-light { padding: 18px; }
+  .card-light .card-title { font-size: 16px; }
 }
 
 @media (max-width: 375px) {
@@ -740,23 +894,29 @@ summary:focus-visible {
   .header-title { font-size: 21px; }
   .header-meta { font-size: 12px; gap: 6px; }
   .header-stats { font-size: 12px; }
+  .topic-stat { white-space: normal; }
   .theme-toggle { top: 10px; right: 10px; width: 44px; height: 44px; font-size: 18px; }
   .lang-toggle { top: 10px; right: 64px; height: 44px; padding: 0 10px; font-size: 12px; }
-  .news-card { padding: 16px; border-left-width: 3px; border-radius: 10px; }
-  .card-title { font-size: 16px; }
-  .card-body { font-size: 13px; }
+  .news-card { padding: 18px; border-left-width: 3px; border-radius: 10px; }
+  .card-title { font-size: 17px; }
+  .card-body { font-size: 14px; }
   .card-header { gap: 8px; }
   .card-index { width: 30px; height: 30px; font-size: 12px; border-radius: 8px; }
   .score-badge { min-width: 36px; height: 30px; padding: 0 8px; font-size: 13px; line-height: 30px; }
   .tab-btn { padding: 8px 10px; font-size: 12px; border-radius: 8px; }
   .tab-btn .tab-count { font-size: 10px; }
   .tab-nav { gap: 4px; padding: 10px 0; margin-bottom: 18px; }
+  .depth-indicator { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
+  .key-facts-bar { font-size: 11px; gap: 5px; }
+  .key-fact-pill { font-size: 11px; padding: 2px 6px; border-radius: 100px; }
 }
 
 @media (min-width: 768px) {
   .container { padding: 0 24px; }
   .header-title { font-size: 34px; }
-  .news-card { padding: 32px; }
+  .news-card { padding: 36px 36px 40px; margin-bottom: 44px; }
+  .card-title { font-size: 22px; }
+  .card-body { font-size: 16.5px; line-height: 2; }
 }
 
 @media (min-width: 1440px) {
@@ -787,15 +947,15 @@ summary:focus-visible {
     </div>
     <div class="header-stats">
       {% if language == "zh" %}
-        从 {{ total_fetched }} 条内容中精选 {{ selected_count }} 条
+        从 {{ total_fetched }} 条中精选 {{ selected_count }} 条
       {% else %}
-        Selected {{ selected_count }} items from {{ total_fetched }}
+        Selected {{ selected_count }} from {{ total_fetched }} items
       {% endif %}
     </div>
-    {% if tabs is defined and selected_count > 0 %}
-    <div class="header-stats-tabs">
-      {% for tab_key, tab in tabs.items() %}
-      <span class="tab-stat">{{ tab.label }} {{ tab['items']|length }}</span>{% if not loop.last %}<span class="tab-stat-sep">·</span>{% endif %}
+    {% if topic_stats is defined and topic_stats|length > 0 %}
+    <div class="topic-stats">
+      {% for ts in topic_stats %}
+      <span class="topic-stat">{{ ts.label }} {{ ts.count }}{{ "条" if language == "zh" else " items" }} ({{ ts.range_low }}-{{ ts.range_high }})</span>{% if not loop.last %}<span class="topic-stat-sep"> · </span>{% endif %}
       {% endfor %}
     </div>
     {% endif %}
@@ -818,27 +978,34 @@ summary:focus-visible {
 
 {% if selected_count > 0 %}
 <div class="selection-info">
+  <div class="selection-rationale">
+    {% if language == "zh" %}
+    &#x1f4ca; 精选逻辑：AI 评分排序，每板块取 top N 条。确保篇篇有深度，条条是干货。
+    {% else %}
+    &#x1f4ca; Selection: AI-score ranked, top N per section. Every item enriched for depth.
+    {% endif %}
+  </div>
   <details>
     <summary>
       {% if language == "zh" %}
-        &#x1f4ca; 筛选说明
+        详细筛选说明
       {% else %}
-        &#x1f4ca; Selection Info
+        Detailed Filter Info
       {% endif %}
     </summary>
     <div class="selection-info-content">
       {% if language == "zh" %}
       {% set filtered_out = total_fetched - selected_count %}
       {% set filter_rate = (filtered_out * 100 // total_fetched) if total_fetched > 0 else 0 %}
-      <p>共抓取 {{ total_fetched }} 条 → {{ selected_count }} 条入选（过滤率 {{ filter_rate }}%）。阈值低于 {{ score_threshold|default(7.0) }} 的 {{ filtered_out }} 条已过滤。</p>
-      <p>AI 评分范围 0-10。阈值 {{ score_threshold|default(7.0) }} 分以上入选。</p>
-      <p>各板块最低保障：AI 技术 &ge; 4 条，AI 市场 &ge; 6 条，经济动向 &ge; 6 条。</p>
+      <p>共抓取 {{ total_fetched }} 条中精选 {{ selected_count }} 条（过滤率 {{ filter_rate }}%）。阈值 &ge; {{ score_threshold|default(7.0) }}。</p>
+      <p>各板块最低保障：{% for ts in topic_stats %}{{ ts.label }} &ge; {{ ts.range_low }} 条{% if not loop.last %}，{% endif %}{% endfor %}。</p>
+      <p>每篇经过 AI 深度丰富：背景知识、关键细节、社区讨论。</p>
       {% else %}
       {% set filtered_out = total_fetched - selected_count %}
       {% set filter_rate = (filtered_out * 100 // total_fetched) if total_fetched > 0 else 0 %}
       <p>Fetched {{ total_fetched }} → selected {{ selected_count }} ({{ filter_rate }}% filtered). Threshold &ge; {{ score_threshold|default(7.0) }}.</p>
-      <p>AI score range 0-10. Threshold &ge; {{ score_threshold|default(7.0) }}.</p>
-      <p>Section minimums: AI Tech &ge; 4, AI Markets &ge; 6, Economy &ge; 6.</p>
+      <p>Section minimums: {% for ts in topic_stats %}{{ ts.label_en }} &ge; {{ ts.range_low }}{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+      <p>Every item AI-enriched with background, key details, and community discussion.</p>
       {% endif %}
     </div>
   </details>
@@ -846,18 +1013,23 @@ summary:focus-visible {
 {% endif %}
 
 {% macro news_card(item) %}
-<article class="news-card">
+{% set score_int = item.score|int %}
+{% if score_int >= 9 %}
+  {% set score_class = "score-9" %}
+{% elif score_int >= 7 %}
+  {% set score_class = "score-7" %}
+{% else %}
+  {% set score_class = "score-5" %}
+{% endif %}
+<article class="news-card{% if score_int < 7 %} card-light{% endif %}">
   <div class="card-header">
     <div class="card-index">{{ item.index }}</div>
-    {% set score_int = item.score|int %}
-    {% if score_int >= 9 %}
-      {% set score_class = "score-9" %}
-    {% elif score_int >= 7 %}
-      {% set score_class = "score-7" %}
-    {% else %}
-      {% set score_class = "score-5" %}
-    {% endif %}
     <div class="score-badge {{ score_class }}">{{ "{:.1f}".format(item.score) }}</div>
+    {% if score_int >= 7 %}
+      <span class="depth-indicator" title="{% if language == "zh" %}深度分析：含网络搜索与完整背景资料{% else %}Deep enrichment: web search + full background{% endif %}">&#x1f50d;</span>
+    {% else %}
+      <span class="depth-indicator" title="{% if language == "zh" %}标准分析：基于文章内容进行丰富{% else %}Standard enrichment: article-based{% endif %}">&#x1f4dd;</span>
+    {% endif %}
     <div class="card-title-area">
       <h2 class="card-title">
         <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
@@ -898,20 +1070,37 @@ summary:focus-visible {
     {% endif %}
 
     {% if item.why_it_matters %}
-    <div>
-      <div class="section-label"><i class="emoji">&#128200;</i> {% if language == "zh" %}为什么重要{% else %}Why It Matters{% endif %}</div>
-      <div class="section-content">{{ item.why_it_matters }}</div>
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; {% if language == "zh" %}为什么重要：{% else %}Why It Matters：{% endif %}</span>
+      {{ item.why_it_matters }}
     </div>
     {% endif %}
 
-    {% if item.key_details %}
-    <div>
-      <div class="section-label"><i class="emoji">&#128269;</i> {% if language == "zh" %}关键细节{% else %}Key Details{% endif %}</div>
-      <div class="section-content">{{ item.key_details }}</div>
+    {% if item.key_facts and item.key_facts|length > 0 %}
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; {% if language == "zh" %}关键数据{% else %}Key Facts{% endif %}:</span>
+      {% for fact in item.key_facts %}
+      <span class="key-fact-pill">{{ fact }}</span>
+      {% endfor %}
     </div>
     {% endif %}
 
-    {% if item.background %}
+    {% if item.related_events %}
+    <div class="related-events">
+      <div class="related-events-label"><i class="emoji">&#128279;</i> {% if language == "zh" %}关联事件{% else %}Related Events{% endif %}</div>
+      <ul class="related-events-list">
+        {% for event in item.related_events %}
+        <li>
+          {% if event is mapping and event.url %}<a href="{{ event.url }}" target="_blank" rel="noopener noreferrer">{% endif %}
+          {{ event.text if event is mapping else event }}
+          {% if event is mapping and event.url %}</a>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if item.background and score_int >= 7 %}
     <div class="details-section">
       <details>
         <summary>{% if language == "zh" %}背景知识{% else %}Background{% endif %}</summary>
@@ -920,7 +1109,16 @@ summary:focus-visible {
     </div>
     {% endif %}
 
-    {% if item.community_discussion %}
+    {% if item.key_details and score_int >= 7 %}
+    <div class="details-section">
+      <details>
+        <summary>{% if language == "zh" %}关键细节{% else %}Key Details{% endif %}</summary>
+        <div class="details-content">{{ item.key_details }}</div>
+      </details>
+    </div>
+    {% endif %}
+
+    {% if item.community_discussion and score_int >= 7 %}
     <div class="details-section">
       <details>
         <summary>{% if language == "zh" %}社区讨论{% else %}Community Discussion{% endif %}</summary>

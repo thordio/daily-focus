@@ -135,20 +135,16 @@ class TestContentEnrichmentSystem:
     """
 
     def test_system_prompt_all_bilingual_pairs(self):
-        """CONTENT_ENRICHMENT_SYSTEM must describe all six bilingual field pairs."""
+        """CONTENT_ENRICHMENT_SYSTEM must describe all five bilingual field pairs."""
         pairs = ["title", "whats_new", "why_it_matters", "key_details",
-                 "background", "community_discussion"]
+                 "background"]
         for field in pairs:
             assert f"{field}_en" in CONTENT_ENRICHMENT_SYSTEM, f"Missing {field}_en"
             assert f"{field}_zh" in CONTENT_ENRICHMENT_SYSTEM, f"Missing {field}_zh"
 
-    def test_user_prompt_all_bilingual_pairs(self):
-        """CONTENT_ENRICHMENT_USER must include all six bilingual field pairs in JSON schema."""
-        pairs = ["title", "whats_new", "why_it_matters", "key_details",
-                 "background", "community_discussion"]
-        for field in pairs:
-            assert f"{field}_en" in CONTENT_ENRICHMENT_USER, f"Missing {field}_en in user prompt"
-            assert f"{field}_zh" in CONTENT_ENRICHMENT_USER, f"Missing {field}_zh in user prompt"
+    def test_user_prompt_has_json_schema_placeholder(self):
+        """CONTENT_ENRICHMENT_USER must contain the json_schema placeholder."""
+        assert "{json_schema}" in CONTENT_ENRICHMENT_USER
 
     def test_critical_language_rule_present(self):
         """The CRITICAL language rule section must be present in system prompt."""
@@ -172,7 +168,6 @@ class TestContentEnrichmentSystem:
         assert "why_it_matters" in CONTENT_ENRICHMENT_SYSTEM
         assert "key_details" in CONTENT_ENRICHMENT_SYSTEM
         assert "background" in CONTENT_ENRICHMENT_SYSTEM
-        assert "community_discussion" in CONTENT_ENRICHMENT_SYSTEM
 
     def test_user_prompt_has_valid_json_only(self):
         """Enrichment user prompt must instruct valid JSON only."""
@@ -539,7 +534,61 @@ class TestAnalyzerIntegration:
 
         asyncio.run(analyzer._analyze_item(item))
 
-        assert item.ai_score == 15.0  # The analyzer doesn't clamp — it stores what AI returns
+        assert item.ai_score == 10.0  # Clamped to [0, 10] range
+
+    def test_analyzer_clamps_scores_above_10(self, monkeypatch):
+        """Scores > 10 must be clamped to 10.0."""
+        item = make_content_item(title="Clamp High")
+        client = SimpleNamespace(complete=None)
+        analyzer = ContentAnalyzer(client)
+
+        async def fake_complete(system, user):
+            return (
+                '{"score": 42.0, "reason": "Clamp down",'
+                ' "summary": "Test", "tags": ["test"]}'
+            )
+
+        monkeypatch.setattr(analyzer.client, "complete", fake_complete)
+
+        asyncio.run(analyzer._analyze_item(item))
+
+        assert item.ai_score == 10.0
+
+    def test_analyzer_clamps_scores_below_0(self, monkeypatch):
+        """Scores < 0 must be clamped to 0.0."""
+        item = make_content_item(title="Clamp Low")
+        client = SimpleNamespace(complete=None)
+        analyzer = ContentAnalyzer(client)
+
+        async def fake_complete(system, user):
+            return (
+                '{"score": -5.0, "reason": "Clamp up",'
+                ' "summary": "Test", "tags": ["test"]}'
+            )
+
+        monkeypatch.setattr(analyzer.client, "complete", fake_complete)
+
+        asyncio.run(analyzer._analyze_item(item))
+
+        assert item.ai_score == 0.0
+
+    def test_analyzer_passes_through_scores_in_range(self, monkeypatch):
+        """Scores in [0, 10] must pass through unchanged."""
+        item = make_content_item(title="Pass Through")
+        client = SimpleNamespace(complete=None)
+        analyzer = ContentAnalyzer(client)
+
+        async def fake_complete(system, user):
+            return (
+                '{"score": 7.5, "reason": "In range",'
+                ' "summary": "Test", "tags": ["test"]}'
+            )
+
+        monkeypatch.setattr(analyzer.client, "complete", fake_complete)
+
+        asyncio.run(analyzer._analyze_item(item))
+
+        assert item.ai_score == 7.5
 
     def test_analyzer_prompt_includes_item_title(self, monkeypatch):
         """The formatted prompt sent to the AI must include the item title."""

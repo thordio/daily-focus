@@ -84,17 +84,33 @@ def resolve_horizon_path(explicit: str | None = None) -> Path:
 
 
 def resolve_config_path(horizon_path: Path, config_path: str | None = None) -> Path:
-    """Resolve config path, defaulting to <horizon>/data/config.json."""
+    """Resolve config path, defaulting to <horizon>/data/config-morning.json.
 
-    if not config_path:
-        path = (horizon_path / "data/config.json").resolve()
-    else:
+    Falls back through config-morning.json, config-evening.json if the
+    primary default does not exist. An explicit config_path is returned
+    as-is and must exist.
+    """
+
+    if config_path:
         raw = Path(config_path).expanduser()
         if raw.is_absolute():
             path = raw.resolve()
         else:
             candidate = (horizon_path / raw).resolve()
             path = candidate if candidate.exists() else (Path.cwd() / raw).resolve()
+    else:
+        candidates = [
+            horizon_path / "data/config-morning.json",
+            horizon_path / "data/config-evening.json",
+            horizon_path / "data/config.json",
+        ]
+        path = None
+        for c in candidates:
+            if c.resolve().exists():
+                path = c.resolve()
+                break
+        if path is None:
+            path = candidates[0].resolve()
 
     if not path.exists():
         raise HorizonMcpError(
@@ -172,7 +188,7 @@ def make_storage(runtime: HorizonRuntime, config_path: Path) -> Any:
     """Build Horizon storage manager bound to config's data directory."""
 
     data_dir = str(config_path.parent.resolve())
-    return runtime.StorageManager(data_dir=data_dir)
+    return runtime.StorageManager(data_dir=data_dir, config_path=str(config_path.resolve()))
 
 
 def make_orchestrator(runtime: HorizonRuntime, config: Any, storage: Any) -> Any:
@@ -340,3 +356,4 @@ def _resolve_secrets_path(horizon_path: Path) -> Path | None:
         if resolved.exists():
             return resolved
     return None
+

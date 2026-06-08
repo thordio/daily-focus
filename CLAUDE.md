@@ -50,7 +50,7 @@ Be clear and easy to understand. If the root cause you identified does not fully
 - Config is validated by Pydantic at startup — malformed JSON is caught early
 - AI calls use OpenAI-compatible protocol with configurable provider/model
 - RSS image extraction writes to `metadata["candidate_images"]`, AI selection writes to `metadata["selected_images"]`
-- Two editions: morning (time_window=14h, threshold=6.0) and evening (time_window=10h, threshold=5.5)
+- Two editions: morning (time_window=14h, threshold=4.0) and evening (time_window=10h, threshold=4.0)
 - GitHub Actions cron triggers: UTC 00:00 (morning) and UTC 12:00 (evening)
 
 ### Information Authenticity (HIGHEST PRINCIPLE)

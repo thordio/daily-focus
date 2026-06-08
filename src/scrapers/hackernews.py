@@ -138,5 +138,6 @@ class HackerNewsScraper(BaseScraper):
                 "type": story.get("type", "story"),
                 "discussion_url": hn_discussion_url,
                 "comment_count": len(comments),
+                "topic": "ai-tech",
             }
         )

@@ -306,6 +306,7 @@ class TwitterScraper(BaseScraper):
                     "is_reply": item.get("is_reply", False),
                     "in_reply_to_status_id": item.get("in_reply_to_status_id"),
                     "in_reply_to_screen_name": item.get("in_reply_to_screen_name"),
+                    "topic": "ai-tech",
                 },
             )
         except Exception as exc:
