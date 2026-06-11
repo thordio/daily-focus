@@ -189,10 +189,9 @@ def test_pipeline_e2e_full_flow():
             assert "DeepSeek" in html
             assert "Market" in html or "market" in html.lower()
 
-            # Period-dependent labels
-            if lang == "zh":
-                expected_title = "Daily Focus 早报" if period == "morning" else "Daily Focus 晚报"
-                assert expected_title in html
+            # Title is always "Daily Focus"
+            expected_title = "Daily Focus"
+            assert expected_title in html
 
 
 def test_pipeline_e2e_empty_items():

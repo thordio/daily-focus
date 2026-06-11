@@ -1,9 +1,10 @@
 """Tests for GitHub Actions workflow configuration files.
 
-Ensures workflow YAML files are valid and free of dead code.
+Ensures the consolidated workflow YAML file is valid and free of dead code.
 
-Note: PyYAML (YAML 1.1) parses the ``on:`` key as boolean ``True``,
-so we handle both ``"on"`` and ``True`` when looking up the trigger key.
+The system has been consolidated from two editions (morning + evening) to a
+single daily edition.  Only ``daily-focus-morning.yml`` remains (the evening
+workflow was removed).
 """
 
 from __future__ import annotations
@@ -16,8 +17,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_DIR = ROOT / ".github" / "workflows"
 
-MORNING_YML = WORKFLOW_DIR / "daily-focus-morning.yml"
-EVENING_YML = WORKFLOW_DIR / "daily-focus-evening.yml"
+WORKFLOW_YML = WORKFLOW_DIR / "daily-focus-morning.yml"
+
+# Expected cron for the single daily edition: UTC 04:00 = Beijing 12:00
+EXPECTED_CRON = "0 4 * * *"
 
 
 def _read_workflow(path: Path) -> str:
@@ -44,35 +47,50 @@ def _steps_text(raw: str) -> str:
     return "\n".join(s.get("run", "") for s in steps if isinstance(s, dict))
 
 
+# --- File existence ---
+
+
+def test_workflow_file_exists() -> None:
+    """The consolidated workflow file exists."""
+    assert WORKFLOW_YML.exists()
+
+
+def test_evening_workflow_removed() -> None:
+    """Evening workflow file has been removed (consolidated to single edition)."""
+    evening_yml = WORKFLOW_DIR / "daily-focus-evening.yml"
+    assert not evening_yml.exists(), (
+        "Evening workflow should have been removed during "
+        "consolidation to a single daily edition."
+    )
+
+
 # --- No dead cp commands ---
 
 
-def test_morning_workflow_no_dead_cp():
-    """Morning workflow has no ``cp data/config`` dead-code steps."""
-    raw = _read_workflow(MORNING_YML)
+def test_workflow_no_dead_cp() -> None:
+    """Workflow has no ``cp data/config`` dead-code steps."""
+    raw = _read_workflow(WORKFLOW_YML)
     steps_run = _steps_text(raw)
     assert "cp data/config" not in steps_run, (
-        "Found dead 'cp data/config' command in morning workflow. "
+        "Found dead 'cp data/config' command in workflow. "
         "This was removed in the fix — if it reappears, the capper "
         "config-copy pattern has been re-introduced."
     )
 
 
-def test_evening_workflow_no_dead_cp():
-    """Evening workflow has no ``cp data/config`` dead-code steps."""
-    raw = _read_workflow(EVENING_YML)
-    steps_run = _steps_text(raw)
-    assert "cp data/config" not in steps_run, (
-        "Found dead 'cp data/config' command in evening workflow. "
-        "This was removed in the fix — if it reappears, the capper "
-        "config-copy pattern has been re-introduced."
+def test_workflow_no_period_flag() -> None:
+    """Single-edition workflow no longer passes ``--period`` flag."""
+    raw = _read_workflow(WORKFLOW_YML)
+    assert "--period" not in raw, (
+        "The consolidated workflow should not pass --period flag, "
+        "as there is only a single daily edition."
     )
 
 
 # --- Valid YAML ---
 
 
-def _check_workflow_valid_yaml(path: Path):
+def _check_workflow_valid_yaml(path: Path) -> None:
     """Validate that a workflow file is structurally sound YAML."""
     raw = _read_workflow(path)
     assert yaml.safe_load(raw) is not None, f"Failed to parse YAML: {path}"
@@ -101,50 +119,75 @@ def _check_workflow_valid_yaml(path: Path):
     assert len(gen["steps"]) > 0, "Job must have at least one step"
 
 
-def test_morning_workflow_valid_yaml():
-    """Morning workflow is valid YAML with expected top-level keys."""
-    _check_workflow_valid_yaml(MORNING_YML)
+def test_workflow_valid_yaml() -> None:
+    """Workflow is valid YAML with expected top-level keys."""
+    _check_workflow_valid_yaml(WORKFLOW_YML)
 
 
-def test_evening_workflow_valid_yaml():
-    """Evening workflow is valid YAML with expected top-level keys."""
-    _check_workflow_valid_yaml(EVENING_YML)
+# --- Cron schedule ---
+
+
+def test_workflow_cron_schedule() -> None:
+    """Workflow has the expected cron schedule."""
+    doc = _parse_workflow(WORKFLOW_YML)
+    on_data = _get_on_data(doc)
+    schedule = on_data.get("schedule", [])
+    assert len(schedule) > 0, "Workflow must have a schedule"
+    cron = schedule[0].get("cron", "")
+    assert cron == EXPECTED_CRON, (
+        f"Expected cron '{EXPECTED_CRON}' (UTC 04:00 = Beijing 12:00), "
+        f"got '{cron}'"
+    )
+    # Verify we only have one cron entry (single daily edition)
+    assert len(schedule) == 1, (
+        f"Expected exactly 1 cron schedule for single daily edition, "
+        f"got {len(schedule)}"
+    )
 
 
 # --- Step sanity checks ---
 
 
-def test_morning_workflow_has_deploy_step():
-    """Morning workflow includes the GitHub Pages deploy step."""
-    doc = _parse_workflow(MORNING_YML)
+def test_workflow_has_deploy_step() -> None:
+    """Workflow includes the GitHub Pages deploy step."""
+    doc = _parse_workflow(WORKFLOW_YML)
     steps = doc["jobs"]["generate"]["steps"]
     step_names = [s.get("name", "") for s in steps if isinstance(s, dict)]
     assert "Deploy to GitHub Pages" in step_names, (
-        "Morning workflow must have a 'Deploy to GitHub Pages' step"
+        "Workflow must have a 'Deploy to GitHub Pages' step"
     )
 
 
-def test_evening_workflow_has_deploy_step():
-    """Evening workflow includes the GitHub Pages deploy step."""
-    doc = _parse_workflow(EVENING_YML)
+def test_workflow_uses_hours_24() -> None:
+    """Workflow runs with ``--hours 24`` (single daily edition covers full day)."""
+    raw = _read_workflow(WORKFLOW_YML)
+    assert "--hours 24" in raw, (
+        "Single-edition workflow must pass '--hours 24' "
+        "to cover the full 24-hour window"
+    )
+
+
+def test_workflow_has_uv_setup_step() -> None:
+    """Workflow includes the uv installation step."""
+    doc = _parse_workflow(WORKFLOW_YML)
     steps = doc["jobs"]["generate"]["steps"]
     step_names = [s.get("name", "") for s in steps if isinstance(s, dict)]
-    assert "Deploy to GitHub Pages" in step_names, (
-        "Evening workflow must have a 'Deploy to GitHub Pages' step"
+    assert "Install uv" in step_names or "install uv" in " ".join(step_names).lower(), (
+        "Workflow must have an 'Install uv' step"
     )
 
 
-def test_morning_workflow_correct_period():
-    """Morning workflow runs with ``--period morning``."""
-    raw = _read_workflow(MORNING_YML)
-    assert "--period morning" in raw, (
-        "Morning workflow must pass '--period morning' to the horizon command"
+def test_workflow_deepseek_api_key_env() -> None:
+    """Workflow sets DEEPSEEK_API_KEY environment variable."""
+    raw = _read_workflow(WORKFLOW_YML)
+    assert "DEEPSEEK_API_KEY" in raw, (
+        "Workflow must use DEEPSEEK_API_KEY secret"
     )
 
 
-def test_evening_workflow_correct_period():
-    """Evening workflow runs with ``--period evening``."""
-    raw = _read_workflow(EVENING_YML)
-    assert "--period evening" in raw, (
-        "Evening workflow must pass '--period evening' to the horizon command"
+def test_workflow_no_evening_references() -> None:
+    """Workflow contains no references to 'evening' edition."""
+    raw = _read_workflow(WORKFLOW_YML)
+    assert "evening" not in raw.lower(), (
+        "Consolidated workflow should not reference the evening edition"
     )

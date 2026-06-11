@@ -131,6 +131,10 @@ class RSSScraper(BaseScraper):
         except Exception as e:
             logger.warning("Error parsing RSS feed %s: %s", source.name, e)
 
+        # Cap items per source to max_items — keep most recent first
+        if len(items) > source.max_items:
+            items = items[:source.max_items]
+
         self._save_image_cache(image_cache)
         return items
 

@@ -433,10 +433,8 @@ class DailySummarizer:
             A dict ready to pass to ``DailyRenderer.render_html()``.
         """
         # Next update string
-        if period == "morning":
-            next_update = "今晚 20:00" if language == "zh" else "Tonight 20:00"
-        else:
-            next_update = "明早 08:00" if language == "zh" else "Tomorrow 08:00"
+        # Single daily edition — next update is always tomorrow 12:00 Beijing
+        next_update = "明天 12:00" if language == "zh" else "Tomorrow 12:00"
 
         # Build the flat item-data list (backward-compat) and grouped tabs
         flat_items = []

@@ -88,6 +88,28 @@ class HorizonOrchestrator:
                     f"→ {len(merged_items)} unique items\n"
                 )
 
+            # 3a. Pre-score per-topic cap: limit items per topic before expensive AI scoring
+            pre_score_max = self.config.filtering.pre_score_max_per_topic
+            if pre_score_max > 0:
+                pre_cap_total = len(merged_items)
+                topic_items: dict[str, list] = defaultdict(list)
+                for item in merged_items:
+                    topic = item.metadata.get("topic", "ai-tech")
+                    topic_items[topic].append(item)
+                capped_items = []
+                for topic, items_list in topic_items.items():
+                    # Sort by published_at descending so newest items survive the cap
+                    items_list.sort(key=lambda x: x.published_at, reverse=True)
+                    kept = items_list[:pre_score_max]
+                    capped_items.extend(kept)
+                    if len(items_list) > pre_score_max:
+                        self.console.print(f"  📊 Pre-score cap [{topic}]: {len(items_list)} → {len(kept)}")
+                merged_items = capped_items
+                if pre_cap_total > len(merged_items):
+                    self.console.print(
+                        f"  📊 Total pre-score cap: {pre_cap_total} → {len(merged_items)} items\n"
+                    )
+
             # 4. Analyze with AI
             analyzed_items = await self._analyze_content(merged_items)
             self.console.print(f"🤖 Analyzed {len(analyzed_items)} items with AI\n")

@@ -19,28 +19,39 @@ def _parse_daily_html_path(path: Path) -> Optional[Dict[str, str]]:
 
     Expected patterns::
 
-        2026-06-01-morning.html          (no lang — legacy)
-        2026-06-01-morning-zh.html        (with lang code)
+        2026-06-01.html                    (no lang, no period)
+        2026-06-01-zh.html                 (lang, no period — new single-edition)
+        2026-06-01-morning.html            (no lang — legacy two-edition)
+        2026-06-01-morning-zh.html         (with lang code — legacy two-edition)
 
     Returns None for non-matching files.
     """
     stem = path.stem
     parts = stem.split("-")
-    # parts must be: [YYYY, MM, DD, period] or [YYYY, MM, DD, period, lang]
-    if len(parts) < 4 or len(parts) > 5:
+    # parts: [YYYY, MM, DD] or [YYYY, MM, DD, period/lang] or [YYYY, MM, DD, period, lang]
+    if len(parts) < 3 or len(parts) > 5:
         return None
     date = "-".join(parts[:3])
     if len(date) != 10 or date[4] != "-" or date[7] != "-":
         return None
-    period = parts[3]
-    if period not in ("morning", "evening"):
-        return None
-    lang = parts[4] if len(parts) == 5 else None
+    period: str | None = None
+    lang: str | None = None
+    if len(parts) == 4:
+        fourth = parts[3]
+        if fourth in ("morning", "evening"):
+            period = fourth
+        else:
+            lang = fourth
+    elif len(parts) == 5:
+        period = parts[3]
+        lang = parts[4]
     return {"date": date, "period": period, "lang": lang}
 
 
-def _period_label(period: str) -> str:
-    """Translate period key to a label for display."""
+def _period_label(period: str | None) -> str:
+    """Translate period key to a label for display. Returns '' for single-edition (no period)."""
+    if period is None:
+        return ""
     return "Morning" if period == "morning" else "Evening"
 
 
@@ -64,10 +75,12 @@ def build_archive_entries(daily_dir: Path) -> List[Dict[str, str]]:
         date = parsed["date"]
         period = parsed["period"]
         lang = parsed.get("lang")  # None for legacy files (no language suffix)
-        if lang:
+        if period and lang:
             url = f"daily/{date}-{period}-{lang}.html"
         elif period:
             url = f"daily/{date}-{period}.html"
+        elif lang:
+            url = f"daily/{date}-{lang}.html"
         else:
             url = f"daily/{date}.html"
         raw.append({
@@ -106,7 +119,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Rebuild docs/index.html + docs/archive.html from saved HTML reports."
     )
-    parser.add_argument("--period", default="morning", help="Edition period")
+    parser.add_argument("--period", default=None, help="Edition period (deprecated, kept for backward compat)")
     args = parser.parse_args()
 
     # Paths

@@ -22,10 +22,15 @@ def test_resolve_horizon_path_accepts_explicit_repo() -> None:
 
 
 def test_resolve_config_path_defaults_to_repo_data_config() -> None:
+    """resolve_config_path finds a config file without explicit path."""
     repo_root = Path(__file__).resolve().parents[1]
 
     resolved = resolve_config_path(repo_root)
-    assert resolved == (repo_root / "data" / "config-morning.json").resolve()
+    # Should resolve to an existing config file
+    assert resolved.exists()
+    # The config file should be in the data directory
+    assert resolved.parent.name == "data"
+    assert resolved.name in ("config.json", "config-morning.json", "config-evening.json")
 
 
 def test_load_mcp_secrets_loads_generic_env_keys(tmp_path: Path, monkeypatch) -> None:

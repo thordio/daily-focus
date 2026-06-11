@@ -10,14 +10,14 @@
 
 </div>
 
-A personalized fork of [Horizon](https://github.com/Thysrael/Horizon) (MIT License). Daily Focus fetches, scores, enriches, and renders a curated HTML briefing every morning and evening — no noise, no filler, every claim traceable to a source.
+A personalized fork of [Horizon](https://github.com/Thysrael/Horizon) (MIT License). Daily Focus fetches, scores, enriches, and renders a curated HTML briefing daily — no noise, no filler, every claim traceable to a source.
 
 ## Key Features
 
 - **Three Topic Tabs**: AI Technology (AI 技术), AI Markets (AI 市场), Economy (经济动向)
 - **Per-topic Caps**: AI tech/markets 6-10 articles, economy 5-7 articles
 - **Bilingual Output**: Chinese (zh) and English (en) editions
-- **Two Daily Editions**: Morning (早报, UTC 00:00) and Evening (晚报, UTC 12:00)
+- **Single Daily Edition**: Generated daily via GitHub Actions cron (UTC 04:00)
 - **Anti-Hallucination**: Every claim grounded in source URLs and web search; "No reliable information" fallback when uncertain
 - **Pydantic v2 Models**: All data flows through validated `ContentItem` models; config validated at startup
 - **Pipeline**: Fetch (RSS, GitHub, Hacker News, Reddit, Telegram, Twitter, OpenBB) → AI Score → Semantic Dedup → Cap → Web Search Enrich → AI Summarize → Render HTML
@@ -46,28 +46,24 @@ uv sync
 # Set your API key
 export DEEPSEEK_API_KEY=your_key_here
 
-# Run morning edition (14-hour window)
-uv run horizon --hours 14 --period morning
-
-# Run evening edition (10-hour window)
-uv run horizon --hours 10 --period evening
+# Run the pipeline
+uv run horizon
 
 # Open the result
-open docs/daily/$(date +%Y-%m-%d)-morning-zh.html
+open docs/daily/$(date +%Y-%m-%d)-zh.html
 ```
 
 ## Config Files
 
-- `data/config-morning.json` — morning edition (14h window, threshold 4.0, concurrency 20)
-- `data/config-evening.json` — evening edition (10h window, threshold 4.0, concurrency 20)
+- `data/config.json` — single daily edition (24h window, threshold 4.0, concurrency 20)
 
-Auto-selected by the `--period morning|evening` flag. All configs are validated at startup via Pydantic `Config.model_validate()`.
+All configs are validated at startup via Pydantic `Config.model_validate()`.
 
 ## GitHub Actions Setup
 
 1. Add `DEEPSEEK_API_KEY` as a repository secret (Settings → Secrets and variables → Actions).
 2. Ensure the repo is **public** (GitHub provides free unlimited Actions minutes for public repos).
-3. Workflows are at `.github/workflows/daily-focus-morning.yml` and `daily-focus-evening.yml`.
+3. Workflow is at `.github/workflows/daily-focus.yml`.
 4. Deployment uses [`peaceiris/actions-gh-pages@v4`](https://github.com/peaceiris/actions-gh-pages) to publish to GitHub Pages.
 
 ## Pipeline

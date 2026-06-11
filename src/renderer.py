@@ -40,7 +40,7 @@ class DailyRenderer:
         Args:
             entries: List of dicts, each with keys:
                 ``date`` (str, YYYY-MM-DD),
-                ``period_label`` (str, "早报"/"晚报"/"Morning"/"Evening"),
+                ``period_label`` (str, "Morning"/"Evening" for legacy, "" for single-edition),
                 ``title`` (str),
                 ``url`` (str, relative path).
 

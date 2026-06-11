@@ -392,12 +392,23 @@ def test_tab_render_javascript_function() -> None:
 
 
 def test_config_rss_sources_have_topic() -> None:
-    """All RSS sources in morning/evening configs have a topic field."""
+    """All RSS sources in config files have a topic field."""
     import json
 
-    for fn in ["data/config-morning.json", "data/config-evening.json"]:
-        with open(fn) as f:
-            cfg_dict = json.load(f)
+    import pytest
+
+    # Try config.json first (single-edition), fall back to legacy
+    config_candidates = ["data/config.json", "data/config-morning.json"]
+    tested = False
+    for fn in config_candidates:
+        try:
+            with open(fn) as f:
+                cfg_dict = json.load(f)
+        except FileNotFoundError:
+            continue
         for src in cfg_dict["sources"]["rss"]:
             assert "topic" in src, f"{fn}: {src['name']} is missing topic"
             assert isinstance(src["topic"], str), f"{fn}: {src['name']} topic is not a string"
+        tested = True
+        break
+    assert tested, "No config file found among: " + ", ".join(config_candidates)

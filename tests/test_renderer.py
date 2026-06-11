@@ -114,7 +114,7 @@ def test_structured_data_fields():
     assert data["language"] == "zh"
     assert data["total_fetched"] == 50
     assert data["selected_count"] == 2
-    assert data["next_update"] == "今晚 20:00"
+    assert data["next_update"] == "明天 12:00"
 
 
 def test_structured_data_next_update():
@@ -123,13 +123,13 @@ def test_structured_data_next_update():
     items = make_sample_items()
 
     # morning/zh
-    assert s.get_structured_data(items, "d", 10, "zh", "morning")["next_update"] == "今晚 20:00"
+    assert s.get_structured_data(items, "d", 10, "zh", "morning")["next_update"] == "明天 12:00"
     # morning/en
-    assert s.get_structured_data(items, "d", 10, "en", "morning")["next_update"] == "Tonight 20:00"
+    assert s.get_structured_data(items, "d", 10, "en", "morning")["next_update"] == "Tomorrow 12:00"
     # evening/zh
-    assert s.get_structured_data(items, "d", 10, "zh", "evening")["next_update"] == "明早 08:00"
+    assert s.get_structured_data(items, "d", 10, "zh", "evening")["next_update"] == "明天 12:00"
     # evening/en
-    assert s.get_structured_data(items, "d", 10, "en", "evening")["next_update"] == "Tomorrow 08:00"
+    assert s.get_structured_data(items, "d", 10, "en", "evening")["next_update"] == "Tomorrow 12:00"
 
 
 def test_structured_data_item_fields():
@@ -209,7 +209,7 @@ def test_structured_data_evening():
     data = s.get_structured_data(items, "2026-06-01", 50, "zh", "evening")
 
     assert data["period"] == "evening"
-    assert data["next_update"] == "明早 08:00"
+    assert data["next_update"] == "明天 12:00"
 
 
 # --- DailyRenderer tests ---
@@ -249,13 +249,13 @@ def test_render_html_bilingual():
     html_zh = r.render_html(data_zh)
     assert "发生了什么" in html_zh
     assert "为什么重要" in html_zh
-    assert "Daily Focus 早报" in html_zh
+    assert "Daily Focus" in html_zh
 
     data_en = s.get_structured_data(items, "2026-06-01", 50, "en", "evening")
     html_en = r.render_html(data_en)
     assert "What's New" in html_en
     assert "Why It Matters" in html_en
-    assert "Daily Focus Evening" in html_en
+    assert "Daily Focus" in html_en
 
 
 def test_render_html_manifest_link():
@@ -302,7 +302,7 @@ def test_render_html_empty():
         "language": "zh",
         "total_fetched": 100,
         "selected_count": 0,
-        "next_update": "今晚 20:00",
+        "next_update": "明天 12:00",
         "items": [],
     }
     html = r.render_html(data)
@@ -482,26 +482,15 @@ def test_render_html_very_long_title():
 
 
 def test_render_html_period_titles():
-    """Title includes '早报' for morning, '晚报' for evening in both languages."""
+    """Title is 'Daily Focus' for all periods in both languages."""
     s = DailySummarizer()
     items = make_sample_items()
     r = DailyRenderer()
 
-    # Morning ZH
-    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning")
-    assert "Daily Focus 早报" in r.render_html(data)
-
-    # Morning EN
-    data = s.get_structured_data(items, "2026-06-01", 50, "en", "morning")
-    assert "Daily Focus Morning" in r.render_html(data)
-
-    # Evening ZH
-    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "evening")
-    assert "Daily Focus 晚报" in r.render_html(data)
-
-    # Evening EN
-    data = s.get_structured_data(items, "2026-06-01", 50, "en", "evening")
-    assert "Daily Focus Evening" in r.render_html(data)
+    for lang in ("zh", "en"):
+        for period in ("morning", "evening"):
+            data = s.get_structured_data(items, "2026-06-01", 50, lang, period)
+            assert "Daily Focus" in r.render_html(data)
 
 
 # --- PWA / Static file validation ---

@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 
+import pytest
+
 from src.models import RSSSourceConfig
 from src.scrapers.rss import RSSScraper
 
@@ -220,3 +222,166 @@ def test_rss_image_cache_dedup() -> None:
     scraper = _make_scraper_for_feed("")
     cache = scraper._load_image_cache()
     assert isinstance(cache, dict)
+
+
+# ---------------------------------------------------------------------------
+# 6. Per-feed max_items cap
+# ---------------------------------------------------------------------------
+
+
+def test_rss_max_items_default_is_30() -> None:
+    """RSSSourceConfig has max_items with default 30."""
+    cfg = RSSSourceConfig(name="Test", url="https://example.com/feed.xml")
+    assert cfg.max_items == 30
+
+
+def test_rss_max_items_custom_value() -> None:
+    """RSSSourceConfig accepts custom max_items value."""
+    cfg = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=5
+    )
+    assert cfg.max_items == 5
+
+
+def test_rss_max_items_round_trip() -> None:
+    """max_items round-trips through serialization."""
+    cfg = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=10
+    )
+    dumped = cfg.model_dump()
+    assert dumped["max_items"] == 10
+    loaded = RSSSourceConfig.model_validate(dumped)
+    assert loaded.max_items == 10
+
+
+def test_rss_max_items_model_validate() -> None:
+    """max_items is parseable via model_validate."""
+    data = {"name": "Test", "url": "https://example.com/feed.xml", "max_items": 3}
+    cfg = RSSSourceConfig.model_validate(data)
+    assert cfg.max_items == 3
+
+
+def _make_feed_with_n_items(n: int) -> str:
+    """Build an RSS feed XML string with ``n`` items."""
+    parts = ['<?xml version="1.0" encoding="UTF-8" ?>',
+             '<rss version="2.0"><channel><title>Test</title>']
+    for i in range(n):
+        parts.append(
+            f'<item><guid>entry-{i}</guid><title>Item {i}</title>'
+            f'<link>https://example.com/{i}</link>'
+            f'<pubDate>Fri, 24 Apr 2026 12:00:00 GMT</pubDate>'
+            f'<description>Content {i}</description></item>'
+        )
+    parts.append('</channel></rss>')
+    return '\n'.join(parts)
+
+
+def test_rss_max_items_cap_applied() -> None:
+    """Scraper returns at most max_items items from a feed."""
+    feed = _make_feed_with_n_items(10)
+    response = MagicMock()
+    response.text = feed
+    response.raise_for_status.return_value = None
+    client = AsyncMock()
+    client.get.return_value = response
+
+    source = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=5
+    )
+    scraper = RSSScraper([source], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 5
+
+
+def test_rss_max_items_no_padding() -> None:
+    """If feed has fewer items than max_items, all are returned (no padding)."""
+    feed = _make_feed_with_n_items(3)
+    response = MagicMock()
+    response.text = feed
+    response.raise_for_status.return_value = None
+    client = AsyncMock()
+    client.get.return_value = response
+
+    source = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=10
+    )
+    scraper = RSSScraper([source], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 3  # not padded to 10
+
+
+def test_rss_max_items_exact_match() -> None:
+    """When feed has exactly max_items items, all are returned."""
+    feed = _make_feed_with_n_items(5)
+    response = MagicMock()
+    response.text = feed
+    response.raise_for_status.return_value = None
+    client = AsyncMock()
+    client.get.return_value = response
+
+    source = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=5
+    )
+    scraper = RSSScraper([source], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 5
+
+
+def test_rss_max_items_zero_edge_case() -> None:
+    """max_items=0 causes the scraper to return 0 items.
+
+    The current implementation slices ``items[:0]`` when max_items is 0,
+    which returns an empty list. This documents that behavior; if a
+    different semantic is desired (e.g., 0 means "no limit"), the
+    comment in ``RSSScraper._fetch_feed`` needs updating.
+    """
+    feed = _make_feed_with_n_items(5)
+    response = MagicMock()
+    response.text = feed
+    response.raise_for_status.return_value = None
+    client = AsyncMock()
+    client.get.return_value = response
+
+    source = RSSSourceConfig(
+        name="Test", url="https://example.com/feed.xml", max_items=0
+    )
+    scraper = RSSScraper([source], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    # max_items=0 → slice [:0] → empty list
+    assert len(items) == 0
+
+
+def test_rss_max_items_per_feed_independent() -> None:
+    """Different feeds have independent max_items caps."""
+    feed_a = _make_feed_with_n_items(10)
+    feed_b = _make_feed_with_n_items(5)
+
+    response_a = MagicMock()
+    response_a.text = feed_a
+    response_a.raise_for_status.return_value = None
+    response_b = MagicMock()
+    response_b.text = feed_b
+    response_b.raise_for_status.return_value = None
+
+    client = AsyncMock()
+    client.get.side_effect = [response_a, response_b]
+
+    source_a = RSSSourceConfig(
+        name="FeedA", url="https://example.com/feedA.xml", max_items=3
+    )
+    source_b = RSSSourceConfig(
+        name="FeedB", url="https://example.com/feedB.xml", max_items=10
+    )
+    scraper = RSSScraper([source_a, source_b], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 8  # 3 capped from feed A + 5 from feed B

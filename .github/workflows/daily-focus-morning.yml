@@ -1,7 +1,7 @@
-name: Daily Focus Morning
+name: Daily Focus
 on:
   schedule:
-    - cron: "0 0 * * *"  # UTC 00:00 = Beijing 08:00
+    - cron: "0 4 * * *"  # UTC 04:00 = Beijing 12:00
   workflow_dispatch:
 jobs:
   generate:
@@ -13,9 +13,9 @@ jobs:
       - name: Run Horizon
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run horizon --hours 14 --period morning
+        run: uv run horizon --hours 24
       - name: Render & Deploy
-        run: uv run python scripts/render_and_deploy.py --period morning
+        run: uv run python scripts/render_and_deploy.py
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

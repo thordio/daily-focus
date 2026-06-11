@@ -97,6 +97,7 @@ class RSSSourceConfig(BaseModel):
     enabled: bool = True
     category: Optional[str] = None
     topic: str = "ai-tech"  # "ai-tech" | "ai-markets" | "economy"
+    max_items: int = 30  # cap items per feed before AI scoring
 
 
 class RedditSubredditConfig(BaseModel):
@@ -331,6 +332,7 @@ class FilteringConfig(BaseModel):
     ai_score_threshold: float = 7.0
     time_window_hours: int = 24
     topic_limits: Dict[str, TopicLimitConfig] = Field(default_factory=dict)
+    pre_score_max_per_topic: int = 50  # cap per topic before expensive AI scoring
 
 
 class Config(BaseModel):

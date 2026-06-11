@@ -48,12 +48,8 @@ def main():
         # Ensure we're in the project directory or use data/ in current dir
         data_dir = Path("data")
 
-        # Auto-select config file based on --period flag
-        config_path = data_dir / f"config-{args.period}.json"
-        if config_path.exists():
-            storage = StorageManager(data_dir=str(data_dir), config_path=str(config_path))
-        else:
-            storage = StorageManager(data_dir=str(data_dir))
+        # Always use config.json (period-specific configs have been consolidated)
+        storage = StorageManager(data_dir=str(data_dir))
 
         # Load configuration
         try:
