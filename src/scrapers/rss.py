@@ -1,5 +1,6 @@
 """RSS feed scraper implementation."""
 
+import asyncio
 import calendar
 import hashlib
 import json
@@ -34,7 +35,7 @@ class RSSScraper(BaseScraper):
         super().__init__({"sources": sources}, http_client)
 
     async def fetch(self, since: datetime) -> List[ContentItem]:
-        """Fetch RSS feed items.
+        """Fetch RSS feed items concurrently.
 
         Args:
             since: Only fetch items published after this time
@@ -42,32 +43,42 @@ class RSSScraper(BaseScraper):
         Returns:
             List[ContentItem]: Fetched content items
         """
+        sources = [s for s in self.config["sources"] if s.enabled]
+        if not sources:
+            return []
+
+        image_cache = self._load_image_cache()
+        results = await asyncio.gather(
+            *(self._fetch_feed(source, since, image_cache=image_cache) for source in sources),
+            return_exceptions=True,
+        )
         items = []
-        sources = self.config["sources"]
-
-        for source in sources:
-            if not source.enabled:
-                continue
-
-            feed_items = await self._fetch_feed(source, since)
-            items.extend(feed_items)
-
+        for source, result in zip(sources, results):
+            if isinstance(result, Exception):
+                logger.warning("Error fetching RSS feed %s: %s", source.name, result)
+            elif isinstance(result, list):
+                items.extend(result)
+        self._save_image_cache(image_cache)
         return items
 
     async def _fetch_feed(
-        self, source: RSSSourceConfig, since: datetime
+        self, source: RSSSourceConfig, since: datetime, image_cache: Dict[str, int] = None
     ) -> List[ContentItem]:
         """Fetch items from a single RSS feed.
 
         Args:
             source: RSS feed configuration
             since: Only fetch items after this time
+            image_cache: Optional shared image URL cache. If not provided,
+                         a local cache is loaded and saved independently.
 
         Returns:
             List[ContentItem]: Feed content items
         """
         items = []
-        image_cache = self._load_image_cache()
+        own_cache = image_cache is None
+        if own_cache:
+            image_cache = self._load_image_cache()
         feed_url_str = str(source.url)
 
         try:
@@ -135,7 +146,8 @@ class RSSScraper(BaseScraper):
         if len(items) > source.max_items:
             items = items[:source.max_items]
 
-        self._save_image_cache(image_cache)
+        if own_cache:
+            self._save_image_cache(image_cache)
         return items
 
     def _parse_date(self, entry: dict) -> datetime:

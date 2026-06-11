@@ -1,8 +1,7 @@
 """Content analysis using AI."""
 
 import asyncio
-import json
-import re
+import time
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, MofNCompleteColumn
@@ -11,6 +10,7 @@ from .client import AIClient
 from .prompts import CONTENT_ANALYSIS_SYSTEM, CONTENT_ANALYSIS_USER
 from .utils import parse_json_response
 from ..models import ContentItem
+from ..utils.benchmark import enabled as bench_enabled
 
 DEFAULT_THROTTLE_SEC = 0.0
 
@@ -20,6 +20,7 @@ class ContentAnalyzer:
 
     def __init__(self, ai_client: AIClient):
         self.client = ai_client
+        self._llm_wait = 0.0
 
     @staticmethod
     def _parse_json_response(response: str) -> Optional[dict]:
@@ -42,6 +43,7 @@ class ContentAnalyzer:
         return max(concurrency, 1)
 
     async def analyze_batch(self, items: List[ContentItem]) -> List[ContentItem]:
+        _batch_start = time.perf_counter() if bench_enabled() else 0
         throttle_sec = self._get_throttle_sec()
         concurrency = self._get_concurrency()
         semaphore = asyncio.Semaphore(concurrency)
@@ -72,6 +74,13 @@ class ContentAnalyzer:
                 _process(item, i, task) for i, item in enumerate(items)
             ]
             analyzed_items = await asyncio.gather(*coros)
+
+        if bench_enabled() and len(items) > 0:
+            total = time.perf_counter() - _batch_start
+            local = max(0, total - self._llm_wait)
+            avg = self._llm_wait / len(items)
+            print(f"    ⏱ LLM: {self._llm_wait:.1f}s avg: {avg:.1f}s/item | Other: {local:.1f}s")
+            self._llm_wait = 0.0
 
         return analyzed_items
 
@@ -140,10 +149,14 @@ class ContentAnalyzer:
         )
 
         # Get AI completion
+        if bench_enabled():
+            _t0 = time.perf_counter()
         response = await self.client.complete(
             system=CONTENT_ANALYSIS_SYSTEM,
             user=user_prompt,
         )
+        if bench_enabled():
+            self._llm_wait += time.perf_counter() - _t0
 
         # Parse JSON response with robust fallback
         result = self._parse_json_response(response)

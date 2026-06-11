@@ -55,7 +55,7 @@ open docs/daily/$(date +%Y-%m-%d)-zh.html
 
 ## Config Files
 
-- `data/config.json` — single daily edition (24h window, threshold 4.0, concurrency 20)
+- `data/config.json` — single daily edition (24h window, threshold 4.0, concurrency 30)
 
 All configs are validated at startup via Pydantic `Config.model_validate()`.
 
@@ -63,7 +63,7 @@ All configs are validated at startup via Pydantic `Config.model_validate()`.
 
 1. Add `DEEPSEEK_API_KEY` as a repository secret (Settings → Secrets and variables → Actions).
 2. Ensure the repo is **public** (GitHub provides free unlimited Actions minutes for public repos).
-3. Workflow is at `.github/workflows/daily-focus.yml`.
+3. Workflow is at `.github/workflows/daily-focus-morning.yml`.
 4. Deployment uses [`peaceiris/actions-gh-pages@v4`](https://github.com/peaceiris/actions-gh-pages) to publish to GitHub Pages.
 
 ## Pipeline

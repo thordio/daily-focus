@@ -6,10 +6,8 @@ For items that pass the score threshold, this module:
 """
 
 import asyncio
-import json
-import re
-import sys
-import os
+import concurrent.futures
+import time
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, MofNCompleteColumn
@@ -21,6 +19,22 @@ from .prompts import (
 )
 from .utils import parse_json_response
 from ..models import ContentItem
+from ..utils.benchmark import enabled as bench_enabled
+
+
+# Dedicated thread pool for concurrent DuckDuckGo searches.
+# Default asyncio thread pool min(32, cpu_count+4) == 12 on 8-core Macs,
+# which is insufficient for 27+ concurrent enrichment web searches.
+_SEARCH_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=50)
+
+
+def _ddgs_search_sync(query: str, max_results: int) -> list:
+    """Synchronous DDGS search with thread-safe stderr suppression."""
+    from io import StringIO
+    import contextlib
+    with contextlib.redirect_stderr(StringIO()):
+        ddgs = DDGS()
+        return ddgs.text(query, max_results=max_results)
 
 
 class ContentEnricher:
@@ -29,16 +43,21 @@ class ContentEnricher:
     # Items at or above this score get web search + full background enrichment.
     # Items below it skip web search (saving ~9s + API cost) and get enrichment
     # from article content alone.
-    _MIN_SCORE_FOR_WEB_SEARCH = 7.0
+    _MIN_SCORE_FOR_WEB_SEARCH = 8.0
 
     def __init__(self, ai_client: AIClient):
         self.client = ai_client
+        self._llm_wait = 0.0
+        self._search_time = 0.0
 
     def _get_concurrency(self) -> int:
         """Return the configured enrichment concurrency, clamped to 1 or above."""
         config = getattr(self.client, "config", None)
         concurrency = getattr(config, "enrichment_concurrency", 1)
-        return max(concurrency, 1)
+        result = max(concurrency, 1)
+        if bench_enabled():
+            print(f"    [debug] enrichment concurrency: {result}")
+        return result
 
     async def enrich_batch(self, items: List[ContentItem]) -> None:
         """Enrich items in-place with background knowledge.
@@ -46,6 +65,7 @@ class ContentEnricher:
         Args:
             items: Content items to enrich (modified in-place)
         """
+        _batch_start = time.perf_counter() if bench_enabled() else 0
         concurrency = self._get_concurrency()
         semaphore = asyncio.Semaphore(concurrency)
 
@@ -70,22 +90,29 @@ class ContentEnricher:
             ]
             await asyncio.gather(*coros)
 
+        if bench_enabled() and len(items) > 0:
+            total = time.perf_counter() - _batch_start
+            local = max(0, total - self._llm_wait - self._search_time)
+            avg_enrich = self._llm_wait / len(items) if len(items) > 0 else 0
+            print(f"    ⏱ Web: {self._search_time:.1f}s | LLM: {self._llm_wait:.1f}s ({avg_enrich:.1f}s/item) | Other: {local:.1f}s | Items: {len(items)}")
+            self._llm_wait = 0.0
+            self._search_time = 0.0
+
     async def _web_search(self, query: str, max_results: int = 3) -> list:
         """Search the web for context via DuckDuckGo.
 
-        Returns:
-            List of dicts with keys: title, url, body
+        Runs the entire DDGS call (including stderr suppression) in a
+        dedicated thread pool so each thread manages its own file
+        descriptors — no global sys.stderr race.
         """
         try:
-            # Suppress primp "Impersonate ... does not exist" stderr warning
-            stderr = sys.stderr
-            sys.stderr = open(os.devnull, "w")
-            try:
-                ddgs = DDGS()
-                results = await asyncio.to_thread(ddgs.text, query, max_results=max_results)
-            finally:
-                sys.stderr.close()
-                sys.stderr = stderr
+            loop = asyncio.get_running_loop()
+            results = await loop.run_in_executor(
+                _SEARCH_EXECUTOR,
+                _ddgs_search_sync,
+                query,
+                max_results,
+            )
         except Exception:
             return []
 
@@ -141,7 +168,7 @@ class ContentEnricher:
     async def _enrich_item(self, item: ContentItem) -> None:
         """Enrich a single item with background knowledge.
 
-        For items below ``_MIN_SCORE_FOR_WEB_SEARCH`` (7.0), the web search is
+        For items below ``_MIN_SCORE_FOR_WEB_SEARCH`` (8.0), the web search is
         skipped entirely — enrichment is generated from article content alone.
         This saves ~9s of web search time for borderline-interesting items.
 
@@ -173,12 +200,15 @@ class ContentEnricher:
         available_urls = {}
 
         if needs_web_search:
-            queries = [q for q in [item.title, ", ".join(item.ai_tags)] if q]
+            queries = [item.title] if item.title else []
             if queries:
+                _search_start = time.perf_counter() if bench_enabled() else 0
                 search_results = await asyncio.gather(
                     *(self._web_search(query) for query in queries),
                     return_exceptions=True,
                 )
+                if bench_enabled():
+                    self._search_time += time.perf_counter() - _search_start
                 web_sections = []
                 for query, results in zip(queries, search_results):
                     if isinstance(results, Exception):
@@ -211,10 +241,14 @@ class ContentEnricher:
             json_schema=json_schema,
         )
 
+        if bench_enabled():
+            _llm_start = time.perf_counter()
         response = await self.client.complete(
             system=CONTENT_ENRICHMENT_SYSTEM,
             user=user_prompt,
         )
+        if bench_enabled():
+            self._llm_wait += time.perf_counter() - _llm_start
 
         # Parse JSON response with robust fallback
         result = self._parse_json_response(response)

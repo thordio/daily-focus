@@ -12,12 +12,25 @@ Focus areas:
 9.  TopicLimitConfig min <= max validation
 10. Non-RSS topic fallback (HackerNews/Reddit/GitHub/OSSInsight -> ai-tech)
 11. Orchestrator reads topic_limits from config (not hardcoded MIN_ITEMS)
+12. Dedup chunking helper (chunk split, empty, indices)
+13. Dedup small/large set orchestration
+14. Enrich web search threshold gating
+15. Enrichment parallelism produces identical output across concurrency levels
+16. Enrichment output contains all required metadata fields per language
+17. High-score items get web search results stored in metadata sources
+18. Chunked dedup produces same results as single-call dedup
+19. Dedup output correctness (keeps primaries, drops duplicates, merges content)
 """
 
 from __future__ import annotations
 
+import asyncio
+import copy
+import json
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import AsyncMock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -1199,3 +1212,826 @@ def test_orchestrator_uses_config_topic_limits_not_hardcoded():
     assert "MIN_ITEMS" not in content, (
         "MIN_ITEMS hardcoded dict must be removed from orchestrator"
     )
+
+
+# ===========================================================================
+# QA 1 — Performance: Dedup chunking helper
+# ===========================================================================
+
+def _chunk_items(items: list, chunk_size: int = 25) -> list[list[tuple[int, object]]]:
+    """Split items into chunks preserving original indices for offset correction.
+
+    Each chunk is a list of ``(original_index, item)`` tuples.  Useful for
+    breaking a large dedup AI call into smaller parallel requests where the
+    returned duplicate indices need to be mapped back to the full-item list.
+
+    Args:
+        items: The full list of items to chunk.
+        chunk_size: Maximum number of items per chunk.
+
+    Returns:
+        List of chunks, where each chunk is a list of (original_index, item).
+    """
+    return [
+        [(i, items[i]) for i in range(start, min(start + chunk_size, len(items)))]
+        for start in range(0, len(items), chunk_size)
+    ]
+
+
+def test_dedup_chunk_split():
+    """Verify items are split into correct chunk sizes."""
+    items = list(range(60))
+    chunks = _chunk_items(items, chunk_size=25)
+    assert len(chunks) == 3          # 60/25 = 2.4 → 3 chunks
+    assert len(chunks[0]) == 25       # chunk 0: items 0-24
+    assert len(chunks[1]) == 25       # chunk 1: items 25-49
+    assert len(chunks[2]) == 10       # chunk 2: items 50-59
+
+
+def test_dedup_chunk_handles_empty():
+    """Empty list and single item produce correct chunks."""
+    assert _chunk_items([], chunk_size=25) == [], "Empty list → no chunks"
+
+    chunks = _chunk_items([42], chunk_size=25)
+    assert len(chunks) == 1
+    assert chunks[0] == [(0, 42)]
+
+
+def test_dedup_chunk_indices_correct():
+    """Verify original indices are preserved in each chunk."""
+    items = list(range(60))
+    chunks = _chunk_items(items, chunk_size=25)
+
+    # Chunk 0: indices 0-24
+    assert chunks[0][0] == (0, 0)
+    assert chunks[0][-1] == (24, 24)
+
+    # Chunk 1: indices 25-49
+    assert chunks[1][0] == (25, 25)
+    assert chunks[1][-1] == (49, 49)
+
+    # Chunk 2: indices 50-59
+    assert chunks[2][0] == (50, 50)
+    assert chunks[2][-1] == (59, 59)
+
+    # Verify all 60 original indices are covered
+    all_indices = sorted(idx for chunk in chunks for idx, _ in chunk)
+    assert all_indices == list(range(60))
+
+
+# ===========================================================================
+# QA 1 — Performance: Dedup small/large set via orchestrator
+# ===========================================================================
+
+
+def test_dedup_small_set_no_chunking(monkeypatch):
+    """A small item set (≤25) processes the single-chunk path without error.
+
+    Mocks the AI client so the test does not require a real API key.
+    """
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = '{"duplicates": []}'
+    monkeypatch.setattr("src.orchestrator.create_ai_client", lambda config: mock_client)
+
+    from src.orchestrator import HorizonOrchestrator
+    from tests.conftest_helpers import make_config
+
+    config = make_config()
+    storage = MagicMock()
+    orch = HorizonOrchestrator(config, storage)
+
+    items = [make_content_item(item_id=f"item-{i}", title=f"Item {i}") for i in range(20)]
+
+    result = asyncio.run(orch.merge_topic_duplicates(items))
+    assert len(result) == 20  # No duplicates found, all items returned
+
+
+def test_dedup_large_set_chunking(monkeypatch):
+    """A large item set (>25) processes without crashing.
+
+    Mocks the AI client so the test does not require a real API key.
+    The Builder's chunked implementation should handle >25 items by
+    splitting into chunks, processing each, and merging results with
+    correct offset indices.
+    """
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = '{"duplicates": []}'
+    monkeypatch.setattr("src.orchestrator.create_ai_client", lambda config: mock_client)
+
+    from src.orchestrator import HorizonOrchestrator
+    from tests.conftest_helpers import make_config
+
+    config = make_config()
+    storage = MagicMock()
+    orch = HorizonOrchestrator(config, storage)
+
+    items = [make_content_item(item_id=f"item-{i}", title=f"Item {i}") for i in range(30)]
+
+    # Must not raise for >25 items (multi-chunk path)
+    result = asyncio.run(orch.merge_topic_duplicates(items))
+    assert len(result) == 30  # No duplicates found, all items returned
+
+
+# ===========================================================================
+# QA 1 — Performance: Enrich web search threshold gating
+# ===========================================================================
+
+
+class TestEnrichWebSearch:
+    """Tests for the web-search gating logic in ContentEnricher.
+
+    Items below ``_MIN_SCORE_FOR_WEB_SEARCH`` should skip the expensive
+    web search and get enrichment from article content alone.
+    """
+
+    def test_enrich_web_search_threshold_8(self, monkeypatch):
+        """Items with score < 8.0 should NOT trigger web search."""
+        monkeypatch.setattr(
+            "src.ai.enricher.ContentEnricher._MIN_SCORE_FOR_WEB_SEARCH", 8.0,
+        )
+
+        from src.ai.enricher import ContentEnricher
+
+        client = AsyncMock()
+        client.complete.return_value = '{"title_en": "test"}'
+        enricher = ContentEnricher(client)
+
+        mock_web_search = AsyncMock(return_value=[])
+        monkeypatch.setattr(enricher, "_web_search", mock_web_search)
+
+        item = make_content_item(
+            item_id="low-score",
+            title="Low Score Item",
+            ai_score=7.5,  # Below 8.0 threshold
+            ai_tags=["test"],
+            content="Test content.",
+            ai_summary="A summary.",
+            ai_reason="A reason.",
+        )
+        asyncio.run(enricher._enrich_item(item))
+
+        mock_web_search.assert_not_called()
+
+    def test_enrich_web_search_at_or_above_8(self, monkeypatch):
+        """Items with score >= 8.0 SHOULD trigger web search."""
+        monkeypatch.setattr(
+            "src.ai.enricher.ContentEnricher._MIN_SCORE_FOR_WEB_SEARCH", 8.0,
+        )
+
+        from src.ai.enricher import ContentEnricher
+
+        client = AsyncMock()
+        client.complete.return_value = '{"title_en": "test"}'
+        enricher = ContentEnricher(client)
+
+        mock_web_search = AsyncMock(return_value=[])
+        monkeypatch.setattr(enricher, "_web_search", mock_web_search)
+
+        item = make_content_item(
+            item_id="high-score",
+            title="High Score Item",
+            ai_score=8.5,  # Above 8.0 threshold
+            ai_tags=["test"],
+            content="Test content.",
+            ai_summary="A summary.",
+            ai_reason="A reason.",
+        )
+        asyncio.run(enricher._enrich_item(item))
+
+        mock_web_search.assert_called()
+
+    def test_enrich_low_score_skips_web_search_saves_time(self, monkeypatch):
+        """Low-score items skip the expensive web search (saves ~9s per item)."""
+        monkeypatch.setattr(
+            "src.ai.enricher.ContentEnricher._MIN_SCORE_FOR_WEB_SEARCH", 8.0,
+        )
+
+        from src.ai.enricher import ContentEnricher
+
+        client = AsyncMock()
+        client.complete.return_value = '{"title_en": "test"}'
+        enricher = ContentEnricher(client)
+
+        mock_web_search = AsyncMock(return_value=[])
+        monkeypatch.setattr(enricher, "_web_search", mock_web_search)
+
+        # Low-score item: should SKIP web search
+        low_item = make_content_item(
+            item_id="low",
+            title="Low Score",
+            ai_score=5.0,
+            ai_tags=["test"],
+            content="Low score content.",
+            ai_summary="Low summary.",
+            ai_reason="Low reason.",
+        )
+        asyncio.run(enricher._enrich_item(low_item))
+        mock_web_search.assert_not_called()
+
+        # Reset mock call count for clarity
+        mock_web_search.reset_mock()
+
+        # High-score item: should trigger web search
+        high_item = make_content_item(
+            item_id="high",
+            title="High Score",
+            ai_score=9.0,
+            ai_tags=["test"],
+            content="High score content.",
+            ai_summary="High summary.",
+            ai_reason="High reason.",
+        )
+        asyncio.run(enricher._enrich_item(high_item))
+        mock_web_search.assert_called()
+
+
+# ===========================================================================
+# QA 1 — Task 5: Enrichment parallelism produces identical output
+# ===========================================================================
+
+MOCK_ENRICH_EN = json.dumps({
+    "title_en": "Test Headline",
+    "whats_new_en": (
+        "Researchers have achieved a major breakthrough in AI reasoning, "
+        "demonstrating a new approach that significantly outperforms existing methods."
+    ),
+    "why_it_matters_en": (
+        "This breakthrough could transform how AI systems handle complex tasks, "
+        "potentially unlocking new applications in scientific research."
+    ),
+    "key_details_en": (
+        "The new model uses a novel architecture with 1 trillion parameters, "
+        "trained on a curated dataset of scientific literature."
+    ),
+    "background_en": (
+        "AI reasoning has been a key challenge for decades. "
+        "Recent advances in transformer architectures have made this possible."
+    ),
+    "sources": [],
+})
+
+MOCK_ENRICH_ZH = json.dumps({
+    "title_zh": "测试标题",
+    "whats_new_zh": (
+        "研究人员在AI推理方面取得了重大突破，展示了一种显著优于现有方法的新方法。"
+    ),
+    "why_it_matters_zh": (
+        "这一突破可能改变AI处理复杂任务的方式，可能为科学研究开辟新的应用。"
+    ),
+    "key_details_zh": (
+        "新模型采用了拥有1万亿参数的新型架构，在精选的科学文献数据集上训练。"
+    ),
+    "background_zh": (
+        "AI推理是几十年来一直存在的关键挑战。最近Transformer架构的进步使这成为可能。"
+    ),
+    "sources": [],
+})
+
+MOCK_ENRICH_BILINGUAL = json.dumps({
+    "title_en": "Test Headline",
+    "whats_new_en": (
+        "Researchers have achieved a major breakthrough in AI reasoning."
+    ),
+    "why_it_matters_en": (
+        "This breakthrough could transform how AI systems handle complex tasks."
+    ),
+    "key_details_en": (
+        "The new model uses a novel architecture with 1 trillion parameters."
+    ),
+    "background_en": (
+        "AI reasoning has been a key challenge for decades."
+    ),
+    "title_zh": "测试标题",
+    "whats_new_zh": "研究人员在AI推理方面取得了重大突破。",
+    "why_it_matters_zh": "这一突破可能改变AI处理复杂任务的方式。",
+    "key_details_zh": "新模型采用了拥有1万亿参数的新型架构。",
+    "background_zh": "AI推理是几十年来一直存在的关键挑战。",
+    "sources": [],
+})
+
+
+def test_enrich_parallelism_produces_same_output(monkeypatch):
+    """Run enrichment at different concurrency levels and verify identical outputs.
+
+    Uses mocked AI client that returns deterministic enrichment JSON.
+    Items are deep-copied for each concurrency level to avoid in-place mutation
+    cross-contamination. All metadata fields must match exactly across
+    concurrency=1, 5, and 30.
+    """
+    from src.ai.enricher import ContentEnricher
+
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = MOCK_ENRICH_EN
+    mock_client.config = MagicMock(languages=["en"])
+
+    base_items = [
+        make_content_item(
+            item_id=f"item-{i}",
+            title=f"Test Article {i}",
+            ai_score=8.5,
+            content=f"Content of article {i}. " * 20,
+            ai_summary=f"Summary of article {i}.",
+            ai_reason=f"Reason for article {i}.",
+            ai_tags=["test", "ai"],
+        )
+        for i in range(10)
+    ]
+
+    results = {}
+    for concurrency in (1, 5, 30):
+        items = copy.deepcopy(base_items)
+        mock_client.config.enrichment_concurrency = concurrency
+        enricher = ContentEnricher(mock_client)
+        monkeypatch.setattr(enricher, "_web_search", AsyncMock(return_value=[]))
+        asyncio.run(enricher.enrich_batch(items))
+        results[concurrency] = [(item.id, dict(item.metadata)) for item in items]
+
+    # Compare: every item must have identical metadata across all concurrency levels
+    concurrency_levels = [1, 5, 30]
+    for i in range(len(base_items)):
+        ref_id, ref_meta = results[1][i]
+        for c in concurrency_levels[1:]:
+            comp_id, comp_meta = results[c][i]
+            assert ref_id == comp_id, f"Item order mismatch at index {i}"
+            assert ref_meta == comp_meta, (
+                f"Metadata mismatch for item {ref_id} between "
+                f"concurrency=1 and concurrency={c}\n"
+                f"  Fields differ: {set(ref_meta.keys()) ^ set(comp_meta.keys())}\n"
+                f"  Ref:  {ref_meta}\n"
+                f"  Comp: {comp_meta}"
+            )
+
+
+# ===========================================================================
+# QA 1 — Task 6: Enrichment output contains required fields per language
+# ===========================================================================
+
+def test_enrich_output_contains_required_fields_en(monkeypatch):
+    """Verify enrichment produces all required metadata fields for English."""
+    from src.ai.enricher import ContentEnricher
+
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = MOCK_ENRICH_EN
+    mock_client.config = MagicMock(languages=["en"], enrichment_concurrency=1)
+
+    enricher = ContentEnricher(mock_client)
+    monkeypatch.setattr(enricher, "_web_search", AsyncMock(return_value=[]))
+
+    item = make_content_item(
+        item_id="test",
+        title="Test Article",
+        ai_score=8.5,
+        content="Test content for enrichment.",
+        ai_summary="A summary.",
+        ai_reason="A reason.",
+        ai_tags=["test"],
+    )
+    asyncio.run(enricher._enrich_item(item))
+
+    # Required English enrichment fields
+    required_en = ["whats_new_en", "why_it_matters_en", "key_details_en", "background_en"]
+    for field in required_en:
+        assert field in item.metadata, (
+            f"Missing required enrichment field: {field}"
+        )
+        assert item.metadata[field], (
+            f"Enrichment field {field} is empty"
+        )
+
+    # Backward-compatible fallback fields (English as default)
+    assert "detailed_summary" in item.metadata, (
+        "Missing backward-compatible detailed_summary"
+    )
+    assert item.metadata["detailed_summary"], "detailed_summary is empty"
+
+    assert "background" in item.metadata, (
+        "Missing backward-compatible background"
+    )
+    assert item.metadata["background"], "background is empty"
+
+    # detailed_summary should be a concatenation of core fields
+    for part in ("whats_new", "why_it_matters"):
+        key = f"{part}_en"
+        if part == "whats_new":
+            assert item.metadata[key] in item.metadata["detailed_summary"], (
+                f"detailed_summary should contain {key}"
+            )
+
+
+def test_enrich_output_contains_required_fields_zh(monkeypatch):
+    """Verify enrichment produces all required metadata fields for Chinese."""
+    from src.ai.enricher import ContentEnricher
+
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = MOCK_ENRICH_ZH
+    mock_client.config = MagicMock(languages=["zh"], enrichment_concurrency=1)
+
+    enricher = ContentEnricher(mock_client)
+    monkeypatch.setattr(enricher, "_web_search", AsyncMock(return_value=[]))
+
+    item = make_content_item(
+        item_id="test-zh",
+        title="测试文章",
+        ai_score=8.5,
+        content="用于增强的测试内容。",
+        ai_summary="总结。",
+        ai_reason="理由。",
+        ai_tags=["test"],
+    )
+    asyncio.run(enricher._enrich_item(item))
+
+    # Required Chinese enrichment fields
+    required_zh = ["whats_new_zh", "why_it_matters_zh", "key_details_zh", "background_zh"]
+    for field in required_zh:
+        assert field in item.metadata, (
+            f"Missing required enrichment field: {field}"
+        )
+        assert item.metadata[field], (
+            f"Enrichment field {field} is empty"
+        )
+
+
+def test_enrich_output_contains_required_fields_bilingual(monkeypatch):
+    """Verify enrichment produces fields for both languages when configured."""
+    from src.ai.enricher import ContentEnricher
+
+    mock_client = AsyncMock()
+    mock_client.complete.return_value = MOCK_ENRICH_BILINGUAL
+    mock_client.config = MagicMock(
+        languages=["en", "zh"], enrichment_concurrency=1,
+    )
+
+    enricher = ContentEnricher(mock_client)
+    monkeypatch.setattr(enricher, "_web_search", AsyncMock(return_value=[]))
+
+    item = make_content_item(
+        item_id="test-bi",
+        title="Bilingual Test",
+        ai_score=8.5,
+        content="Test content.",
+        ai_summary="Summary.",
+        ai_reason="Reason.",
+        ai_tags=["test"],
+    )
+    asyncio.run(enricher._enrich_item(item))
+
+    # Verify both language fields are present
+    for lang in ("en", "zh"):
+        for field in ("whats_new", "why_it_matters", "key_details", "background"):
+            key = f"{field}_{lang}"
+            assert key in item.metadata, (
+                f"Missing field {key} in bilingual mode"
+            )
+            assert item.metadata[key], (
+                f"Field {key} is empty in bilingual mode"
+            )
+
+    # Verify backward-compat fields exist
+    assert "detailed_summary" in item.metadata, (
+        "Missing detailed_summary in bilingual mode"
+    )
+    assert "background" in item.metadata, (
+        "Missing background in bilingual mode"
+    )
+
+
+# ===========================================================================
+# QA 1 — Task 7: High-score items get web search results in metadata
+# ===========================================================================
+
+def test_enrich_high_score_gets_web_search_results_in_metadata(monkeypatch):
+    """Items above threshold get web search sources stored in metadata.
+
+    For high-score items (>= 8.0):
+    1. _web_search is called
+    2. AI response includes source URLs
+    3. item.metadata["sources"] is populated with valid entries
+
+    For low-score items (< 8.0):
+    1. _web_search is NOT called
+    2. Even if AI returns source URLs, they are NOT stored (no available_urls)
+    """
+    from src.ai.enricher import ContentEnricher
+
+    mock_search_results = [
+        {"title": "Result 1", "url": "https://example.com/result1", "body": "Body text 1."},
+        {"title": "Result 2", "url": "https://example.com/result2", "body": "Body text 2."},
+    ]
+
+    # AI response includes sources matching the web search results
+    mock_ai_response = json.dumps({
+        "whats_new_en": "Breakthrough in AI reasoning achieved.",
+        "why_it_matters_en": "This matters for the whole industry.",
+        "sources": [
+            "https://example.com/result1",
+            "https://example.com/result2",
+        ],
+    })
+
+    mock_client = AsyncMock()
+    mock_client.config = MagicMock(languages=["en"], enrichment_concurrency=1)
+
+    # ------ High-score item: should get sources in metadata ------
+    mock_client.complete.return_value = mock_ai_response
+    enricher_high = ContentEnricher(mock_client)
+    monkeypatch.setattr(enricher_high, "_web_search", AsyncMock(return_value=mock_search_results))
+
+    high_item = make_content_item(
+        item_id="high-score",
+        title="High Score Item",
+        ai_score=8.5,
+        content="Important content.",
+        ai_summary="Important summary.",
+        ai_reason="Important reason.",
+        ai_tags=["test"],
+    )
+    asyncio.run(enricher_high._enrich_item(high_item))
+
+    assert "sources" in high_item.metadata, (
+        "High-score item should have sources in metadata"
+    )
+    assert len(high_item.metadata["sources"]) == 2, (
+        f"Expected 2 sources, got {len(high_item.metadata['sources'])}"
+    )
+    urls = {s["url"] for s in high_item.metadata["sources"]}
+    assert "https://example.com/result1" in urls, "Missing expected source URL"
+    assert "https://example.com/result2" in urls, "Missing expected source URL"
+
+    # ------ Low-score item: should NOT get sources in metadata ------
+    mock_client.complete.reset_mock()
+    mock_client.complete.return_value = mock_ai_response
+    enricher_low = ContentEnricher(mock_client)
+    low_search_mock = AsyncMock(return_value=mock_search_results)
+    monkeypatch.setattr(enricher_low, "_web_search", low_search_mock)
+
+    low_item = make_content_item(
+        item_id="low-score",
+        title="Low Score Item",
+        ai_score=5.0,
+        content="Low importance content.",
+        ai_summary="Low summary.",
+        ai_reason="Low reason.",
+        ai_tags=["test"],
+    )
+    asyncio.run(enricher_low._enrich_item(low_item))
+
+    # _web_search should NOT have been called for low-score item
+    low_search_mock.assert_not_called()
+    # Sources should NOT be in metadata because available_urls was empty
+    assert "sources" not in low_item.metadata, (
+        "Low-score item should NOT have sources in metadata"
+    )
+
+
+# ===========================================================================
+# QA 1 — Task 8: Chunked dedup produces same result as single-call dedup
+# ===========================================================================
+
+def test_dedup_chunked_same_as_single(monkeypatch):
+    """Verify chunked (30 items) and single-call (14 items) produce same output.
+
+    With mocked AI client returning deterministic duplicate groups, both paths
+    should:
+    - Drop the same items within the overlapping set (first 14 items)
+    - Keep the same primary items
+    - Merge content from duplicates into primaries identically
+
+    The single-call path triggers when len(items) <= CHUNK_SIZE (15).
+    The chunked path triggers when len(items) > CHUNK_SIZE.
+    """
+    from src.orchestrator import HorizonOrchestrator
+    from tests.conftest_helpers import make_config
+
+    mock_client = AsyncMock()
+    monkeypatch.setattr("src.orchestrator.create_ai_client", lambda config: mock_client)
+
+    config = make_config()
+    storage = MagicMock()
+    orch = HorizonOrchestrator(config, storage)
+
+    # Create 14 items with descending scores
+    items_base = [
+        make_content_item(
+            item_id=f"item-{i}",
+            title=f"News Item {i}",
+            ai_score=float(10 - i * 0.5),
+            content=f"Content of item {i}.",
+            ai_summary=f"Summary of item {i}.",
+            ai_reason=f"Reason for item {i}.",
+            ai_tags=["test"],
+        )
+        for i in range(14)
+    ]
+
+    # --- Single-call path (14 items, <= CHUNK_SIZE) ---
+    # Mock returns two duplicate groups: items 2&5 are dupes, items 8&12 are dupes
+    mock_client.complete.return_value = (
+        '{"duplicates": [[2, 5], [8, 12]]}'
+    )
+
+    # Deep copy to avoid cross-test mutation
+    result_single = asyncio.run(
+        orch.merge_topic_duplicates(copy.deepcopy(items_base))
+    )
+
+    single_ids = {item.id for item in result_single}
+
+    # Verify: items at index 5 and 12 should be dropped (14 - 2 = 12 kept)
+    assert len(result_single) == 12, (
+        f"Single-call: expected 12 items, got {len(result_single)}"
+    )
+    assert "item-5" not in single_ids, "item-5 should be dropped (duplicate of item-2)"
+    assert "item-12" not in single_ids, "item-12 should be dropped (duplicate of item-8)"
+    assert "item-2" in single_ids, "item-2 should be kept (primary)"
+    assert "item-8" in single_ids, "item-8 should be kept (primary)"
+
+    # --- Chunked path: 30 items (2 chunks of 15) ---
+    items_chunked = copy.deepcopy(items_base) + [
+        make_content_item(
+            item_id=f"extra-{i}",
+            title=f"Extra News Item {i}",
+            ai_score=float(5 - i * 0.3),
+            content=f"Extra content {i}.",
+            ai_summary=f"Extra summary {i}.",
+            ai_reason=f"Extra reason {i}.",
+            ai_tags=["test"],
+        )
+        for i in range(16)
+    ]  # Total: 30 items
+
+    # Both chunks use the SAME mock response because asyncio.gather makes
+    # concurrent calls and side_effect order is non-deterministic.
+    # Each chunk detects its own local indices [2,5] and [8,12] as duplicates.
+    mock_client.complete.return_value = (
+        '{"duplicates": [[2, 5], [8, 12]]}'
+    )
+
+    result_chunked = asyncio.run(
+        orch.merge_topic_duplicates(copy.deepcopy(items_chunked))
+    )
+
+    chunked_ids = {item.id for item in result_chunked}
+
+    # Verify chunk 0 items have same dedup as single-call (items 5, 12 dropped)
+    assert "item-5" not in chunked_ids, "item-5 should be dropped in chunked path"
+    assert "item-12" not in chunked_ids, "item-12 should be dropped in chunked path"
+    assert "item-2" in chunked_ids, "item-2 should be kept in chunked path"
+    assert "item-8" in chunked_ids, "item-8 should be kept in chunked path"
+
+    # Verify chunk 1 dedup: with same mock response [[2,5],[8,12]] and offset 15:
+    #   items[15+2=17] = extra-3 (primary), items[15+5=20] = extra-6 (dropped)
+    #   items[15+8=23] = extra-9 (primary), items[15+12=27] = extra-13 (dropped)
+    assert "extra-6" not in chunked_ids, (
+        "extra-6 (full index 20) should be dropped (duplicate of extra-3)"
+    )
+    assert "extra-13" not in chunked_ids, (
+        "extra-13 (full index 27) should be dropped (duplicate of extra-9)"
+    )
+    assert "extra-3" in chunked_ids, (
+        "extra-3 (full index 17) should be kept (primary)"
+    )
+    assert "extra-9" in chunked_ids, (
+        "extra-9 (full index 23) should be kept (primary)"
+    )
+
+    # Total kept: 30 - 2 (chunk 0) - 2 (chunk 1) = 26
+    assert len(result_chunked) == 26, (
+        f"Chunked: expected 26 kept, got {len(result_chunked)}"
+    )
+
+    # Verify overlapping items (0-13) have same keep/drop outcome in both paths
+    for item in items_base:
+        should_be_kept = item.id not in ("item-5", "item-12")
+        is_kept_single = item.id in single_ids
+        is_kept_chunked = item.id in chunked_ids
+        assert is_kept_single == is_kept_chunked == should_be_kept, (
+            f"Item {item.id}: single-call kept={is_kept_single}, "
+            f"chunked kept={is_kept_chunked}, expected kept={should_be_kept}"
+        )
+
+
+# ===========================================================================
+# QA 1 — Task 9: Dedup output quality (correctness scenarios)
+# ===========================================================================
+
+def test_dedup_output_quality(monkeypatch):
+    """Verify dedup correctness across multiple scenarios.
+
+    Tests:
+    1. No duplicates → all items pass through unchanged
+    2. One duplicate pair → only the primary is kept
+    3. Multiple groups → correct items dropped in each group
+    4. Groups with 3+ items → only primary kept, all rest dropped
+    5. All items merged to one → only the highest-scored item kept
+    """
+    from src.orchestrator import HorizonOrchestrator
+    from tests.conftest_helpers import make_config
+
+    mock_client = AsyncMock()
+    monkeypatch.setattr("src.orchestrator.create_ai_client", lambda config: mock_client)
+
+    config = make_config()
+    storage = MagicMock()
+    orch = HorizonOrchestrator(config, storage)
+
+    def _make_items(n: int) -> list:
+        """Create n items with descending scores."""
+        return [
+            make_content_item(
+                item_id=f"i-{idx}",
+                title=f"Item {idx}",
+                ai_score=float(10 - idx * 0.5),
+                content=f"Content of item {idx}.",
+                ai_summary=f"Summary {idx}.",
+                ai_reason=f"Reason {idx}.",
+                ai_tags=["test"],
+            )
+            for idx in range(n)
+        ]
+
+    def _run(items: list, response: str) -> list:
+        """Run merge_topic_duplicates with a given mock response."""
+        mock_client.complete.return_value = response
+        # Force the orchestrator to create a new client from the monkeypatched factory
+        return asyncio.run(orch.merge_topic_duplicates(copy.deepcopy(items)))
+
+    # --- Scenario 1: No duplicates → all items pass through ---
+    items_10 = _make_items(10)
+    result = _run(items_10, '{"duplicates": []}')
+    assert len(result) == 10, (
+        f"No duplicates: expected 10 items, got {len(result)}"
+    )
+    result_ids = {item.id for item in result}
+    expected_ids = {f"i-{i}" for i in range(10)}
+    assert result_ids == expected_ids, (
+        f"No duplicates: item IDs mismatch. Missing: {expected_ids - result_ids}"
+    )
+
+    # --- Scenario 2: One duplicate pair → one item dropped ---
+    result = _run(items_10, '{"duplicates": [[0, 5]]}')
+    assert len(result) == 9, (
+        f"One pair: expected 9 items, got {len(result)}"
+    )
+    result_ids = {item.id for item in result}
+    assert "i-5" not in result_ids, "i-5 should be dropped (duplicate of i-0)"
+    assert "i-0" in result_ids, "i-0 should be kept (primary)"
+
+    # --- Scenario 3: Multiple groups → correct items dropped ---
+    result = _run(items_10, '{"duplicates": [[0, 3], [1, 4, 7]]}')
+    assert len(result) == 7, (
+        f"Multiple groups: expected 7 items, got {len(result)}"
+    )
+    result_ids = {item.id for item in result}
+    # Items dropped: 3 (dup of 0), 4 and 7 (dups of 1) → 3 dropped
+    assert "i-3" not in result_ids, "i-3 should be dropped (dup of i-0)"
+    assert "i-4" not in result_ids, "i-4 should be dropped (dup of i-1)"
+    assert "i-7" not in result_ids, "i-7 should be dropped (dup of i-1)"
+    assert "i-0" in result_ids, "i-0 should be kept (primary)"
+    assert "i-1" in result_ids, "i-1 should be kept (primary)"
+
+    # --- Scenario 4: Group with 3+ items → only primary kept ---
+    result = _run(items_10, '{"duplicates": [[2, 5, 8, 9]]}')
+    assert len(result) == 7, (
+        f"Group of 4: expected 7 items, got {len(result)}"
+    )
+    result_ids = {item.id for item in result}
+    for dropped in ("i-5", "i-8", "i-9"):
+        assert dropped not in result_ids, (
+            f"{dropped} should be dropped (dup of i-2)"
+        )
+    assert "i-2" in result_ids, "i-2 should be kept (primary)"
+
+    # --- Scenario 5: Content merging ---
+    # Create items with specific content to verify merging
+    items_content = [
+        make_content_item(
+            item_id="primary",
+            title="Primary Item",
+            ai_score=9.0,
+            content="Primary content.",
+            ai_summary="Primary summary.",
+            ai_reason="Primary reason.",
+            ai_tags=["test"],
+        ),
+        make_content_item(
+            item_id="duplicate",
+            title="Duplicate Item",
+            ai_score=8.0,
+            content="Duplicate content with additional details.",
+            ai_summary="Duplicate summary.",
+            ai_reason="Duplicate reason.",
+            ai_tags=["test"],
+        ),
+    ]
+    result = _run(items_content, '{"duplicates": [[0, 1]]}')
+    assert len(result) == 1, (
+        f"Content merge: expected 1 item, got {len(result)}"
+    )
+    primary_result = result[0]
+    assert primary_result.id == "primary"
+    # Content from duplicate should be merged into primary
+    assert primary_result.content is not None
+    assert "Duplicate content" in primary_result.content, (
+        "Primary item should contain merged content from duplicate"
+    )
+

@@ -3,6 +3,8 @@
 import os
 from abc import ABC, abstractmethod
 from typing import Optional
+
+import httpx
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from anthropic import AsyncAnthropic
 from google import genai
@@ -141,7 +143,16 @@ class OpenAIClient(AIClient):
         if base_url:
             kwargs["base_url"] = base_url
 
-        self.client = AsyncOpenAI(timeout=120.0, **kwargs)
+        # Use a custom httpx client with explicit connection pool limits to
+        # support high concurrency (enrichment_concurrency up to 30+).
+        http_client = httpx.AsyncClient(
+            limits=httpx.Limits(
+                max_connections=100,
+                max_keepalive_connections=100,
+            ),
+            timeout=httpx.Timeout(120.0, connect=5.0),
+        )
+        self.client = AsyncOpenAI(http_client=http_client, **kwargs)
         self.model = config.model
         self.temperature = config.temperature
         self.max_tokens = config.max_tokens

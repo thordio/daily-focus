@@ -26,6 +26,7 @@ from .ai.summarizer import DailySummarizer
 from .ai.enricher import ContentEnricher
 from .ai.image_selector import ImageSelector
 from .ai.tokens import get_usage_snapshot
+from .utils.benchmark import timer, enabled as bench_enabled, get_stage_timer
 
 
 class HorizonOrchestrator:
@@ -68,12 +69,16 @@ class HorizonOrchestrator:
             self.email_manager.check_subscriptions(self.storage)
 
         try:
+            stage_timer = get_stage_timer()
+
             # 1. Determine time window
             since = self._determine_time_window(force_hours)
             self.console.print(f"📅 Fetching content since: {since.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
             # 2. Fetch content from all sources
-            all_items = await self.fetch_all_sources(since)
+            with timer("Fetch all sources") as t:
+                all_items = await self.fetch_all_sources(since)
+            stage_timer.record("1. Fetch", t.elapsed if bench_enabled() else 0, f"{len(all_items)} items")
             self.console.print(f"📥 Fetched {len(all_items)} items from all sources\n")
 
             if not all_items:
@@ -81,7 +86,9 @@ class HorizonOrchestrator:
                 return
 
             # 3. Merge cross-source duplicates (same URL from different sources)
-            merged_items = self.merge_cross_source_duplicates(all_items)
+            with timer("Cross-source dedup") as t:
+                merged_items = self.merge_cross_source_duplicates(all_items)
+            stage_timer.record("2. Cross-dedup", t.elapsed if bench_enabled() else 0, f"{len(merged_items)} items")
             if len(merged_items) < len(all_items):
                 self.console.print(
                     f"🔗 Merged {len(all_items) - len(merged_items)} cross-source duplicates "
@@ -89,122 +96,130 @@ class HorizonOrchestrator:
                 )
 
             # 3a. Pre-score per-topic cap: limit items per topic before expensive AI scoring
-            pre_score_max = self.config.filtering.pre_score_max_per_topic
-            if pre_score_max > 0:
-                pre_cap_total = len(merged_items)
-                topic_items: dict[str, list] = defaultdict(list)
-                for item in merged_items:
-                    topic = item.metadata.get("topic", "ai-tech")
-                    topic_items[topic].append(item)
-                capped_items = []
-                for topic, items_list in topic_items.items():
-                    # Sort by published_at descending so newest items survive the cap
-                    items_list.sort(key=lambda x: x.published_at, reverse=True)
-                    kept = items_list[:pre_score_max]
-                    capped_items.extend(kept)
-                    if len(items_list) > pre_score_max:
-                        self.console.print(f"  📊 Pre-score cap [{topic}]: {len(items_list)} → {len(kept)}")
-                merged_items = capped_items
-                if pre_cap_total > len(merged_items):
-                    self.console.print(
-                        f"  📊 Total pre-score cap: {pre_cap_total} → {len(merged_items)} items\n"
-                    )
+            with timer("Pre-score topic cap") as t:
+                pre_score_max = self.config.filtering.pre_score_max_per_topic
+                if pre_score_max > 0:
+                    pre_cap_total = len(merged_items)
+                    topic_items: dict[str, list] = defaultdict(list)
+                    for item in merged_items:
+                        topic = item.metadata.get("topic", "ai-tech")
+                        topic_items[topic].append(item)
+                    capped_items = []
+                    for topic, items_list in topic_items.items():
+                        # Sort by published_at descending so newest items survive the cap
+                        items_list.sort(key=lambda x: x.published_at, reverse=True)
+                        kept = items_list[:pre_score_max]
+                        capped_items.extend(kept)
+                        if len(items_list) > pre_score_max:
+                            self.console.print(f"  📊 Pre-score cap [{topic}]: {len(items_list)} → {len(kept)}")
+                    merged_items = capped_items
+                    if pre_cap_total > len(merged_items):
+                        self.console.print(
+                            f"  📊 Total pre-score cap: {pre_cap_total} → {len(merged_items)} items\n"
+                        )
+            stage_timer.record("3. Pre-cap", t.elapsed if bench_enabled() else 0)
 
             # 4. Analyze with AI
-            analyzed_items = await self._analyze_content(merged_items)
+            with timer("AI scoring (all items)") as t:
+                analyzed_items = await self._analyze_content(merged_items)
+            stage_timer.record("4. AI Score", t.elapsed if bench_enabled() else 0, f"{len(analyzed_items)} items")
             self.console.print(f"🤖 Analyzed {len(analyzed_items)} items with AI\n")
 
             # 5. Filter by score threshold + per-topic hard limits
-            threshold = self.config.filtering.ai_score_threshold
-            above_threshold = [
-                item for item in analyzed_items
-                if item.ai_score and item.ai_score >= threshold
-            ]
+            with timer("Filter + semantic dedup") as t:
+                threshold = self.config.filtering.ai_score_threshold
+                above_threshold = [
+                    item for item in analyzed_items
+                    if item.ai_score and item.ai_score >= threshold
+                ]
 
-            self.console.print(
-                f"⭐️ {len(above_threshold)} items scored ≥ {threshold}\n"
-            )
-
-            # 5a. Semantic deduplication: drop items covering the same topic
-            deduped_items = await self.merge_topic_duplicates(above_threshold)
-            deduped_ids = {item.id for item in deduped_items}
-            if len(deduped_items) < len(above_threshold):
                 self.console.print(
-                    f"🧹 Removed {len(above_threshold) - len(deduped_items)} topic duplicates "
-                    f"→ {len(deduped_items)} unique items\n"
+                    f"⭐️ {len(above_threshold)} items scored ≥ {threshold}\n"
                 )
+
+                # 5a. Semantic deduplication: drop items covering the same topic
+                deduped_items = await self.merge_topic_duplicates(above_threshold)
+                deduped_ids = {item.id for item in deduped_items}
+                if len(deduped_items) < len(above_threshold):
+                    self.console.print(
+                        f"🧹 Removed {len(above_threshold) - len(deduped_items)} topic duplicates "
+                        f"→ {len(deduped_items)} unique items\n"
+                    )
+            stage_timer.record("5. Filter+Dedup", t.elapsed if bench_enabled() else 0, f"{len(deduped_items)} items")
 
             # 5b. Per-topic hard limits: cap at max, fill to min, log dropped
             #     Items outside configured topics also pass through.
-            limits = self.config.filtering.topic_limits
-            selected: List[ContentItem] = []
-            dropped_counts: Dict[str, int] = {}
-            for topic_key, limit_config in limits.items():
-                topic_items = [
-                    i for i in deduped_items
-                    if i.metadata.get("topic") == topic_key
-                ]
-                topic_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
-
-                # Cap at max
-                cap = min(limit_config.max, len(topic_items))
-                selected.extend(topic_items[:cap])
-
-                # Fill to min if needed (from below-threshold pool, excluding dedup-removed items)
-                if cap < limit_config.min:
-                    selected_ids = {item.id for item in selected}
-                    below = [
-                        i for i in analyzed_items
+            with timer("Per-topic final cap") as t:
+                limits = self.config.filtering.topic_limits
+                selected: List[ContentItem] = []
+                dropped_counts: Dict[str, int] = {}
+                for topic_key, limit_config in limits.items():
+                    topic_items = [
+                        i for i in deduped_items
                         if i.metadata.get("topic") == topic_key
-                        and i.id not in selected_ids
-                        and ((i.ai_score or 0) < threshold or i.id in deduped_ids)
                     ]
-                    below.sort(key=lambda x: x.ai_score or 0, reverse=True)
-                    needed = limit_config.min - cap
-                    selected.extend(below[:needed])
+                    topic_items.sort(key=lambda x: x.ai_score or 0, reverse=True)
 
-                dropped = len(topic_items) - cap
-                if dropped > 0:
-                    dropped_counts[topic_key] = dropped
-                    self.console.print(f"  📊 {topic_key}: {len(topic_items)} candidates → kept top {cap} (dropped {dropped})")
+                    # Cap at max
+                    cap = min(limit_config.max, len(topic_items))
+                    selected.extend(topic_items[:cap])
 
-            # Log total
-            total_dropped = sum(dropped_counts.values())
-            if total_dropped > 0:
-                self.console.print(f"  ✂️  Capped {total_dropped} items across all topics")
+                    # Fill to min if needed (from below-threshold pool, excluding dedup-removed items)
+                    if cap < limit_config.min:
+                        selected_ids = {item.id for item in selected}
+                        below = [
+                            i for i in analyzed_items
+                            if i.metadata.get("topic") == topic_key
+                            and i.id not in selected_ids
+                            and ((i.ai_score or 0) < threshold or i.id in deduped_ids)
+                        ]
+                        below.sort(key=lambda x: x.ai_score or 0, reverse=True)
+                        needed = limit_config.min - cap
+                        selected.extend(below[:needed])
 
-            # Handle items without topic limits: add them all (backward compat)
-            if not limits:
-                selected = deduped_items  # no limits configured, keep all
-            else:
-                # Also include items that belong to topics NOT in limits config
-                limited_topics = set(limits.keys())
-                for item in deduped_items:
-                    topic = item.metadata.get("topic", "ai-tech")
-                    if topic not in limited_topics:
-                        selected.append(item)
+                    dropped = len(topic_items) - cap
+                    if dropped > 0:
+                        dropped_counts[topic_key] = dropped
+                        self.console.print(f"  📊 {topic_key}: {len(topic_items)} candidates → kept top {cap} (dropped {dropped})")
 
-            # Remove duplicates (different topics shouldn't overlap, but safe)
-            seen_ids = set()
-            unique_selected = []
-            for item in selected:
-                if item.id not in seen_ids:
-                    seen_ids.add(item.id)
-                    unique_selected.append(item)
-            selected = unique_selected
+                # Log total
+                total_dropped = sum(dropped_counts.values())
+                if total_dropped > 0:
+                    self.console.print(f"  ✂️  Capped {total_dropped} items across all topics")
 
-            # Sort by score descending
-            selected.sort(key=lambda x: x.ai_score or 0, reverse=True)
-            important_items = selected
+                # Handle items without topic limits: add them all (backward compat)
+                if not limits:
+                    selected = deduped_items  # no limits configured, keep all
+                else:
+                    # Also include items that belong to topics NOT in limits config
+                    limited_topics = set(limits.keys())
+                    for item in deduped_items:
+                        topic = item.metadata.get("topic", "ai-tech")
+                        if topic not in limited_topics:
+                            selected.append(item)
 
-            # 5c. Show per-topic breakdown
-            from collections import Counter
-            topic_breakdown = Counter(
-                i.metadata.get("topic", "ai-tech") for i in important_items
-            )
-            for topic, count in sorted(topic_breakdown.items()):
-                self.console.print(f"      • {topic}: {count} items")
-            self.console.print("")
+                # Remove duplicates (different topics shouldn't overlap, but safe)
+                seen_ids = set()
+                unique_selected = []
+                for item in selected:
+                    if item.id not in seen_ids:
+                        seen_ids.add(item.id)
+                        unique_selected.append(item)
+                selected = unique_selected
+
+                # Sort by score descending
+                selected.sort(key=lambda x: x.ai_score or 0, reverse=True)
+                important_items = selected
+
+                # 5c. Show per-topic breakdown
+                from collections import Counter
+                topic_breakdown = Counter(
+                    i.metadata.get("topic", "ai-tech") for i in important_items
+                )
+                for topic, count in sorted(topic_breakdown.items()):
+                    self.console.print(f"      • {topic}: {count} items")
+                self.console.print("")
+            stage_timer.record("6. Final cap", t.elapsed if bench_enabled() else 0)
 
             # 5d. Optional second-stage Twitter reply expansion + targeted re-analysis
             await self._expand_twitter_discussion(important_items)
@@ -219,67 +234,75 @@ class HorizonOrchestrator:
             self.console.print("")
 
             # 6. Search related stories + enrich with background knowledge (2nd AI pass)
-            await self._enrich_important_items(important_items)
+            with timer("Enrichment (web search + AI)") as t:
+                await self._enrich_important_items(important_items)
+            stage_timer.record("7. Enrich", t.elapsed if bench_enabled() else 0, f"{len(important_items)} items")
 
             # 6.5 Select informative images for high-scoring items
-            await self._select_images(important_items)
+            with timer("Image selection") as t:
+                await self._select_images(important_items)
+            stage_timer.record("8. Images", t.elapsed if bench_enabled() else 0)
 
             # 7. Generate and save daily summaries for each configured language
-            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            for lang in self.config.ai.languages:
-                summarizer = DailySummarizer()
+            with timer("HTML render + save") as t:
+                today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                for lang in self.config.ai.languages:
+                    summarizer = DailySummarizer()
 
-                # 7a. Render HTML via structured data -> Jinja2 template
-                structured = summarizer.get_structured_data(
-                    important_items, today, len(all_items),
-                    language=lang, period=period,
-                    score_threshold=self.config.filtering.ai_score_threshold,
-                    topic_limits=limits,
-                )
-
-                from .renderer import DailyRenderer
-
-                renderer = DailyRenderer()
-                html = renderer.render_html(structured)
-
-                from pathlib import Path
-
-                docs_dir = Path("docs")
-                docs_dir.mkdir(parents=True, exist_ok=True)
-
-                # Save a dated copy for archival linking
-                daily_dir = docs_dir / "daily"
-                daily_dir.mkdir(parents=True, exist_ok=True)
-                daily_path = daily_dir / f"{today}-{period}-{lang}.html"
-                with open(daily_path, "w", encoding="utf-8") as f:
-                    f.write(html)
-                self.console.print(f"📄 Archived HTML to: {daily_path}\n")
-
-                # 7b. Generate Markdown summary for email/webhook compatibility
-                summary = await summarizer.generate_summary(important_items, today, len(all_items), language=lang)
-
-                # Save to data/summaries/
-                summary_path = self.storage.save_daily_summary(today, summary, language=lang, period=period)
-                self.console.print(f"💾 Saved {lang.upper()} summary to: {summary_path}\n")
-
-                # Send email if configured
-                if self.email_manager and self.config.email and self.config.email.enabled:
-                    self.console.print(f"📧 Sending {lang.upper()} email summary...")
-                    subscribers = self.storage.load_subscribers()
-                    subject = f"Horizon Summary ({lang.upper()}) - {today}"
-                    self.email_manager.send_daily_summary(summary, subject, subscribers)
-
-                # Send webhook notification if configured
-                if self.webhook_notifier:
-                    await self.webhook_notifier.send_daily_summary(
-                        summary=summary,
-                        important_items=important_items,
-                        all_items_count=len(all_items),
-                        date=today,
-                        lang=lang,
-                        summarizer=summarizer,
+                    # 7a. Render HTML via structured data -> Jinja2 template
+                    structured = summarizer.get_structured_data(
+                        important_items, today, len(all_items),
+                        language=lang, period=period,
+                        score_threshold=self.config.filtering.ai_score_threshold,
+                        topic_limits=limits,
                     )
 
+                    from .renderer import DailyRenderer
+
+                    renderer = DailyRenderer()
+                    html = renderer.render_html(structured)
+
+                    from pathlib import Path
+
+                    docs_dir = Path("docs")
+                    docs_dir.mkdir(parents=True, exist_ok=True)
+
+                    # Save a dated copy for archival linking
+                    daily_dir = docs_dir / "daily"
+                    daily_dir.mkdir(parents=True, exist_ok=True)
+                    daily_path = daily_dir / f"{today}-{period}-{lang}.html"
+                    with open(daily_path, "w", encoding="utf-8") as f:
+                        f.write(html)
+                    self.console.print(f"📄 Archived HTML to: {daily_path}\n")
+
+                    # 7b. Generate Markdown summary for email/webhook compatibility
+                    summary = await summarizer.generate_summary(important_items, today, len(all_items), language=lang)
+
+                    # Save to data/summaries/
+                    summary_path = self.storage.save_daily_summary(today, summary, language=lang, period=period)
+                    self.console.print(f"💾 Saved {lang.upper()} summary to: {summary_path}\n")
+
+                    # Send email if configured
+                    if self.email_manager and self.config.email and self.config.email.enabled:
+                        self.console.print(f"📧 Sending {lang.upper()} email summary...")
+                        subscribers = self.storage.load_subscribers()
+                        subject = f"Horizon Summary ({lang.upper()}) - {today}"
+                        self.email_manager.send_daily_summary(summary, subject, subscribers)
+
+                    # Send webhook notification if configured
+                    if self.webhook_notifier:
+                        await self.webhook_notifier.send_daily_summary(
+                            summary=summary,
+                            important_items=important_items,
+                            all_items_count=len(all_items),
+                            date=today,
+                            lang=lang,
+                            summarizer=summarizer,
+                        )
+            stage_timer.record("9. Render", t.elapsed if bench_enabled() else 0)
+
+            if bench_enabled():
+                stage_timer.print_summary()
             self.console.print("[bold green]✅ Horizon completed successfully![/bold green]")
             usage = get_usage_snapshot()
             if usage.total_tokens > 0:
@@ -497,54 +520,95 @@ class HorizonOrchestrator:
 
         return merged
 
-    async def merge_topic_duplicates(self, items: List[ContentItem]) -> List[ContentItem]:
-        """Merge items covering the same topic using AI semantic deduplication.
+    async def _dedup_chunk(self, chunk_items: List[ContentItem], start_offset: int, ai_client) -> List[List[int]]:
+        """Run AI semantic dedup on a chunk of items.
 
-        This is a stable stage helper for integrations such as MCP.
+        Args:
+            chunk_items: Items in this chunk (must be sorted by ai_score desc)
+            start_offset: Index offset of this chunk within the full items list
+            ai_client: Shared AI client (created once, reused across chunks)
 
-        Sends all item titles, tags, and summaries to AI in a single call.
-        Items must already be sorted by ai_score descending so that the first
-        item in each duplicate group is always the highest-scored one.
-        Content (comments) from duplicate items is merged into the primary.
-
-        Falls back to returning items unchanged if the AI call fails.
+        Returns:
+            List of duplicate groups, each group is [primary_idx, dup_idx, ...]
+            with indices adjusted to the full items list. Returns empty list
+            if the AI call fails or no duplicates are found.
         """
-        if len(items) <= 1:
-            return items
-
         from .ai.prompts import TOPIC_DEDUP_SYSTEM, TOPIC_DEDUP_USER
         from .ai.utils import parse_json_response
 
-        # Build the item list for the prompt
         lines = []
-        for i, item in enumerate(items):
-            tags = ", ".join(item.ai_tags) if item.ai_tags else "—"
+        for i, item in enumerate(chunk_items):
             summary = item.ai_summary or "—"
-            lines.append(f"[{i}] {item.title}\n    Tags: {tags}\n    Summary: {summary}")
+            lines.append(f"[{i}] {item.title}\n    Summary: {summary}")
         items_text = "\n\n".join(lines)
 
         try:
-            ai_client = create_ai_client(self.config.ai)
             response = await ai_client.complete(
                 system=TOPIC_DEDUP_SYSTEM,
                 user=TOPIC_DEDUP_USER.format(items=items_text),
             )
             result = parse_json_response(response)
             if result is None:
-                self.console.print("[yellow]  dedup: could not parse AI response, skipping[/yellow]")
-                return items
+                return []
+            groups = result.get("duplicates", [])
+        except Exception:
+            return []
 
-            duplicate_groups = result.get("duplicates", [])
-        except Exception as e:
-            self.console.print(f"[yellow]  dedup: AI call failed ({e}), skipping[/yellow]")
+        # Adjust indices to full items list
+        adjusted = []
+        for group in groups:
+            if not isinstance(group, list) or len(group) < 2:
+                continue
+            adjusted_group = [
+                idx + start_offset
+                for idx in group
+                if isinstance(idx, int) and 0 <= idx < len(chunk_items)
+            ]
+            if len(adjusted_group) >= 2:
+                adjusted.append(adjusted_group)
+        return adjusted
+
+    async def merge_topic_duplicates(self, items: List[ContentItem]) -> List[ContentItem]:
+        """Merge items covering the same topic using AI semantic deduplication.
+
+        This is a stable stage helper for integrations such as MCP.
+
+        Sends item titles and summaries to AI — split into chunks of 15
+        for large item sets, with parallel AI calls per chunk. Items must already
+        be sorted by ai_score descending so that the first item in each duplicate
+        group is always the highest-scored one. Content (comments) from duplicate
+        items is merged into the primary.
+
+        Falls back to returning items unchanged if the AI call fails.
+        """
+        if len(items) <= 1:
             return items
 
-        if not duplicate_groups:
+        CHUNK_SIZE = 15
+
+        # Create AI client once, reuse across all chunks
+        ai_client = create_ai_client(self.config.ai)
+
+        # Split into chunks for large item sets, single call otherwise
+        if len(items) <= CHUNK_SIZE:
+            groups = await self._dedup_chunk(items, 0, ai_client)
+        else:
+            chunks = [(items[i:i+CHUNK_SIZE], i) for i in range(0, len(items), CHUNK_SIZE)]
+            results = await asyncio.gather(
+                *(self._dedup_chunk(chunk, offset, ai_client) for chunk, offset in chunks),
+                return_exceptions=True,
+            )
+            groups = []
+            for result in results:
+                if isinstance(result, list):
+                    groups.extend(result)
+
+        if not groups:
             return items
 
         # Build a set of indices to drop (all non-primary duplicates)
         drop_indices: set[int] = set()
-        for group in duplicate_groups:
+        for group in groups:
             if not isinstance(group, list) or len(group) < 2:
                 continue
             primary_idx = group[0]

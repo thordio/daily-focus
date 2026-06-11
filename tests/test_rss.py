@@ -385,3 +385,151 @@ def test_rss_max_items_per_feed_independent() -> None:
 
     items = asyncio.run(scraper.fetch(since))
     assert len(items) == 8  # 3 capped from feed A + 5 from feed B
+
+
+# ---------------------------------------------------------------------------
+# 7. Parallel RSS fetch (Performance Optimization)
+# ---------------------------------------------------------------------------
+
+
+def test_rss_fetches_multiple_feeds_concurrently():
+    """Multiple RSS feeds are all fetched and items from both appear."""
+    feed_a = _make_feed_with_n_items(3)
+    feed_b = _make_feed_with_n_items(4)
+
+    response_a = MagicMock()
+    response_a.text = feed_a
+    response_a.raise_for_status.return_value = None
+    response_b = MagicMock()
+    response_b.text = feed_b
+    response_b.raise_for_status.return_value = None
+
+    # URL-aware side_effect works with both sequential and parallel fetches
+    def mock_get(url, **kwargs):
+        if "feedA" in str(url):
+            return response_a
+        elif "feedB" in str(url):
+            return response_b
+        raise ValueError(f"Unexpected URL: {url}")
+
+    client = AsyncMock()
+    client.get.side_effect = mock_get
+
+    source_a = RSSSourceConfig(
+        name="FeedA", url="https://example.com/feedA.xml", max_items=10
+    )
+    source_b = RSSSourceConfig(
+        name="FeedB", url="https://example.com/feedB.xml", max_items=10
+    )
+    scraper = RSSScraper([source_a, source_b], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 7  # 3 from feed A + 4 from feed B
+    # Items from both feeds appear in the result
+    titles = [item.title for item in items]
+    assert "Item 0" in titles
+    assert "Item 3" in titles  # feed B has items 0-3
+
+
+def test_rss_parallel_correct_count():
+    """3 feeds x 5 items = 15 total items returned."""
+    responses = []
+    for _ in range(3):
+        feed = _make_feed_with_n_items(5)
+        response = MagicMock()
+        response.text = feed
+        response.raise_for_status.return_value = None
+        responses.append(response)
+
+    def mock_get(url, **kwargs):
+        if "feedA" in str(url):
+            return responses[0]
+        elif "feedB" in str(url):
+            return responses[1]
+        elif "feedC" in str(url):
+            return responses[2]
+        raise ValueError(f"Unexpected URL: {url}")
+
+    client = AsyncMock()
+    client.get.side_effect = mock_get
+
+    sources = [
+        RSSSourceConfig(name="FeedA", url="https://example.com/feedA.xml", max_items=10),
+        RSSSourceConfig(name="FeedB", url="https://example.com/feedB.xml", max_items=10),
+        RSSSourceConfig(name="FeedC", url="https://example.com/feedC.xml", max_items=10),
+    ]
+    scraper = RSSScraper(sources, client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 15
+
+
+def test_rss_image_cache_safe_during_parallel_fetch(monkeypatch):
+    """Image cache works correctly when multiple feeds share image URLs."""
+    # Use a shared cache dict so all parallel fetches contribute to the
+    # same frequency tracking (rather than each getting an isolated cache).
+    shared_cache: dict[str, int] = {}
+    monkeypatch.setattr(
+        RSSScraper, "_load_image_cache", lambda self: shared_cache,
+    )
+    monkeypatch.setattr(
+        RSSScraper, "_save_image_cache", lambda self, cache: None,
+    )
+
+    def _build_feed_with_images(name: str, img_urls: list[str], n_items: int = 3) -> str:
+        parts = ['<?xml version="1.0" encoding="UTF-8" ?>',
+                 '<rss version="2.0"><channel><title>Test</title>']
+        for i in range(n_items):
+            imgs = " ".join(
+                f'<img src="{url}" alt="Image {j}" />'
+                for j, url in enumerate(img_urls)
+            )
+            parts.append(
+                f'<item><guid>{name}-{i}</guid>'
+                f'<title>{name} Item {i}</title>'
+                f'<link>https://example.com/{name}/{i}</link>'
+                f'<pubDate>Fri, 24 Apr 2026 12:00:00 GMT</pubDate>'
+                f'<description><![CDATA[{imgs}<p>Content</p>]]></description>'
+                f'</item>'
+            )
+        parts.append('</channel></rss>')
+        return "\n".join(parts)
+
+    shared_img = "https://images.example.com/chart.png"
+    feed_a = _build_feed_with_images("FeedA", [shared_img, "https://images.example.com/other.png"])
+    feed_b = _build_feed_with_images("FeedB", [shared_img, "https://images.example.com/another.png"])
+
+    response_a = MagicMock()
+    response_a.text = feed_a
+    response_a.raise_for_status.return_value = None
+    response_b = MagicMock()
+    response_b.text = feed_b
+    response_b.raise_for_status.return_value = None
+
+    def mock_get(url, **kwargs):
+        if "feedA" in str(url):
+            return response_a
+        elif "feedB" in str(url):
+            return response_b
+        raise ValueError(f"Unexpected URL: {url}")
+
+    client = AsyncMock()
+    client.get.side_effect = mock_get
+
+    source_a = RSSSourceConfig(name="FeedA", url="https://example.com/feedA.xml", max_items=10)
+    source_b = RSSSourceConfig(name="FeedB", url="https://example.com/feedB.xml", max_items=10)
+    scraper = RSSScraper([source_a, source_b], client)
+    since = datetime(2026, 4, 24, 0, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(scraper.fetch(since))
+    assert len(items) == 6  # 3 per feed
+
+    # The shared image URL should be tracked in the shared cache
+    assert shared_img in shared_cache, (
+        "Shared image URL must be tracked in the image cache"
+    )
+    assert shared_cache[shared_img] > 0, (
+        "Shared image URL count must be positive after fetching both feeds"
+    )
