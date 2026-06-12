@@ -17,12 +17,12 @@ from typing import Dict, List, Optional
 def _parse_daily_html_path(path: Path) -> Optional[Dict[str, str]]:
     """Parse a daily HTML filename into {date, period, lang}.
 
-    Expected patterns::
+    Handles all historical filename patterns::
 
-        2026-06-01.html                    (no lang, no period)
-        2026-06-01-zh.html                 (lang, no period — new single-edition)
-        2026-06-01-morning.html            (no lang — legacy two-edition)
-        2026-06-01-morning-zh.html         (with lang code — legacy two-edition)
+        2026-06-01.html                    (no period, no lang)
+        2026-06-01-zh.html                 (lang only)
+        2026-06-01-morning.html            (period only)
+        2026-06-01-morning-zh.html         (period + lang)
 
     Returns None for non-matching files.
     """
