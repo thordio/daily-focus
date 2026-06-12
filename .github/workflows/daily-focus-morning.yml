@@ -11,12 +11,17 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
       - name: Debug check config
-        run: ls -la data/config.json
+        run: |
+          pwd
+          ls -la data/
+          python3 -c "from pathlib import Path; print('config.json exists:', Path('data/config.json').exists()); print('cwd:', Path.cwd())"
       - name: Run Horizon
-        working-directory: ${{ github.workspace }}
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: uv run horizon --hours 24
+        run: |
+          pwd
+          ls data/config.json
+          uv run horizon --hours 24
       - name: Render & Deploy
         run: uv run python scripts/render_and_deploy.py
       - name: Deploy to GitHub Pages
