@@ -106,9 +106,12 @@ async def fetch_sina() -> dict[str, dict]:
 
     results: dict[str, dict] = {}
     for key, code in SINA_MAP.items():
-        # Sina CSV format:
-        #   For futures (gold/oil): name, prev_close, price, open, high, low, ...
-        #   For indices: name, open, prev_close, current_price, ...
+        # Sina CSV field layout for international futures (hf_ prefix):
+        #   field 0: current price (最新价)
+        #   field 1: previous close (昨收, may be empty for some symbols like CL)
+        #   field 2: open, field 3: high, field 4: low, ...
+        # For Chinese stock indices (sh/sz prefix):
+        #   field 1: open, field 2: prev_close, field 3: current price, ...
         if key in ("gold", "oil"):
             field_idx = 0  # price
             prev_idx = 1   # prev_close
@@ -191,10 +194,10 @@ async def fetch_all() -> dict[str, dict]:
     # Compute domestic gold reference price (CNY/gram)
     # Formula: COMEX gold (USD/oz) × USD/CNY rate ÷ 31.1035 (grams per troy oz)
     gold_price = all_data.get("gold", {}).get("price")
-    cny_rate = all_data.get("usdcny", {}).get("price")
-    if gold_price is not None and cny_rate is not None:
+    usdcny_rate = all_data.get("usdcny", {}).get("price")
+    if gold_price is not None and usdcny_rate is not None:
         all_data["domestic_gold"] = {
-            "price": round(gold_price * cny_rate / 31.1035, 2),
+            "price": round(gold_price * usdcny_rate / 31.1035, 2),
             "prev_close": None,
         }
     else:

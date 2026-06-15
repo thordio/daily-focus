@@ -170,6 +170,66 @@ summary:focus-visible {
   align-items: center;
 }
 
+/* Day Navigation Bar */
+.day-nav-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.day-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.day-nav-btn:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.day-nav-btn:active {
+  transform: scale(0.97);
+}
+.day-nav-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.day-nav-btn.primary:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+.day-nav-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
+.day-nav-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
 .header-stats {
   font-size: 13px;
   opacity: 0.85;
@@ -242,18 +302,6 @@ summary:focus-visible {
 .lang-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 .lang-toggle:active { transform: scale(0.95); }
 
-.period-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius: 6px;
-  padding: 3px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
-
 /* Demo data banner */
 .demo-banner {
   background: #fef3c7;
@@ -305,6 +353,12 @@ summary:focus-visible {
   font-size: 13px;
   color: var(--text-secondary);
   opacity: 0.8;
+}
+
+.empty-icon {
+  font-size: 40px;
+  opacity: 0.5;
+  margin-bottom: 8px;
 }
 
 /* Selection transparency info */
@@ -885,6 +939,9 @@ summary:focus-visible {
   .key-fact-pill { font-size: 12px; padding: 2px 8px; }
   .news-card.card-light { padding: 18px; }
   .card-light .card-title { font-size: 16px; }
+  .day-nav-bar { gap: 8px; padding: 12px 16px; }
+  .day-nav-btn { padding: 7px 14px; font-size: 13px; gap: 4px; }
+  .day-nav-arrow { font-size: 14px; }
 }
 
 @media (max-width: 375px) {
@@ -909,6 +966,9 @@ summary:focus-visible {
   .depth-indicator { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
   .key-facts-bar { font-size: 11px; gap: 5px; }
   .key-fact-pill { font-size: 11px; padding: 2px 6px; border-radius: 100px; }
+  .day-nav-bar { gap: 6px; padding: 10px 12px; }
+  .day-nav-btn { padding: 6px 12px; font-size: 12px; gap: 3px; }
+  .day-nav-arrow { font-size: 12px; }
 }
 
 @media (min-width: 768px) {
@@ -1154,6 +1214,38 @@ summary:focus-visible {
   </div>
 </header>
 
+{% if prev_url is defined or next_url is defined %}
+<div class="day-nav-bar">
+  {% if prev_url %}
+  <a href="{{ prev_url }}" class="day-nav-btn">
+    <span class="day-nav-arrow">&#8592;</span>
+    {% if language == "zh" %}前一天{% else %}Previous{% endif %}
+  </a>
+  {% else %}
+  <span class="day-nav-btn disabled">
+    <span class="day-nav-arrow">&#8592;</span>
+    {% if language == "zh" %}前一天{% else %}Previous{% endif %}
+  </span>
+  {% endif %}
+
+  <a href="{{ latest_url|default('#') }}" class="day-nav-btn primary">
+    {% if language == "zh" %}📅 最新{% else %}📅 Latest{% endif %}
+  </a>
+
+  {% if next_url %}
+  <a href="{{ next_url }}" class="day-nav-btn">
+    {% if language == "zh" %}后一天{% else %}Next{% endif %}
+    <span class="day-nav-arrow">&#8594;</span>
+  </a>
+  {% else %}
+  <span class="day-nav-btn disabled">
+    {% if language == "zh" %}后一天{% else %}Next{% endif %}
+    <span class="day-nav-arrow">&#8594;</span>
+  </span>
+  {% endif %}
+</div>
+{% endif %}
+
 {% if is_demo|default(false) %}
 <div class="demo-banner">
   &#x26a0;&#xfe0f; 演示数据 — 非真实新闻内容 / DEMO DATA — Not real news content
@@ -1377,7 +1469,7 @@ summary:focus-visible {
        role="tabpanel">
     {% if tab.is_chart|default(false) %}
     {# ── Market Indicators Chart Tab ── #}
-    {% if market_indicators is defined and market_indicators|length > 0 %}
+    {% if market_indicators_groups is defined and market_indicators_groups|length > 0 %}
     <div class="market-summary">
       <div class="market-summary-title">
         {% if language == "zh" %}实时行情{% else %}Live Prices{% endif %}
@@ -1405,7 +1497,7 @@ summary:focus-visible {
               --
             {% endif %}
           </div>
-          {% if indicator.prev_close is not none and indicator.price is not none %}
+          {% if indicator.prev_close is not none and indicator.price is not none and indicator.prev_close != 0 %}
           {% set pct = ((indicator.price - indicator.prev_close) / indicator.prev_close * 100) %}
           <div class="msi-change {% if pct >= 0 %}up{% else %}down{% endif %}">
             {{ "%+.2f"|format(pct) }}%
@@ -1728,7 +1820,7 @@ summary:focus-visible {
     var series = (historyData[currentIndicator] || []).slice();
     var filtered = filterByDays(series, currentDays);
 
-    if (filtered.length < 2) {
+    if (filtered.length < 1) {
       canvas.style.display = 'none';
       emptyEl.style.display = 'flex';
       if (chart) { chart.destroy(); chart = null; }
@@ -1742,6 +1834,7 @@ summary:focus-visible {
     var labels = filtered.map(function(p) { return p.date; });
     var prices = filtered.map(function(p) { return p.price; });
     var colors = getThemeColors();
+    var singlePoint = filtered.length === 1;
 
     var datasets = [{
       label: 'Price',
@@ -1750,7 +1843,7 @@ summary:focus-visible {
       backgroundColor: colors.fill,
       fill: true,
       tension: 0.3,
-      pointRadius: filtered.length > 60 ? 0 : 2,
+      pointRadius: singlePoint ? 5 : (filtered.length > 60 ? 0 : 2),
       pointHoverRadius: 5,
       pointBackgroundColor: colors.line,
       borderWidth: 2,

@@ -415,6 +415,9 @@ class DailySummarizer:
         market_data: Optional[Dict[str, Any]] = None,
         market_history: Optional[Dict[str, Any]] = None,
         market_indicators_meta: Optional[Dict[str, Any]] = None,
+        prev_url: Optional[str] = None,
+        next_url: Optional[str] = None,
+        latest_url: Optional[str] = None,
     ) -> Dict:
         """Return structured dict for Jinja2 HTML rendering.
 
@@ -538,6 +541,9 @@ class DailySummarizer:
             "market_indicators": market_indicators,
             "market_indicators_groups": market_indicators_groups,
             "market_indicators_history": market_indicators_history,
+            "prev_url": prev_url,
+            "next_url": next_url,
+            "latest_url": latest_url,
         }
 
     def _generate_empty_summary(self, date: str, total_fetched: int, labels: dict) -> str:

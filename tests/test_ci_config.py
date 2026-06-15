@@ -19,8 +19,8 @@ WORKFLOW_DIR = ROOT / ".github" / "workflows"
 
 WORKFLOW_YML = WORKFLOW_DIR / "daily-focus-morning.yml"
 
-# Expected cron for the single daily edition: UTC 04:00 = Beijing 12:00
-EXPECTED_CRON = "0 4 * * *"
+# Expected cron for the single daily edition: UTC 05:43 = Beijing 13:43
+EXPECTED_CRON = "43 5 * * *"
 
 
 def _read_workflow(path: Path) -> str:
@@ -135,7 +135,7 @@ def test_workflow_cron_schedule() -> None:
     assert len(schedule) > 0, "Workflow must have a schedule"
     cron = schedule[0].get("cron", "")
     assert cron == EXPECTED_CRON, (
-        f"Expected cron '{EXPECTED_CRON}' (UTC 04:00 = Beijing 12:00), "
+        f"Expected cron '{EXPECTED_CRON}' (UTC 05:43 = Beijing 13:43), "
         f"got '{cron}'"
     )
     # Verify we only have one cron entry (single daily edition)

@@ -283,7 +283,23 @@ class HorizonOrchestrator:
                 for lang in self.config.ai.languages:
                     summarizer = DailySummarizer()
 
-                    # 7a. Render HTML via structured data -> Jinja2 template
+                    # 7a. Compute prev/next day navigation links
+                    daily_dir = Path("docs") / "daily"
+                    today_date = datetime.strptime(today, "%Y-%m-%d")
+                    prev_url, next_url = None, None
+
+                    prev_path = daily_dir / f"{(today_date - timedelta(days=1)).strftime('%Y-%m-%d')}-{period}-{lang}.html"
+                    if prev_path.exists():
+                        prev_url = prev_path.name  # same directory, just filename
+
+                    next_path = daily_dir / f"{(today_date + timedelta(days=1)).strftime('%Y-%m-%d')}-{period}-{lang}.html"
+                    if next_path.exists():
+                        next_url = next_path.name  # same directory, just filename
+
+                    # Latest report link — always points to index.html which redirects to today
+                    latest_url = "../index.html"
+
+                    # 7b. Render HTML via structured data -> Jinja2 template
                     structured = summarizer.get_structured_data(
                         important_items, today, len(all_items),
                         language=lang, period=period,
@@ -292,6 +308,9 @@ class HorizonOrchestrator:
                         market_data=market_data,
                         market_history=market_history,
                         market_indicators_meta=market_indicators_meta,
+                        prev_url=prev_url,
+                        next_url=next_url,
+                        latest_url=latest_url,
                     )
 
                     from .renderer import DailyRenderer
@@ -310,7 +329,7 @@ class HorizonOrchestrator:
                         f.write(html)
                     self.console.print(f"📄 Archived HTML to: {daily_path}\n")
 
-                    # 7b. Generate Markdown summary for email/webhook compatibility
+                    # 7c. Generate Markdown summary for email/webhook compatibility
                     summary = await summarizer.generate_summary(important_items, today, len(all_items), language=lang)
 
                     # Save to data/summaries/

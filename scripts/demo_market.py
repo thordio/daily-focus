@@ -18,12 +18,15 @@ async def main() -> None:
     ok = sum(1 for v in market_data.values() if "price" in v)
     print(f"  Market: {ok}/{len(market_data)} indicators OK")
 
-    meta = json.loads(open("data/market-indicators.json").read())
+    with open("data/market-indicators.json") as f:
+        meta = json.load(f)
 
-    # Build 30-day simulated history
+    # Build simulated history: 1 day (today only) + 30-day option
+    # Set to 30 for full demo, 0 for single-point test
+    HISTORY_DAYS = 30  # change to 0 for single-point test
     today = datetime.now(timezone.utc)
     history: dict = {"version": 1, "indicators": sorted(market_data.keys()), "history": {}}
-    for days_ago in range(30, -1, -1):
+    for days_ago in range(HISTORY_DAYS, -1, -1):
         d = (today - timedelta(days=days_ago)).strftime("%Y-%m-%d")
         snapshot: dict = {}
         for key, val in market_data.items():
@@ -93,18 +96,37 @@ async def main() -> None:
     print(f"  News: {len(items)} sample items")
     print("Rendering...")
 
+    date_str = today.strftime("%Y-%m-%d")
+    # Compute prev/next day links (check if adjacent files exist locally)
+    prev_url, next_url = None, None
+    yesterday = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+    tomorrow = (today + timedelta(days=1)).strftime("%Y-%m-%d")
+    daily_dir = Path("docs/daily")
+    if (daily_dir / f"{yesterday}-morning-zh.html").exists():
+        prev_url = f"{yesterday}-morning-zh.html"
+    if (daily_dir / f"{tomorrow}-morning-zh.html").exists():
+        next_url = f"{tomorrow}-morning-zh.html"
+    latest_url = "../index.html"
+
     s = DailySummarizer()
     structured = s.get_structured_data(
-        items, today.strftime("%Y-%m-%d"), 100,
+        items, date_str, 100,
         language="zh", period="morning", score_threshold=4.0,
         market_data=market_data, market_history=history,
         market_indicators_meta=meta,
+        prev_url=prev_url, next_url=next_url, latest_url=latest_url,
     )
+    structured["is_demo"] = True
     html = DailyRenderer().render_html(structured)
 
     demo = Path("docs/daily/demo-market.html")
     demo.parent.mkdir(parents=True, exist_ok=True)
     demo.write_text(html, encoding="utf-8")
+    # Also generate index.html for the "Latest" nav button
+    index_html = DailyRenderer().render_index(f"daily/{date_str}-morning-zh.html")
+    (Path("docs") / "index.html").write_text(index_html, encoding="utf-8")
+    print("  docs/index.html (redirects to latest)")
+
     print(f"\nDone: {demo} ({demo.stat().st_size:,} bytes)")
     print(f"Open: file://{demo.resolve()}")
 
