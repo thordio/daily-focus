@@ -819,3 +819,88 @@ def test_depth_indicator_threshold_english():
     # English title text
     assert "web search" in html
     assert "article-based" in html
+
+
+# ---------------------------------------------------------------------------
+# 6. Market indicators tab rendering
+# ---------------------------------------------------------------------------
+
+MOCK_MARKET_DATA = {
+    "gold": {"price": 2350.80, "prev_close": None},
+    "oil": {"price": 78.45, "prev_close": None},
+    "nasdaq": {"price": 19723.45, "prev_close": 19650.80},
+    "usdcny": {"price": 7.2456, "prev_close": None},
+    "eurcny": {"price": 7.8422, "prev_close": None},
+    "jpycny": {"price": 4.2270, "prev_close": None},
+    "domestic_gold": {"price": 547.58, "prev_close": None},
+    "shanghai": {"price": 3150.45, "prev_close": None},
+    "chinext": {"price": 2050.30, "prev_close": None},
+    "star50": {"price": 980.60, "prev_close": None},
+}
+
+MOCK_INDICATORS_META = {
+    "indicators": {
+        "international": {
+            "gold": {"name": "Gold", "name_en": "Gold", "ticker": "GC=F"},
+            "nasdaq": {"name": "NASDAQ", "name_en": "NASDAQ", "ticker": "^IXIC"},
+        },
+        "domestic": {
+            "shanghai": {"name": "Shanghai", "name_en": "Shanghai", "ticker": "000001.SS"},
+        },
+    },
+}
+
+MOCK_MARKET_HISTORY = {
+    "version": 1,
+    "indicators": ["gold", "nasdaq", "shanghai"],
+    "history": {
+        "2026-06-01": {"gold": {"price": 2350.0}, "nasdaq": {"price": 19700.0}},
+        "2026-06-02": {"gold": {"price": 2355.0}, "nasdaq": {"price": 19723.0}},
+    },
+}
+
+
+def test_structured_data_includes_market_tab() -> None:
+    """When market_data + meta provided, tabs dict includes market_indicators."""
+    s = DailySummarizer()
+    items = make_sample_items()
+    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning",
+        market_data=MOCK_MARKET_DATA,
+        market_indicators_meta=MOCK_INDICATORS_META)
+    assert "market_indicators" in data["tabs"]
+    assert data["tabs"]["market_indicators"]["is_chart"] is True
+    assert data["market_indicators"] != {}
+
+
+def test_market_tab_empty_without_data() -> None:
+    """Without market data params, market_indicators data dict is empty."""
+    s = DailySummarizer()
+    items = make_sample_items()
+    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning")
+    assert "market_indicators" in data["tabs"]  # tab always present via TAB_DEFS
+    assert data["market_indicators"] == {}
+
+
+def test_market_tab_has_empty_items() -> None:
+    """Market tab has empty items list (no news cards)."""
+    s = DailySummarizer()
+    items = make_sample_items()
+    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning",
+        market_data=MOCK_MARKET_DATA,
+        market_indicators_meta=MOCK_INDICATORS_META)
+    assert data["tabs"]["market_indicators"]["items"] == []
+
+
+def test_render_html_with_market_data() -> None:
+    """Rendered HTML contains chart elements when market data provided."""
+    s = DailySummarizer()
+    items = make_sample_items()
+    data = s.get_structured_data(items, "2026-06-01", 50, "zh", "morning",
+        market_data=MOCK_MARKET_DATA,
+        market_indicators_meta=MOCK_INDICATORS_META,
+        market_history=MOCK_MARKET_HISTORY)
+    r = DailyRenderer()
+    html = r.render_html(data)
+    assert 'id="market-chart"' in html
+    assert 'id="indicator-selector"' in html
+    assert 'Chart.js' in html or 'chart.js' in html

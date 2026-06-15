@@ -1,11 +1,17 @@
 """Main orchestrator coordinating the entire workflow."""
 
 import asyncio
+import json
+import logging
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import List, Dict
 from urllib.parse import urlparse
 import httpx
+
+
+logger = logging.getLogger(__name__)
 from rich.console import Console
 
 from .models import Config, ContentItem
@@ -243,6 +249,34 @@ class HorizonOrchestrator:
                 await self._select_images(important_items)
             stage_timer.record("8. Images", t.elapsed if bench_enabled() else 0)
 
+            # 6.6 Fetch market data for Global Indicators tab
+            with timer("Market data fetch") as t:
+                market_data = None
+                market_history = None
+                market_indicators_meta = None
+                try:
+                    from src.scrapers.market_data import fetch_all
+                    from src.scrapers.market_history import load_history, append_history, save_history
+
+                    market_data = await fetch_all()
+
+                    indicators_meta_path = Path("data/market-indicators.json")
+                    if indicators_meta_path.exists():
+                        market_indicators_meta = json.loads(indicators_meta_path.read_text(encoding="utf-8"))
+
+                    market_history_path = Path("docs") / "daily" / "market-history.json"
+                    market_history = load_history(market_history_path)
+                    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                    market_history = append_history(market_history, today_str, market_data)
+                    save_history(market_history_path, market_history)
+
+                    ok = sum(1 for v in market_data.values() if "price" in v)
+                    self.console.print(f"📈 Market data: {ok}/{len(market_data)} indicators OK")
+                except Exception as exc:
+                    logger.warning("Market data unavailable: %s", exc)
+                    self.console.print(f"[yellow]⚠️  Market data unavailable: {exc}[/yellow]")
+            stage_timer.record("8.5 Market", t.elapsed if bench_enabled() else 0)
+
             # 7. Generate and save daily summaries for each configured language
             with timer("HTML render + save") as t:
                 today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -255,14 +289,15 @@ class HorizonOrchestrator:
                         language=lang, period=period,
                         score_threshold=self.config.filtering.ai_score_threshold,
                         topic_limits=limits,
+                        market_data=market_data,
+                        market_history=market_history,
+                        market_indicators_meta=market_indicators_meta,
                     )
 
                     from .renderer import DailyRenderer
 
                     renderer = DailyRenderer()
                     html = renderer.render_html(structured)
-
-                    from pathlib import Path
 
                     docs_dir = Path("docs")
                     docs_dir.mkdir(parents=True, exist_ok=True)

@@ -922,7 +922,204 @@ summary:focus-visible {
 @media (min-width: 1440px) {
   body { font-size: 17.5px; }
 }
+/* ===== Market Indicators Tab ===== */
+
+.market-summary {
+  margin-bottom: 28px;
+}
+.market-summary-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.market-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.market-summary-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.market-summary-item:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent);
+}
+.market-summary-item .msi-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.market-summary-item .msi-price {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.market-summary-item .msi-price.error {
+  font-size: 13px;
+  color: var(--score-9plus);
+  font-weight: 600;
+}
+.market-summary-item .msi-change {
+  font-size: 12px;
+  margin-top: 2px;
+  font-weight: 500;
+}
+.market-summary-item .msi-change.up { color: #22c55e; }
+.market-summary-item .msi-change.down { color: #ef4444; }
+
+/* Chart controls bar */
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.indicator-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.indicator-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.indicator-pill:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+.indicator-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.indicator-pill .pill-sub {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+.indicator-pill.active .pill-sub { opacity: 1; }
+
+.range-selector {
+  display: flex;
+  gap: 4px;
+  background: var(--tag-bg);
+  padding: 3px;
+  border-radius: 8px;
+}
+.range-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.range-btn:hover { color: var(--text); }
+.range-btn.active {
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.ma-toggle {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+.ma-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+.ma-checkbox input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 20px 24px 20px 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Chart empty state */
+.chart-empty {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.chart-empty-icon { font-size: 40px; opacity: 0.5; }
+.chart-empty-text { font-size: 14px; font-weight: 500; }
+.chart-empty-hint { font-size: 12px; opacity: 0.7; }
+
+/* Market group label */
+.market-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 6px 0 4px 4px;
+  opacity: 0.7;
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .market-summary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  .chart-controls { flex-direction: column; align-items: stretch; }
+  .ma-toggle { margin-left: 0; justify-content: center; }
+  .chart-container { height: 300px; padding: 12px 16px 12px 10px; }
+  .market-summary-item .msi-price { font-size: 17px; }
+}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -967,7 +1164,7 @@ summary:focus-visible {
 <div class="selection-info">
   <div class="selection-rationale">
     {% if language == "zh" %}
-    &#x1f4ca; 精选逻辑：AI 评分排序，每板块取 top N 条。确保篇篇有深度，条条是干货。
+    &#x1f4ca; 精选逻辑：AI 评分排序，每板块取 top N 条。
     {% else %}
     &#x1f4ca; Selection: AI-score ranked, top N per section. Every item enriched for depth.
     {% endif %}
@@ -1178,7 +1375,108 @@ summary:focus-visible {
   <div class="tab-panel{% if tab_key == active_tab %} active{% endif %}"
        id="tab-{{ tab_key }}"
        role="tabpanel">
-    {% if tab['items']|length == 0 %}
+    {% if tab.is_chart|default(false) %}
+    {# ── Market Indicators Chart Tab ── #}
+    {% if market_indicators is defined and market_indicators|length > 0 %}
+    <div class="market-summary">
+      <div class="market-summary-title">
+        {% if language == "zh" %}实时行情{% else %}Live Prices{% endif %}
+      </div>
+      <div class="market-summary-grid" id="market-summary-grid">
+        {% for group_key, group in market_indicators_groups.items() %}
+        <div class="market-group-label">
+          {% if language == "zh" %}
+            {{ "国际" if group_key == "international" else "国内" }}
+          {% else %}
+            {{ group_key|title }}
+          {% endif %}
+        </div>
+        {% for key, indicator in group.items() %}
+        <div class="market-summary-item" data-key="{{ key }}"
+             onclick="MarketChart.switchIndicator('{{ key }}')"
+             title="{% if language == "zh" %}点击查看图表{% else %}Click for chart{% endif %}">
+          <div class="msi-name">{% if language == "zh" %}{{ indicator.name }}{% else %}{{ indicator.name_en }}{% endif %}</div>
+          <div class="msi-price {% if indicator.error %}error{% endif %}">
+            {% if indicator.error %}
+              --
+            {% elif indicator.price is not none %}
+              {{ "{:,.2f}".format(indicator.price) }}
+            {% else %}
+              --
+            {% endif %}
+          </div>
+          {% if indicator.prev_close is not none and indicator.price is not none %}
+          {% set pct = ((indicator.price - indicator.prev_close) / indicator.prev_close * 100) %}
+          <div class="msi-change {% if pct >= 0 %}up{% else %}down{% endif %}">
+            {{ "%+.2f"|format(pct) }}%
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="chart-controls">
+      <div class="indicator-selector" id="indicator-selector">
+        {% set ns = namespace(first=true) %}
+        {% for group_key, group in market_indicators_groups.items() %}
+        {% for key, indicator in group.items() %}
+        <button class="indicator-pill{% if ns.first %} active{% endif %}"
+                data-key="{{ key }}"
+                onclick="MarketChart.switchIndicator('{{ key }}')">
+          {% if language == "zh" %}{{ indicator.name }}{% else %}{{ indicator.name_en }}{% endif %}
+          <span class="pill-sub">{{ indicator.ticker }}</span>
+        </button>
+        {% set ns.first = false %}
+        {% endfor %}
+        {% endfor %}
+      </div>
+      <div class="range-selector" id="range-selector">
+        <button class="range-btn" data-days="7" onclick="MarketChart.switchRange(7)">7D</button>
+        <button class="range-btn active" data-days="30" onclick="MarketChart.switchRange(30)">30D</button>
+        <button class="range-btn" data-days="90" onclick="MarketChart.switchRange(90)">90D</button>
+        <button class="range-btn" data-days="0" onclick="MarketChart.switchRange(0)">
+          {% if language == "zh" %}全部{% else %}All{% endif %}
+        </button>
+      </div>
+      <div class="ma-toggle" id="ma-toggle">
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="5" onchange="MarketChart.toggleMA(5, this.checked)">MA5
+        </label>
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="10" onchange="MarketChart.toggleMA(10, this.checked)">MA10
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-container" id="chart-container">
+      <canvas id="market-chart"></canvas>
+      <div class="chart-empty" id="chart-empty" style="display:none">
+        <div class="chart-empty-icon">&#x1f4c8;</div>
+        <div class="chart-empty-text">
+          {% if language == "zh" %}暂无足够数据{% else %}Not enough data{% endif %}
+        </div>
+        <div class="chart-empty-hint">
+          {% if language == "zh" %}数据将在每日运行后累积{% else %}Data accumulates with each daily run{% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <h2>
+        {% if language == "zh" %}市场数据暂不可用{% else %}Market data unavailable{% endif %}
+      </h2>
+      <p>
+        {% if language == "zh" %}
+          今日市场数据获取失败，请稍后再来查看
+        {% else %}
+          Market data fetch failed today. Please check back later.
+        {% endif %}
+      </p>
+    </div>
+    {% endif %}
+    {% elif tab['items']|length == 0 %}
     <div class="empty-state">
       <div class="empty-icon">&#x1f4ed;</div>
       <h2>
@@ -1328,6 +1626,280 @@ summary:focus-visible {
 
   try { var saved = localStorage.getItem('theme'); if (saved) root.setAttribute('data-theme', saved); } catch(e) {}
   updateIcon();
+})();
+</script>
+
+<script>
+// ── Market Chart ────────────────────────────────────────────
+(function() {
+  'use strict';
+
+  var historyData = {{ market_indicators_history|default({})|tojson }};
+  historyData = historyData || {};
+  var indicatorKeys = Object.keys(historyData);
+
+  if (!indicatorKeys.length) {
+    var emptyEl = document.getElementById('chart-empty');
+    if (emptyEl) {
+      emptyEl.style.display = 'flex';
+      var canvas = document.getElementById('market-chart');
+      if (canvas) canvas.style.display = 'none';
+    }
+    return;  // No data, skip initialization
+  }
+
+  var chart = null;
+  var currentIndicator = indicatorKeys[0];
+  var currentDays = 30;
+  var maPeriods = {5: false, 10: false};
+
+  function getThemeColors() {
+    var root = document.documentElement;
+    var explicit = root.getAttribute('data-theme');
+    var isDark;
+    if (explicit) {
+      isDark = explicit === 'dark';
+    } else {
+      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return {
+      grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      text: isDark ? '#94a3b8' : '#6b7280',
+      line: isDark ? '#60a5fa' : '#2563eb',
+      fill: isDark ? 'rgba(96,165,250,0.10)' : 'rgba(37,99,235,0.10)',
+      ma5: isDark ? '#fbbf24' : '#d97706',
+      ma10: isDark ? '#34d399' : '#059669',
+    };
+  }
+
+  function filterByDays(series, days) {
+    if (days === 0 || !days) return series.slice();
+    var cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - days);
+    return series.filter(function(p) {
+      return new Date(p.date + 'T00:00:00') >= cutoff;
+    });
+  }
+
+  function calcMA(values, period) {
+    if (values.length < period) return new Array(values.length).fill(null);
+    var result = new Array(period - 1).fill(null);
+    var sum = 0;
+    for (var i = 0; i < period; i++) sum += values[i];
+    result.push(Math.round(sum / period * 100) / 100);
+    for (var i = period; i < values.length; i++) {
+      sum = sum - values[i - period] + values[i];
+      result.push(Math.round(sum / period * 100) / 100);
+    }
+    return result;
+  }
+
+  function updatePills() {
+    // Update summary grid items to highlight active indicator
+    document.querySelectorAll('.market-summary-item').forEach(function(el) {
+      el.style.borderColor = el.dataset.key === currentIndicator
+        ? getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+        : '';
+      el.style.borderWidth = el.dataset.key === currentIndicator ? '2px' : '';
+    });
+    // Update indicator pills
+    document.querySelectorAll('.indicator-pill').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.key === currentIndicator);
+    });
+  }
+
+  function renderChart() {
+    var canvas = document.getElementById('market-chart');
+    var emptyEl = document.getElementById('chart-empty');
+    if (!canvas || !emptyEl) return;
+
+    // Guard: Chart.js CDN failed to load
+    if (typeof Chart === 'undefined') {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      var emptyText = emptyEl.querySelector('.chart-empty-text');
+      var emptyHint = emptyEl.querySelector('.chart-empty-hint');
+      if (emptyText) emptyText.textContent = 'Chart library unavailable';
+      if (emptyHint) emptyHint.textContent = 'Please check your network connection';
+      return;
+    }
+
+    var series = (historyData[currentIndicator] || []).slice();
+    var filtered = filterByDays(series, currentDays);
+
+    if (filtered.length < 2) {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      if (chart) { chart.destroy(); chart = null; }
+      updatePills();
+      return;
+    }
+
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    var labels = filtered.map(function(p) { return p.date; });
+    var prices = filtered.map(function(p) { return p.price; });
+    var colors = getThemeColors();
+
+    var datasets = [{
+      label: 'Price',
+      data: prices,
+      borderColor: colors.line,
+      backgroundColor: colors.fill,
+      fill: true,
+      tension: 0.3,
+      pointRadius: filtered.length > 60 ? 0 : 2,
+      pointHoverRadius: 5,
+      pointBackgroundColor: colors.line,
+      borderWidth: 2,
+    }];
+
+    // Moving averages
+    [5, 10].forEach(function(period) {
+      if (maPeriods[period]) {
+        var maData = calcMA(prices, period);
+        datasets.push({
+          label: 'MA' + period,
+          data: maData,
+          borderColor: colors['ma' + period] || colors.line,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          fill: false,
+          tension: 0.3,
+        });
+      }
+    });
+
+    if (chart) {
+      chart.data.labels = labels;
+      chart.data.datasets = datasets;
+      chart.options.plugins.legend.display = datasets.length > 1;
+      // Update theme colors dynamically
+      var colors = getThemeColors();
+      chart.options.scales.x.ticks.color = colors.text;
+      chart.options.scales.y.ticks.color = colors.text;
+      chart.options.scales.y.grid.color = colors.grid;
+      chart.options.plugins.legend.labels.color = colors.text;
+      chart.update('none');
+    } else {
+      var ctx = canvas.getContext('2d');
+      var colors = getThemeColors();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          animation: { duration: 300 },
+          plugins: {
+            legend: {
+              display: datasets.length > 1,
+              labels: {
+                color: colors.text,
+                font: { size: 12 },
+                usePointStyle: true,
+                padding: 16,
+              }
+            },
+            tooltip: {
+              backgroundColor: colors.line,
+              titleFont: { size: 12 },
+              bodyFont: { size: 13, weight: '600' },
+              padding: 10,
+              cornerRadius: 8,
+              displayColors: false,
+              callbacks: {
+                label: function(ctx) {
+                  var val = ctx.parsed.y;
+                  return (val !== null ? val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--');
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                maxTicksLimit: 12,
+                maxRotation: 45,
+              },
+              grid: { display: false },
+            },
+            y: {
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                callback: function(v) {
+                  if (v >= 10000) return (v / 1000).toFixed(0) + 'k';
+                  if (v >= 1000 && v < 10000) return (v / 1000).toFixed(1) + 'k';
+                  return v.toFixed(1);
+                }
+              },
+              grid: { color: colors.grid },
+            }
+          }
+        }
+      });
+    }
+
+    updatePills();
+  }
+
+  // Public API
+  window.MarketChart = {
+    switchIndicator: function(key) {
+      if (key === currentIndicator) return;
+      currentIndicator = key;
+      renderChart();
+    },
+    switchRange: function(days) {
+      currentDays = days;
+      document.querySelectorAll('.range-btn').forEach(function(btn) {
+        btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
+      });
+      renderChart();
+    },
+    toggleMA: function(period, enabled) {
+      maPeriods[period] = enabled;
+      renderChart();
+    },
+  };
+
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderChart);
+  } else {
+    renderChart();
+  }
+
+  // Re-render on theme change
+  var themeObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.attributeName === 'data-theme') {
+        if (chart) renderChart();
+      }
+    });
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // Re-render when tab becomes visible (Chart.js needs visible canvas for sizing)
+  var marketPanel = document.getElementById('tab-market_indicators');
+  if (marketPanel) {
+    var tabObserver = new MutationObserver(function() {
+      if (marketPanel.classList.contains('active') && chart) {
+        chart.resize();
+      }
+    });
+    tabObserver.observe(marketPanel, { attributes: true, attributeFilter: ['class'] });
+  }
+
 })();
 </script>
 

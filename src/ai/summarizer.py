@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 from ..models import ContentItem
+from ..scrapers.market_history import get_chart_series
 
 
 _CJK = r"[\u4e00-\u9fff\u3400-\u4dbf]"
@@ -297,6 +298,7 @@ class DailySummarizer:
         "ai-tech": {"label": "AI 技术", "label_en": "AI Tech"},
         "ai-markets": {"label": "AI 市场", "label_en": "AI Markets"},
         "economy": {"label": "经济动向", "label_en": "Economy"},
+        "market_indicators": {"label": "全球指标", "label_en": "Global Indicators", "is_chart": True},
     }
 
     @staticmethod
@@ -410,6 +412,9 @@ class DailySummarizer:
         period: str = "morning",
         score_threshold: float = 7.0,
         topic_limits: Optional[Dict[str, Any]] = None,
+        market_data: Optional[Dict[str, Any]] = None,
+        market_history: Optional[Dict[str, Any]] = None,
+        market_indicators_meta: Optional[Dict[str, Any]] = None,
     ) -> Dict:
         """Return structured dict for Jinja2 HTML rendering.
 
@@ -436,6 +441,36 @@ class DailySummarizer:
         # Single daily edition — next update is always tomorrow 12:00 Beijing
         next_update = "明天 12:00" if language == "zh" else "Tomorrow 12:00"
 
+        # --- Assemble market indicators data ---
+        market_indicators: Dict[str, Dict] = {}
+        market_indicators_groups: Dict[str, Dict] = {}
+        market_indicators_history: Dict[str, list] = {}
+
+        if market_data and market_indicators_meta:
+            raw_groups = market_indicators_meta.get("indicators", {})
+            for group_key, group in raw_groups.items():
+                market_indicators_groups[group_key] = {}
+                for key, meta in group.items():
+                    entry = market_data.get(key, {})
+                    has_error = "error" in entry
+                    market_indicators[key] = {
+                        "name": meta["name"],
+                        "name_en": meta["name_en"],
+                        "ticker": meta["ticker"],
+                        "group": group_key,
+                        "price": entry.get("price") if not has_error else None,
+                        "prev_close": entry.get("prev_close") if not has_error else None,
+                        "error": entry.get("error") if has_error else None,
+                    }
+                    market_indicators_groups[group_key][key] = market_indicators[key]
+
+            # Build chart series for JS (all available data)
+            if market_history:
+                for key in market_indicators:
+                    market_indicators_history[key] = get_chart_series(
+                        market_history, key, max_days=0
+                    )
+
         # Build the flat item-data list (backward-compat) and grouped tabs
         flat_items = []
         grouped: Dict[str, list] = defaultdict(list)
@@ -448,11 +483,7 @@ class DailySummarizer:
         # Build tabs from TAB_DEFS first, then auto-create for any extra topics
         tabs = {}
         for tab_key, tab_def in self.TAB_DEFS.items():
-            tabs[tab_key] = {
-                "label": tab_def["label"],
-                "label_en": tab_def["label_en"],
-                "items": grouped.get(tab_key, []),
-            }
+            tabs[tab_key] = {**tab_def, "items": grouped.get(tab_key, [])}
         # Auto-create tabs for any topics found in data that are not in TAB_DEFS
         for topic_key in grouped:
             if topic_key not in tabs:
@@ -471,6 +502,8 @@ class DailySummarizer:
         tl = topic_limits or {}
         topic_stats: list[dict] = []
         for tab_key in tabs:
+            if tab_key == "market_indicators":
+                continue  # chart tab, not news
             count = len(grouped.get(tab_key, []))
             limit_cfg = tl.get(tab_key)
             low = limit_cfg.min if limit_cfg else 4
@@ -502,6 +535,9 @@ class DailySummarizer:
             "active_tab": "ai-tech",
             "alternate_url": alternate_url,
             "topic_stats": topic_stats,
+            "market_indicators": market_indicators,
+            "market_indicators_groups": market_indicators_groups,
+            "market_indicators_history": market_indicators_history,
         }
 
     def _generate_empty_summary(self, date: str, total_fetched: int, labels: dict) -> str:

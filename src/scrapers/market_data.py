@@ -1,11 +1,11 @@
-"""Production-grade market data fetcher for 9 financial indicators.
+"""Production-grade market data fetcher for 10 financial indicators.
 
 Provides async ``fetch_all()`` that returns current prices and (where
 available) previous-close values for gold, oil, NASDAQ, China A-share
-indices, and major forex pairs.
+indices, CNY-centric forex pairs, and domestic gold reference.
 
 Data sources (queried concurrently):
-  - open.er-api.com -- forex (CNY, JPY, EUR vs USD)
+  - open.er-api.com -- forex (USD/CNY, EUR/CNY, JPY/CNY(100))
   - Sina Finance    -- CN indices + gold + oil
   - akshare         -- NASDAQ
 
@@ -45,15 +45,16 @@ SINA_MAP: dict[str, str] = {
 }
 
 LABELS: dict[str, tuple[str, str]] = {
-    "gold":     ("Gold",              "GC=F"),
-    "oil":      ("WTI Crude Oil",     "CL=F"),
-    "nasdaq":   ("NASDAQ",            "^IXIC"),
-    "usdcny":   ("USD/CNY",           "CNY=X"),
-    "usdjpy":   ("USD/JPY",           "JPY=X"),
-    "eurusd":   ("EUR/USD",           "EURUSD=X"),
-    "shanghai": ("Shanghai Composite", "000001.SS"),
-    "chinext":  ("ChiNext",           "399006.SZ"),
-    "star50":   ("STAR 50",           "000688.SS"),
+    "gold":     ("纽约金",            "COMEX Gold"),
+    "oil":      ("WTI 原油",          "WTI Crude Oil"),
+    "nasdaq":   ("纳斯达克",          "NASDAQ"),
+    "usdcny":   ("美元/人民币",        "USD/CNY"),
+    "eurcny":   ("欧元/人民币",        "EUR/CNY"),
+    "jpycny":   ("日元/人民币(100)",   "JPY/CNY(100)"),
+    "shanghai": ("上证指数",           "Shanghai Composite"),
+    "chinext":  ("创业板指",           "ChiNext"),
+    "star50":   ("科创 50",           "STAR 50"),
+    "domestic_gold": ("国内参考金价",  "Domestic Gold"),
 }
 
 TIMEOUT = 15
@@ -62,20 +63,27 @@ TIMEOUT = 15
 
 
 async def fetch_forex() -> dict[str, dict]:
-    """Fetch USD/CNY, USD/JPY, EUR/USD from open.er-api.com."""
+    """Fetch USD/CNY, EUR/CNY, JPY/CNY(100) from open.er-api.com.
+
+    All rates are CNY-centric: how many CNY per foreign currency unit.
+    JPY/CNY is per 100 JPY (standard China convention).
+    """
     try:
         async with httpx.AsyncClient(timeout=TIMEOUT) as client:
             resp = await client.get(FOREX_URL)
             resp.raise_for_status()
             rates = resp.json()["rates"]
+        usd_cny = rates["CNY"]
+        usd_jpy = rates["JPY"]
+        usd_eur = rates["EUR"]
         return {
-            "usdcny": {"price": round(rates["CNY"], 4), "prev_close": None},
-            "usdjpy": {"price": round(rates["JPY"], 4), "prev_close": None},
-            "eurusd": {"price": round(1 / rates["EUR"], 4), "prev_close": None},
+            "usdcny": {"price": round(usd_cny, 4), "prev_close": None},
+            "eurcny": {"price": round(usd_cny / usd_eur, 4), "prev_close": None},
+            "jpycny": {"price": round(100 * usd_cny / usd_jpy, 4), "prev_close": None},
         }
     except Exception as exc:
         logger.warning("Forex fetch failed: %s", exc)
-        return {k: {"error": str(exc)} for k in ("usdcny", "usdjpy", "eurusd")}
+        return {k: {"error": str(exc)} for k in ("usdcny", "eurcny", "jpycny")}
 
 
 # ── Sina (CN indices, gold, oil) ──────────────────────────────────────────
@@ -98,16 +106,28 @@ async def fetch_sina() -> dict[str, dict]:
 
     results: dict[str, dict] = {}
     for key, code in SINA_MAP.items():
-        field_idx = 0 if key in ("gold", "oil") else 3
+        # Sina CSV format:
+        #   For futures (gold/oil): name, prev_close, price, open, high, low, ...
+        #   For indices: name, open, prev_close, current_price, ...
+        if key in ("gold", "oil"):
+            field_idx = 0  # price
+            prev_idx = 1   # prev_close
+        else:
+            field_idx = 3  # current_price
+            prev_idx = 2   # prev_close
         for line in raw.split("\n"):
             if code not in line:
                 continue
             try:
                 parts = line.split('"')[1].split(",")
-                results[key] = {
-                    "price": round(float(parts[field_idx]), 4),
-                    "prev_close": None,
-                }
+                price_raw = parts[field_idx].strip() if field_idx < len(parts) else ""
+                prev_raw = parts[prev_idx].strip() if prev_idx < len(parts) else ""
+                price = round(float(price_raw), 4) if price_raw else None
+                prev_close = round(float(prev_raw), 4) if prev_raw else None
+                if price is not None:
+                    results[key] = {"price": price, "prev_close": prev_close}
+                else:
+                    results[key] = {"error": f"empty price at field {field_idx}: {parts[:4]}"}
             except (ValueError, IndexError) as exc:
                 results[key] = {"error": f"parse: {exc} -- {parts[:4]}"}
             break
@@ -147,10 +167,11 @@ async def fetch_nasdaq() -> dict[str, dict]:
 
 
 async def fetch_all() -> dict[str, dict]:
-    """Fetch current prices for all 9 indicators across 3 data sources.
+    """Fetch current prices for all 10 indicators across 3 data sources.
 
     Returns a dict keyed by indicator slug (``gold``, ``oil``, ``nasdaq``,
-    ``usdcny``, ``usdjpy``, ``eurusd``, ``shanghai``, ``chinext``, ``star50``).
+    ``usdcny``, ``eurcny``, ``jpycny``, ``shanghai``, ``chinext``, ``star50``,
+    ``domestic_gold``).
     Each value is either:
 
     - ``{"price": float, "prev_close": float | None}`` on success, or
@@ -165,7 +186,21 @@ async def fetch_all() -> dict[str, dict]:
     forex, sina, nasdaq = await asyncio.gather(
         fetch_forex(), fetch_sina(), fetch_nasdaq(),
     )
-    return {**forex, **sina, **nasdaq}
+    all_data = {**forex, **sina, **nasdaq}
+
+    # Compute domestic gold reference price (CNY/gram)
+    # Formula: COMEX gold (USD/oz) × USD/CNY rate ÷ 31.1035 (grams per troy oz)
+    gold_price = all_data.get("gold", {}).get("price")
+    cny_rate = all_data.get("usdcny", {}).get("price")
+    if gold_price is not None and cny_rate is not None:
+        all_data["domestic_gold"] = {
+            "price": round(gold_price * cny_rate / 31.1035, 2),
+            "prev_close": None,
+        }
+    else:
+        all_data["domestic_gold"] = {"error": "missing gold or usdcny data"}
+
+    return all_data
 
 
 # ── Standalone Display ────────────────────────────────────────────────────

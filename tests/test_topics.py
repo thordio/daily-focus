@@ -170,11 +170,11 @@ def test_topic_grouping_all_items_one_tab() -> None:
     assert len(data["tabs"]["economy"]["items"]) == 0
 
 
-def test_topic_grouping_tabs_dict_has_three_keys() -> None:
-    """tabs dict always has exactly three keys: ai-tech, ai-markets, economy."""
+def test_topic_grouping_tabs_dict_has_four_keys() -> None:
+    """tabs dict always has four keys: 3 news topics + market_indicators."""
     s = DailySummarizer()
     data = s.get_structured_data([], "2026-06-01", 10, "zh", "morning")
-    assert set(data["tabs"].keys()) == {"ai-tech", "ai-markets", "economy"}
+    assert set(data["tabs"].keys()) == {"ai-tech", "ai-markets", "economy", "market_indicators"}
 
 
 def test_topic_grouping_backward_compat_no_topic() -> None:
@@ -237,8 +237,8 @@ def test_tab_render_has_tab_navigation() -> None:
     assert 'class="tab-btn' in html
 
 
-def test_tab_render_three_tab_buttons() -> None:
-    """Rendered HTML has exactly three tab buttons."""
+def test_tab_render_four_tab_buttons() -> None:
+    """Rendered HTML has exactly four tab buttons (3 news + 1 market indicators)."""
     s = DailySummarizer()
     items = [_make_topic_item("1", "ai-tech")]
     data = s.get_structured_data(items, "2026-06-01", 10, "zh", "morning")
@@ -248,7 +248,7 @@ def test_tab_render_three_tab_buttons() -> None:
     # Each tab button has class="tab-btn"
     import re
     tab_buttons = re.findall(r'class="tab-btn[^"]*"', html)
-    assert len(tab_buttons) == 3
+    assert len(tab_buttons) == 4
 
 
 def test_tab_render_shows_item_count() -> None:
@@ -358,8 +358,8 @@ def test_tab_render_fallback_flat_when_no_tabs() -> None:
     assert "Flat Item" in html
 
 
-def test_tab_render_only_three_panels() -> None:
-    """Rendered HTML contains exactly three tab panels."""
+def test_tab_render_four_panels() -> None:
+    """Rendered HTML contains exactly four tab panels (3 news + 1 market indicators)."""
     s = DailySummarizer()
     items = [
         _make_topic_item("1", "ai-tech"),
@@ -370,8 +370,9 @@ def test_tab_render_only_three_panels() -> None:
     html = r.render_html(data)
 
     import re
-    panels = re.findall(r'id="tab-(ai-tech|ai-markets|economy)"', html)
-    assert len(panels) == 3
+    panels = re.findall(r'id="tab-([^"]+)"', html)
+    assert len(panels) == 4
+    assert "tab-market_indicators" in html
 
 
 def test_tab_render_javascript_function() -> None:

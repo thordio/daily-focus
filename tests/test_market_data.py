@@ -27,15 +27,16 @@ from src.scrapers.market_data import fetch_all
 
 EXPECTED_KEYS = frozenset({
     "gold", "oil", "nasdaq",
-    "usdcny", "usdjpy", "eurusd",
+    "usdcny", "eurcny", "jpycny",
     "shanghai", "chinext", "star50",
+    "domestic_gold",
 })
 
 # Realistic mock data for the three sub-fetchers.
 MOCK_FOREX = {
     "usdcny": {"price": 7.2456},
-    "usdjpy": {"price": 151.30},
-    "eurusd": {"price": 1.0842},
+    "eurcny": {"price": 7.7924},
+    "jpycny": {"price": 4.7915},
 }
 
 MOCK_SINA = {
@@ -85,12 +86,12 @@ def _run_fetch_all_mocked(mock_data: tuple[dict, dict, dict]) -> dict:
 class TestFetchAllInterface:
     """Tests for the ``fetch_all`` public interface with mocked internals."""
 
-    def test_fetch_all_returns_9_indicators(self):
-        """fetch_all() returns a dict with all 9 expected indicator keys."""
+    def test_fetch_all_returns_all_indicators(self):
+        """fetch_all() returns a dict with all 10 expected indicator keys."""
         result = _run_fetch_all_mocked((MOCK_FOREX, MOCK_SINA, MOCK_US))
 
         assert isinstance(result, dict)
-        assert len(result) == 9
+        assert len(result) == 10
         missing = EXPECTED_KEYS - result.keys()
         assert not missing, f"Missing indicator keys: {missing}"
 
@@ -107,15 +108,15 @@ class TestFetchAllInterface:
                     f"got {type(price).__name__}"
                 )
 
-    def test_fetch_all_returns_9_even_with_errors(self):
+    def test_fetch_all_returns_all_even_with_errors(self):
         """fetch_all returns 10 entries even when some sub-fetchers have errors."""
         result = _run_fetch_all_mocked((
-            {k: {"error": "timeout"} for k in ("usdcny", "usdjpy", "eurusd")},
+            {k: {"error": "timeout"} for k in ("usdcny", "eurcny", "jpycny")},
             MOCK_SINA,
             MOCK_US,
         ))
 
-        assert len(result) == 9
+        assert len(result) == 10
         assert "error" in result["usdcny"]
         assert "price" in result["shanghai"]
         assert "price" in result["nasdaq"]
@@ -127,7 +128,7 @@ class TestPartialFailure:
     def test_forex_failure_preserves_sina_and_us(self):
         """Forex errors: sina and US data still returned."""
         result = _run_fetch_all_mocked((
-            {k: {"error": "Forex API down"} for k in ("usdcny", "usdjpy", "eurusd")},
+            {k: {"error": "Forex API down"} for k in ("usdcny", "eurcny", "jpycny")},
             MOCK_SINA,
             MOCK_US,
         ))
@@ -171,7 +172,7 @@ class TestForexIntegration:
     """Integration tests for forex exchange-rate endpoints."""
 
     def test_fetch_forex_prices_reasonable(self):
-        """Forex prices in expected ranges: CNY 5-8, JPY 100-200, EUR 0.8-1.5."""
+        """Forex prices in expected ranges: CNY 5-8, EUR/CNY 7-10, JPY/CNY(100) 4-8."""
         try:
             from src.scrapers.market_data import fetch_forex
         except ImportError:
@@ -180,20 +181,20 @@ class TestForexIntegration:
         result = asyncio.run(fetch_forex())
 
         assert "usdcny" in result
-        assert "usdjpy" in result
-        assert "eurusd" in result
+        assert "eurcny" in result
+        assert "jpycny" in result
 
         cny = result["usdcny"].get("price")
         if cny is not None:
             assert 5.0 <= cny <= 8.0, f"USD/CNY {cny} outside expected range 5.0-8.0"
 
-        jpy = result["usdjpy"].get("price")
-        if jpy is not None:
-            assert 100.0 <= jpy <= 200.0, f"USD/JPY {jpy} outside expected range 100-200"
-
-        eur = result["eurusd"].get("price")
+        eur = result["eurcny"].get("price")
         if eur is not None:
-            assert 0.8 <= eur <= 1.5, f"EUR/USD {eur} outside expected range 0.8-1.5"
+            assert 7.0 <= eur <= 10.0, f"EUR/CNY {eur} outside expected range 7.0-10.0"
+
+        jpy = result["jpycny"].get("price")
+        if jpy is not None:
+            assert 4.0 <= jpy <= 8.0, f"JPY/CNY(100) {jpy} outside expected range 4.0-8.0"
 
 
 @pytest.mark.integration
@@ -268,4 +269,4 @@ class TestTimeout:
         assert elapsed < 60.0, (
             f"fetch_all took {elapsed:.1f}s, expected < 60s"
         )
-        assert len(result) == 9
+        assert len(result) == 10
