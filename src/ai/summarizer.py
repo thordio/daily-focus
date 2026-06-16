@@ -541,6 +541,7 @@ class DailySummarizer:
             "market_indicators": market_indicators,
             "market_indicators_groups": market_indicators_groups,
             "market_indicators_history": market_indicators_history,
+            "market_indicators_meta": market_indicators_meta,
             "prev_url": prev_url,
             "next_url": next_url,
             "latest_url": latest_url,

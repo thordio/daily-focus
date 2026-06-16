@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -75,7 +75,7 @@ def get_chart_series(
     history_data = history.get("history", {})
     sorted_dates = sorted(history_data.keys())
     if max_days > 0 and sorted_dates:
-        cutoff = (datetime.now() - timedelta(days=max_days)).strftime("%Y-%m-%d")
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=max_days)).strftime("%Y-%m-%d")
         sorted_dates = [d for d in sorted_dates if d >= cutoff]
     series = []
     for date_str in sorted_dates:

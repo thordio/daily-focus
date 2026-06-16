@@ -14,8 +14,10 @@ jobs:
       - name: Fetch archive from gh-pages
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
-          if git show gh-pages:docs/daily/ >/dev/null 2>&1; then
-            git checkout gh-pages -- docs/daily/
+          if git show gh-pages:daily/ >/dev/null 2>&1; then
+            git checkout gh-pages -- daily/
+            cp -r daily/* docs/daily/ 2>/dev/null || true
+            rm -rf daily/
             echo "Restored previous daily editions"
           else
             echo "No previous archive (first run)"

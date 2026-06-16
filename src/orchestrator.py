@@ -254,27 +254,64 @@ class HorizonOrchestrator:
                 market_data = None
                 market_history = None
                 market_indicators_meta = None
+
+                from src.scrapers.market_data import fetch_all
+                from src.scrapers.market_history import load_history, append_history, save_history
+
+                # ── Fetch current market data ──
+                # Network failures here are recoverable — the page still renders
+                # without the Global Indicators tab.
                 try:
-                    from src.scrapers.market_data import fetch_all
-                    from src.scrapers.market_history import load_history, append_history, save_history
-
                     market_data = await fetch_all()
-
-                    indicators_meta_path = Path("data/market-indicators.json")
-                    if indicators_meta_path.exists():
-                        market_indicators_meta = json.loads(indicators_meta_path.read_text(encoding="utf-8"))
-
-                    market_history_path = Path("docs") / "daily" / "market-history.json"
-                    market_history = load_history(market_history_path)
-                    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-                    market_history = append_history(market_history, today_str, market_data)
-                    save_history(market_history_path, market_history)
-
-                    ok = sum(1 for v in market_data.values() if "price" in v)
-                    self.console.print(f"📈 Market data: {ok}/{len(market_data)} indicators OK")
                 except Exception as exc:
-                    logger.warning("Market data unavailable: %s", exc)
-                    self.console.print(f"[yellow]⚠️  Market data unavailable: {exc}[/yellow]")
+                    logger.warning("Market data fetch failed (network): %s", exc)
+                    self.console.print(f"[yellow]⚠️  Market data fetch failed: {exc}[/yellow]")
+
+                # ── Load indicator metadata ──
+                indicators_meta_path = Path("data/market-indicators.json")
+                if indicators_meta_path.exists():
+                    try:
+                        market_indicators_meta = json.loads(indicators_meta_path.read_text(encoding="utf-8"))
+                    except (json.JSONDecodeError, OSError) as exc:
+                        logger.warning("Market indicators meta unreadable: %s", exc)
+
+                # ── Load → append → save history ──
+                # Market history persistence is best-effort — surface the error but
+                # continue so the page still renders with today's data.
+                market_history_path = Path("docs") / "daily" / "market-history.json"
+                if market_data is not None:
+                    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                    try:
+                        market_history = load_history(market_history_path)
+                        prev_dates = len(market_history.get("history", {}))
+                        market_history = append_history(market_history, today_str, market_data)
+                        save_history(market_history_path, market_history)
+                        new_dates = len(market_history.get("history", {}))
+                        ok = sum(1 for v in market_data.values() if "price" in v)
+                        self.console.print(
+                            f"📈 Market data: {ok}/{len(market_data)} indicators OK  "
+                            f"(history: {prev_dates}→{new_dates} dates, saved to {market_history_path})"
+                        )
+
+                        # ── Enrich prev_close from yesterday's history ──
+                        # Fill in prev_close for indicators where the scraper returned None.
+                        # Previous day prices are real data captured by the same pipeline.
+                        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+                        yesterday_history = market_history.get("history", {}).get(yesterday, {})
+                        for key, entry in market_data.items():
+                            if "price" in entry and entry.get("prev_close") is None:
+                                if key in yesterday_history:
+                                    entry["prev_close"] = yesterday_history[key]["price"]
+                    except (OSError, json.JSONDecodeError, ValueError, TypeError) as exc:
+                        logger.exception("CRITICAL: market history save failed")
+                        self.console.print(f"[red]❌ Market history save FAILED: {exc}[/red]")
+                        # Keep market_data for the template (show today's data even if
+                        # history persistence is broken), but leave market_history as None
+                        # so the template knows there is no historical data.
+                        market_history = None
+                else:
+                    self.console.print("[yellow]⚠️  Skipping market history — no market data available[/yellow]")
+
             stage_timer.record("8.5 Market", t.elapsed if bench_enabled() else 0)
 
             # 7. Generate and save daily summaries for each configured language

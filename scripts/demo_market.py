@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Generate a demo HTML page with all 4 tabs (3 news + market indicators)."""
+"""Generate a demo HTML page with all 4 tabs (3 news + market indicators)
+and working prev/next day navigation.
+
+Two-pass: first write all files, then rewrite with cross-links resolved.
+"""
 import asyncio
 import json
-import random
+import shutil
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -12,32 +16,8 @@ from src.renderer import DailyRenderer
 from src.models import ContentItem, SourceType
 
 
-async def main() -> None:
-    print("Fetching market data...")
-    market_data = await fetch_all()
-    ok = sum(1 for v in market_data.values() if "price" in v)
-    print(f"  Market: {ok}/{len(market_data)} indicators OK")
-
-    with open("data/market-indicators.json") as f:
-        meta = json.load(f)
-
-    # Build simulated history: 1 day (today only) + 30-day option
-    # Set to 30 for full demo, 0 for single-point test
-    HISTORY_DAYS = 30  # change to 0 for single-point test
-    today = datetime.now(timezone.utc)
-    history: dict = {"version": 1, "indicators": sorted(market_data.keys()), "history": {}}
-    for days_ago in range(HISTORY_DAYS, -1, -1):
-        d = (today - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-        snapshot: dict = {}
-        for key, val in market_data.items():
-            if "price" in val and val["price"] is not None:
-                variation = 1 + (random.random() - 0.5) * 0.03
-                snapshot[key] = {"price": round(val["price"] * variation, 2)}
-        if snapshot:
-            history["history"][d] = snapshot
-
-    # Sample news items
-    items = []
+def build_items(day: datetime, date_str: str) -> list[ContentItem]:
+    """Build demo news items for a given date."""
     topics = [
         ("ai-tech", [
             ("OpenAI GPT-5 发布", "https://openai.com", 9.2),
@@ -65,6 +45,7 @@ async def main() -> None:
             ("供应链压力新低", "https://example.com", 6.5),
         ]),
     ]
+    items: list[ContentItem] = []
     idx = 0
     for topic_key, articles in topics:
         for title, url, score in articles:
@@ -75,7 +56,7 @@ async def main() -> None:
                 title=title,
                 url=url,
                 author="source",
-                published_at=today - timedelta(hours=random.randint(1, 23)),
+                published_at=day - timedelta(hours=(idx * 7) % 23 + 1),
                 content=f"{title} 详细内容",
                 ai_score=score,
                 ai_reason="重要事件",
@@ -92,43 +73,95 @@ async def main() -> None:
                 "sources": [{"url": url, "title": title}],
             })
             items.append(item)
+    return items
 
-    print(f"  News: {len(items)} sample items")
-    print("Rendering...")
 
-    date_str = today.strftime("%Y-%m-%d")
-    # Compute prev/next day links (check if adjacent files exist locally)
-    prev_url, next_url = None, None
-    yesterday = (today - timedelta(days=1)).strftime("%Y-%m-%d")
-    tomorrow = (today + timedelta(days=1)).strftime("%Y-%m-%d")
+async def main() -> None:
+    print("Fetching market data...")
+    market_data = await fetch_all()
+    ok = sum(1 for v in market_data.values() if "price" in v)
+    print(f"  Market: {ok}/{len(market_data)} indicators OK")
+
+    with open("data/market-indicators.json") as f:
+        meta = json.load(f)
+
     daily_dir = Path("docs/daily")
-    if (daily_dir / f"{yesterday}-morning-zh.html").exists():
-        prev_url = f"{yesterday}-morning-zh.html"
-    if (daily_dir / f"{tomorrow}-morning-zh.html").exists():
-        next_url = f"{tomorrow}-morning-zh.html"
-    latest_url = "../index.html"
+    daily_dir.mkdir(parents=True, exist_ok=True)
 
-    s = DailySummarizer()
-    structured = s.get_structured_data(
-        items, date_str, 100,
-        language="zh", period="morning", score_threshold=4.0,
-        market_data=market_data, market_history=history,
-        market_indicators_meta=meta,
-        prev_url=prev_url, next_url=next_url, latest_url=latest_url,
-    )
-    structured["is_demo"] = True
-    html = DailyRenderer().render_html(structured)
+    # Load REAL market history (June 15 extracted from live + June 16 from API)
+    history_path = daily_dir / "market-history.json"
+    if history_path.exists():
+        with open(history_path) as f:
+            real_history = json.load(f)
+        print(f"  History: {len(real_history.get('history', {}))} real dates loaded")
+    else:
+        real_history = {"version": 1, "indicators": sorted(market_data.keys()), "history": {}}
 
-    demo = Path("docs/daily/demo-market.html")
-    demo.parent.mkdir(parents=True, exist_ok=True)
-    demo.write_text(html, encoding="utf-8")
-    # Also generate index.html for the "Latest" nav button
-    index_html = DailyRenderer().render_index(f"daily/{date_str}-morning-zh.html")
+    today = datetime.now(timezone.utc)
+    today_str = today.strftime("%Y-%m-%d")
+    yesterday = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+    # 3 consecutive days so prev/next links resolve locally
+    days = [today - timedelta(days=offset) for offset in (2, 1, 0)]
+
+    # Enrich prev_close from REAL history (so percentage badges render)
+    yesterday_history = real_history.get("history", {}).get(yesterday, {})
+    for key, entry in market_data.items():
+        if "price" in entry and entry.get("prev_close") is None:
+            if key in yesterday_history:
+                entry["prev_close"] = yesterday_history[key]["price"]
+
+    items_by_date: dict[str, list[ContentItem]] = {}
+    for day in days:
+        date_str = day.strftime("%Y-%m-%d")
+        items_by_date[date_str] = build_items(day, date_str)
+
+    # Pass 1: write all files (without prev/next so they exist on disk)
+    print("\nPass 1 — writing all 3 files...")
+    for day in days:
+        date_str = day.strftime("%Y-%m-%d")
+        structured = DailySummarizer().get_structured_data(
+            items_by_date[date_str], date_str, len(items_by_date[date_str]),
+            language="zh", period="morning", score_threshold=4.0,
+            market_data=market_data, market_history=real_history,
+            market_indicators_meta=meta,
+        )
+        structured["is_demo"] = True
+        fpath = daily_dir / f"{date_str}-morning-zh.html"
+        fpath.write_text(DailyRenderer().render_html(structured), encoding="utf-8")
+        print(f"  {fpath.name}")
+
+    # Pass 2: rewrite with correct prev/next cross-links
+    print("\nPass 2 — setting cross-links...")
+    for day in days:
+        date_str = day.strftime("%Y-%m-%d")
+        yesterday = (day - timedelta(days=1)).strftime("%Y-%m-%d")
+        tomorrow = (day + timedelta(days=1)).strftime("%Y-%m-%d")
+        prev_path = daily_dir / f"{yesterday}-morning-zh.html"
+        next_path = daily_dir / f"{tomorrow}-morning-zh.html"
+        prev_url = prev_path.name if prev_path.exists() else None
+        next_url = next_path.name if next_path.exists() else None
+
+        structured = DailySummarizer().get_structured_data(
+            items_by_date[date_str], date_str, len(items_by_date[date_str]),
+            language="zh", period="morning", score_threshold=4.0,
+            market_data=market_data, market_history=real_history,
+            market_indicators_meta=meta,
+            prev_url=prev_url, next_url=next_url, latest_url="../index.html",
+        )
+        structured["is_demo"] = True
+        fpath = daily_dir / f"{date_str}-morning-zh.html"
+        fpath.write_text(DailyRenderer().render_html(structured), encoding="utf-8")
+        print(f"  {fpath.name}  prev={prev_url}  next={next_url}")
+
+    # Generate index.html redirecting to today's report
+    index_html = DailyRenderer().render_index(f"daily/{today_str}-morning-zh.html")
     (Path("docs") / "index.html").write_text(index_html, encoding="utf-8")
-    print("  docs/index.html (redirects to latest)")
+    print("  docs/index.html")
 
-    print(f"\nDone: {demo} ({demo.stat().st_size:,} bytes)")
-    print(f"Open: file://{demo.resolve()}")
+    # Copy today's file as the canonical demo
+    shutil.copy(daily_dir / f"{today_str}-morning-zh.html", daily_dir / "demo-market.html")
+    print(f"\nDone: {daily_dir / 'demo-market.html'}")
+    print(f"Open: file://{(daily_dir / 'demo-market.html').resolve()}")
 
 
 if __name__ == "__main__":

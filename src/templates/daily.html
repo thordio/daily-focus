@@ -1458,7 +1458,7 @@ summary:focus-visible {
             data-tab="{{ tab_key }}"
             aria-selected="{% if tab_key == active_tab %}true{% else %}false{% endif %}">
       {% if language == "zh" %}{{ tab.label }}{% else %}{{ tab.label_en }}{% endif %}
-      <span class="tab-count">{{ tab['items']|length }}</span>
+      {% if not tab.is_chart|default(false) %}<span class="tab-count">{{ tab['items']|length }}</span>{% endif %}
     </button>
     {% endfor %}
   </div>
@@ -1728,6 +1728,18 @@ summary:focus-visible {
 
   var historyData = {{ market_indicators_history|default({})|tojson }};
   historyData = historyData || {};
+  var indicatorMeta = {{ market_indicators_meta|default({})|tojson }};
+  indicatorMeta = indicatorMeta || {};
+  // Build a flat key→precision lookup
+  var precisionMap = {};
+  if (indicatorMeta.indicators) {
+    Object.keys(indicatorMeta.indicators).forEach(function(g) {
+      var group = indicatorMeta.indicators[g];
+      Object.keys(group).forEach(function(k) {
+        precisionMap[k] = group[k].precision || 1;
+      });
+    });
+  }
   var indicatorKeys = Object.keys(historyData);
 
   if (!indicatorKeys.length) {
@@ -1842,7 +1854,7 @@ summary:focus-visible {
       borderColor: colors.line,
       backgroundColor: colors.fill,
       fill: true,
-      tension: 0.3,
+      tension: filtered.length <= 2 ? 0 : 0.3,
       pointRadius: singlePoint ? 5 : (filtered.length > 60 ? 0 : 2),
       pointHoverRadius: 5,
       pointBackgroundColor: colors.line,
@@ -1863,7 +1875,7 @@ summary:focus-visible {
           pointRadius: 0,
           pointHoverRadius: 3,
           fill: false,
-          tension: 0.3,
+          tension: filtered.length <= 2 ? 0 : 0.3,
         });
       }
     });
@@ -1878,6 +1890,7 @@ summary:focus-visible {
       chart.options.scales.y.ticks.color = colors.text;
       chart.options.scales.y.grid.color = colors.grid;
       chart.options.plugins.legend.labels.color = colors.text;
+      chart.options.plugins.tooltip.backgroundColor = colors.line;
       chart.update('none');
     } else {
       var ctx = canvas.getContext('2d');
@@ -1910,7 +1923,9 @@ summary:focus-visible {
               callbacks: {
                 label: function(ctx) {
                   var val = ctx.parsed.y;
-                  return (val !== null ? val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--');
+                  if (val === null) return '--';
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return val.toFixed(prec);
                 }
               }
             }
@@ -1926,13 +1941,13 @@ summary:focus-visible {
               grid: { display: false },
             },
             y: {
+              grace: '5%',
               ticks: {
                 color: colors.text,
                 font: { size: 11 },
                 callback: function(v) {
-                  if (v >= 10000) return (v / 1000).toFixed(0) + 'k';
-                  if (v >= 1000 && v < 10000) return (v / 1000).toFixed(1) + 'k';
-                  return v.toFixed(1);
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return v.toFixed(prec);
                 }
               },
               grid: { color: colors.grid },

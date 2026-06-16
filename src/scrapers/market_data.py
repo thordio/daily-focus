@@ -82,7 +82,7 @@ async def fetch_forex() -> dict[str, dict]:
             "jpycny": {"price": round(100 * usd_cny / usd_jpy, 4), "prev_close": None},
         }
     except Exception as exc:
-        logger.warning("Forex fetch failed: %s", exc)
+        logger.exception("Forex fetch failed: %s", exc)
         return {k: {"error": str(exc)} for k in ("usdcny", "eurcny", "jpycny")}
 
 
@@ -101,7 +101,7 @@ async def fetch_sina() -> dict[str, dict]:
             resp.raise_for_status()
             raw = resp.text
     except Exception as exc:
-        logger.warning("Sina fetch failed: %s", exc)
+        logger.exception("Sina fetch failed: %s", exc)
         return {k: {"error": str(exc)} for k in SINA_MAP}
 
     results: dict[str, dict] = {}
@@ -123,6 +123,10 @@ async def fetch_sina() -> dict[str, dict]:
                 continue
             try:
                 parts = line.split('"')[1].split(",")
+            except IndexError:
+                results[key] = {"error": f"malformed Sina line for {code}"}
+                break
+            try:
                 price_raw = parts[field_idx].strip() if field_idx < len(parts) else ""
                 prev_raw = parts[prev_idx].strip() if prev_idx < len(parts) else ""
                 price = round(float(price_raw), 4) if price_raw else None
@@ -132,7 +136,7 @@ async def fetch_sina() -> dict[str, dict]:
                 else:
                     results[key] = {"error": f"empty price at field {field_idx}: {parts[:4]}"}
             except (ValueError, IndexError) as exc:
-                results[key] = {"error": f"parse: {exc} -- {parts[:4]}"}
+                results[key] = {"error": f"parse: {exc} -- {parts[:4] if 'parts' in dir() else 'N/A'}"}
             break
         else:
             results[key] = {"error": "no matching line in Sina response"}
@@ -158,6 +162,7 @@ async def _fetch_nasdaq() -> dict:
         prev_close = round(float(df["close"].iloc[-2]), 2) if len(df) >= 2 else None
         return {"price": price, "prev_close": prev_close}
     except Exception as exc:
+        logger.exception("NASDAQ akshare: %s", exc)
         return {"error": f"NASDAQ akshare: {exc}"}
 
 
@@ -180,8 +185,9 @@ async def fetch_all() -> dict[str, dict]:
     - ``{"price": float, "prev_close": float | None}`` on success, or
     - ``{"error": str}`` on failure for that specific indicator.
 
-    Only **nasdaq** includes a meaningful ``prev_close`` (derived from akshare
-    daily history). All other indicators set ``prev_close`` to ``None``.
+    Most indicators set ``prev_close`` to ``None`` at scrape time; the
+    orchestrator enriches them from the previous day's market history,
+    which was captured by the same pipeline on the prior run.
 
     Sources are queried concurrently; wall-clock time is bounded by the
     slowest source (typically under 10 seconds).
