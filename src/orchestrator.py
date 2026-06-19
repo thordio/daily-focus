@@ -35,6 +35,43 @@ from .ai.tokens import get_usage_snapshot
 from .utils.benchmark import timer, enabled as bench_enabled, get_stage_timer
 
 
+def _backfill_next_button(
+    daily_dir: Path,
+    today_date: datetime,
+    period: str,
+    lang: str,
+    today_filename: str,
+    console: Console,
+) -> None:
+    """Patch yesterday's HTML to enable the 'next day' button → today's page."""
+    yesterday_str = (today_date - timedelta(days=1)).strftime("%Y-%m-%d")
+    yesterday_path = daily_dir / f"{yesterday_str}-{period}-{lang}.html"
+    if not yesterday_path.exists():
+        return
+    label = "后一天" if lang == "zh" else "Next"
+    disabled_btn = (
+        f'<span class="day-nav-btn disabled">\n    {label}\n'
+        f'    <span class="day-nav-arrow">&#8594;</span>\n  </span>'
+    )
+    active_btn = (
+        f'<a href="{today_filename}" class="day-nav-btn">\n    {label}\n'
+        f'    <span class="day-nav-arrow">&#8594;</span>\n  </a>'
+    )
+    content = yesterday_path.read_text("utf-8")
+    if disabled_btn in content:
+        content = content.replace(disabled_btn, active_btn)
+    else:
+        import re
+        content = re.sub(
+            rf'<span class="day-nav-btn disabled">\s*{re.escape(label)}\s*'
+            r'<span class="day-nav-arrow">&#8594;</span>\s*</span>',
+            active_btn,
+            content,
+        )
+    yesterday_path.write_text(content, "utf-8")
+    console.print(f"🔗 Backfilled {yesterday_path.name} → next day = {today_filename}")
+
+
 class HorizonOrchestrator:
     """Orchestrates the complete workflow for content aggregation and analysis."""
 
@@ -365,6 +402,12 @@ class HorizonOrchestrator:
                     with open(daily_path, "w", encoding="utf-8") as f:
                         f.write(html)
                     self.console.print(f"📄 Archived HTML to: {daily_path}\n")
+
+                    # 7a2. Backfill yesterday's "next day" button (best-effort)
+                    try:
+                        _backfill_next_button(daily_dir, today_date, period, lang, daily_path.name, self.console)
+                    except Exception as exc:
+                        logger.warning("Backfill of next-day button skipped: %s", exc)
 
                     # 7c. Generate Markdown summary for email/webhook compatibility
                     summary = await summarizer.generate_summary(important_items, today, len(all_items), language=lang)
