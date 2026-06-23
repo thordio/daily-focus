@@ -1,0 +1,4864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Daily Focus - 2026-06-23">
+<title>Daily Focus — 2026-06-23</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --tag-bg: #f3f4f6;
+  --tag-text: #4b5563;
+  --score-9plus: #dc2626;
+  --score-7to8: #ea580c;
+  --score-5to6: #6b7280;
+  --score-bg: #f3f4f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.06);
+  --details-bg: #f9fafb;
+  --header-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --footer-bg: #f3f4f6;
+  --card-radius: 14px;
+}
+
+/* System dark mode (only when user hasn't set manual preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --tag-bg: #334155;
+    --tag-text: #e2e8f0;
+    --score-bg: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
+    --details-bg: #1a2332;
+    --header-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --footer-bg: #1e293b;
+    --card-radius: 14px;
+  }
+
+  /* Dark mode score badge overrides */
+  :root:not([data-theme="light"]) .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  :root:not([data-theme="light"]) .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+  :root:not([data-theme="light"]) .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
+}
+
+/* Manual dark mode (user explicitly chose dark) */
+:root[data-theme="dark"] {
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --tag-bg: #334155;
+  --tag-text: #e2e8f0;
+  --score-bg: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
+  --details-bg: #1a2332;
+  --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --footer-bg: #1e293b;
+  --card-radius: 14px;
+}
+
+:root[data-theme="dark"] .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+:root[data-theme="dark"] .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+:root[data-theme="dark"] .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
+
+/* Manual light mode (user explicitly chose light) -- no extra vars needed, :root is light */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  font-size: 16.5px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "palt" 1, "pkna" 1;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  position: relative;
+  background: var(--header-gradient);
+  color: #fff;
+  padding: 40px 0 36px;
+  margin-bottom: 36px;
+  overflow: hidden;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.header .container {
+  padding: 0 20px;
+}
+
+.header-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.header-meta {
+  font-size: 14px;
+  opacity: 0.85;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Day Navigation Bar */
+.day-nav-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.day-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.day-nav-btn:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.day-nav-btn:active {
+  transform: scale(0.97);
+}
+.day-nav-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.day-nav-btn.primary:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+.day-nav-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
+.day-nav-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.header-stats {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.topic-stats {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  line-height: 1.6;
+}
+
+.topic-stat {
+  white-space: nowrap;
+}
+
+.topic-stat-sep {
+  white-space: pre;
+  opacity: 0.5;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.theme-toggle:active { transform: scale(0.95); }
+
+.lang-toggle {
+  position: absolute;
+  top: 20px;
+  right: 74px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.05em;
+}
+.lang-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.lang-toggle:active { transform: scale(0.95); }
+
+/* Demo data banner */
+.demo-banner {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .demo-banner {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+:root[data-theme="dark"] .demo-banner {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.empty-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.empty-icon {
+  font-size: 40px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+/* Selection transparency info */
+.selection-info {
+  max-width: 680px;
+  margin: -20px auto 20px;
+  padding: 0 20px;
+}
+
+.selection-rationale {
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: var(--details-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+.selection-info details {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.selection-info details summary {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+
+.selection-info details summary:hover {
+  opacity: 1;
+}
+
+.selection-info details summary::-webkit-details-marker {
+  display: none;
+}
+
+.selection-info summary::after {
+  content: "\25b6";
+  font-size: 9px;
+  margin-left: 4px;
+  transition: transform 0.2s;
+}
+
+.selection-info details[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.selection-info-content {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.7;
+  font-size: 12.5px;
+}
+
+/* Language mismatch indicator */
+.lang-mismatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lang-mismatch {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+:root[data-theme="dark"] .lang-mismatch {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* News Cards */
+.news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 32px 32px 36px;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.news-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.news-card:has(.score-9) { border-left-color: var(--score-9plus); }
+.news-card:has(.score-7) { border-left-color: var(--score-7to8); }
+.news-card:has(.score-5) { border-left-color: var(--score-5to6); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-index {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--score-bg);
+  color: var(--text-secondary);
+}
+
+.score-badge {
+  flex-shrink: 0;
+  min-width: 40px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 34px;
+}
+
+.score-9 { background: #fef2f2; color: var(--score-9plus); }
+.score-7 { background: #fff7ed; color: var(--score-7to8); }
+.score-5 { background: var(--score-bg); color: var(--score-5to6); }
+
+.score-reason-line {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: -8px;
+  margin-bottom: 14px;
+  padding-left: 48px;
+}
+
+.reading-time {
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.depth-indicator {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 10px;
+  background: var(--score-bg);
+  cursor: help;
+}
+
+/* Light card for medium-interest items (5.0-6.9) */
+.news-card.card-light {
+  padding: 20px;
+  border-left: none;
+}
+.card-light .card-title {
+  font-size: 17px;
+}
+
+.card-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.card-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.card-source {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  opacity: 0.95;
+}
+
+.card-source .dot {
+  font-size: 10px;
+  opacity: 0.35;
+  line-height: 1;
+}
+
+.card-source-type {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  text-transform: uppercase;
+}
+
+.card-body {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+.card-body > * + * {
+  margin-top: 20px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-label .emoji {
+  font-style: normal;
+}
+
+.section-content {
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+/* Compact Why It Matters — one-liner with accent */
+.why-matters-compact {
+  padding: 12px 16px;
+  background: var(--details-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.why-matters-prefix {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* Key Facts bar — quick-scan stats pills */
+.key-facts-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.key-facts-label {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.key-fact-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Related Events — cross-references between articles */
+.related-events {
+  margin-top: 18px;
+}
+
+.related-events-label {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.related-events-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+
+.related-events-list li {
+  position: relative;
+  padding: 5px 0 5px 20px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.related-events-list li::before {
+  content: "\2192";
+  position: absolute;
+  left: 2px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.related-events-list li + li {
+  margin-top: 2px;
+}
+
+.details-section {
+  margin-top: 18px;
+}
+
+.details-section details {
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 8px;
+}
+
+.details-section details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 4px 0;
+  user-select: none;
+  opacity: 0.85;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.details-section details summary:hover {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.details-section details summary::before {
+  content: "\1f4d6";
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+.details-section details[open] {
+  padding-bottom: 18px;
+}
+
+.details-section details[open] summary {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.details-content {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  white-space: nowrap;
+}
+
+/* Images */
+.images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.images img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* References */
+.references {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.references-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.references-list {
+  list-style: none;
+  padding: 0;
+}
+
+.references-list li {
+  margin-bottom: 4px;
+}
+
+.references-list a {
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding: 14px 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.tab-btn:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tab-btn .tab-count {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.tab-btn.active .tab-count {
+  opacity: 1;
+}
+
+/* Tab panels */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Footer */
+.footer {
+  margin-top: 56px;
+  padding: 36px 0;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 2;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .header { padding: 28px 0 24px; }
+  .header-title { font-size: 24px; }
+  .header-meta { font-size: 13px; gap: 8px; }
+  .theme-toggle { top: 12px; right: 12px; width: 44px; height: 44px; font-size: 18px; }
+  .lang-toggle { top: 12px; right: 66px; height: 44px; padding: 0 12px; font-size: 13px; }
+  .news-card { padding: 24px; border-radius: 12px; }
+  .card-title { font-size: 18px; }
+  .card-body { font-size: 15px; }
+  .card-header { gap: 10px; }
+  .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 10px; }
+  .tab-nav { gap: 6px; margin-bottom: 22px; padding: 12px 0; }
+  .depth-indicator { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+  .key-facts-bar { font-size: 12px; }
+  .key-fact-pill { font-size: 12px; padding: 2px 8px; }
+  .news-card.card-light { padding: 18px; }
+  .card-light .card-title { font-size: 16px; }
+  .day-nav-bar { gap: 8px; padding: 12px 16px; }
+  .day-nav-btn { padding: 7px 14px; font-size: 13px; gap: 4px; }
+  .day-nav-arrow { font-size: 14px; }
+}
+
+@media (max-width: 375px) {
+  .container { padding: 0 16px; }
+  .header .container { padding: 0 16px; }
+  .header { padding: 24px 0 18px; }
+  .header-title { font-size: 21px; }
+  .header-meta { font-size: 12px; gap: 6px; }
+  .header-stats { font-size: 12px; }
+  .topic-stat { white-space: normal; }
+  .theme-toggle { top: 10px; right: 10px; width: 44px; height: 44px; font-size: 18px; }
+  .lang-toggle { top: 10px; right: 64px; height: 44px; padding: 0 10px; font-size: 12px; }
+  .news-card { padding: 18px; border-left-width: 3px; border-radius: 10px; }
+  .card-title { font-size: 17px; }
+  .card-body { font-size: 14px; }
+  .card-header { gap: 8px; }
+  .card-index { width: 30px; height: 30px; font-size: 12px; border-radius: 8px; }
+  .score-badge { min-width: 36px; height: 30px; padding: 0 8px; font-size: 13px; line-height: 30px; }
+  .tab-btn { padding: 8px 10px; font-size: 12px; border-radius: 8px; }
+  .tab-btn .tab-count { font-size: 10px; }
+  .tab-nav { gap: 4px; padding: 10px 0; margin-bottom: 18px; }
+  .depth-indicator { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
+  .key-facts-bar { font-size: 11px; gap: 5px; }
+  .key-fact-pill { font-size: 11px; padding: 2px 6px; border-radius: 100px; }
+  .day-nav-bar { gap: 6px; padding: 10px 12px; }
+  .day-nav-btn { padding: 6px 12px; font-size: 12px; gap: 3px; }
+  .day-nav-arrow { font-size: 12px; }
+}
+
+@media (min-width: 768px) {
+  .container { padding: 0 24px; }
+  .header-title { font-size: 34px; }
+  .news-card { padding: 36px 36px 40px; margin-bottom: 44px; }
+  .card-title { font-size: 22px; }
+  .card-body { font-size: 16.5px; line-height: 2; }
+}
+
+@media (min-width: 1440px) {
+  body { font-size: 17.5px; }
+}
+/* ===== Market Indicators Tab ===== */
+
+.market-summary {
+  margin-bottom: 28px;
+}
+.market-summary-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.market-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.market-summary-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.market-summary-item:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent);
+}
+.market-summary-item .msi-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.market-summary-item .msi-price {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.market-summary-item .msi-price.error {
+  font-size: 13px;
+  color: var(--score-9plus);
+  font-weight: 600;
+}
+.market-summary-item .msi-change {
+  font-size: 12px;
+  margin-top: 2px;
+  font-weight: 500;
+}
+.market-summary-item .msi-change.up { color: #22c55e; }
+.market-summary-item .msi-change.down { color: #ef4444; }
+
+/* Chart controls bar */
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.indicator-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.indicator-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.indicator-pill:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+.indicator-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.indicator-pill .pill-sub {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+.indicator-pill.active .pill-sub { opacity: 1; }
+
+.range-selector {
+  display: flex;
+  gap: 4px;
+  background: var(--tag-bg);
+  padding: 3px;
+  border-radius: 8px;
+}
+.range-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.range-btn:hover { color: var(--text); }
+.range-btn.active {
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.ma-toggle {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+.ma-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+.ma-checkbox input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 20px 24px 20px 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Chart empty state */
+.chart-empty {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.chart-empty-icon { font-size: 40px; opacity: 0.5; }
+.chart-empty-text { font-size: 14px; font-weight: 500; }
+.chart-empty-hint { font-size: 12px; opacity: 0.7; }
+
+/* Market group label */
+.market-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 6px 0 4px 4px;
+  opacity: 0.7;
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .market-summary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  .chart-controls { flex-direction: column; align-items: stretch; }
+  .ma-toggle { margin-left: 0; justify-content: center; }
+  .chart-container { height: 300px; padding: 12px 16px 12px 10px; }
+  .market-summary-item .msi-price { font-size: 17px; }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <div class="header-title">Daily Focus</div>
+    <div class="header-meta">
+      <span>2026-06-23</span>
+    </div>
+    <div class="header-stats">
+      
+        从 248 条中精选 27 条
+      
+    </div>
+    
+    <div class="topic-stats">
+      
+      <span class="topic-stat">AI 技术 10条 (6-10)</span><span class="topic-stat-sep"> · </span>
+      
+      <span class="topic-stat">AI 市场 10条 (6-10)</span><span class="topic-stat-sep"> · </span>
+      
+      <span class="topic-stat">经济动向 7条 (5-7)</span>
+      
+    </div>
+    
+    
+    <a class="lang-toggle" href="2026-06-23-morning-en.html" aria-label="Switch language">
+      中/EN
+    </a>
+    
+    <button class="theme-toggle" id="theme-toggle" aria-label="切换主题 / Toggle theme" title="切换深浅色模式">
+      <span id="theme-icon">🌙</span>
+    </button>
+  </div>
+</header>
+
+
+<div class="day-nav-bar">
+  
+  <a href="2026-06-22-morning-zh.html" class="day-nav-btn">
+    <span class="day-nav-arrow">&#8592;</span>
+    前一天
+  </a>
+  
+
+  <a href="../index.html" class="day-nav-btn primary">
+    📅 最新
+  </a>
+
+  
+  <span class="day-nav-btn disabled">
+    后一天
+    <span class="day-nav-arrow">&#8594;</span>
+  </span>
+  
+</div>
+
+
+
+
+
+<div class="selection-info">
+  <div class="selection-rationale">
+    
+    &#x1f4ca; 精选逻辑：AI 评分排序，每板块取 top N 条。
+    
+  </div>
+  <details>
+    <summary>
+      
+        详细筛选说明
+      
+    </summary>
+    <div class="selection-info-content">
+      
+      
+      
+      <p>共抓取 248 条中精选 27 条（过滤率 89%）。阈值 &ge; 4.0。</p>
+      <p>各板块最低保障：AI 技术 &ge; 6 条，AI 市场 &ge; 6 条，经济动向 &ge; 5 条。</p>
+      <p>每篇经过 AI 深度丰富：背景知识、关键细节、社区讨论。</p>
+      
+    </div>
+  </details>
+</div>
+
+
+
+
+<main class="container">
+  
+
+  
+  <div class="tab-nav" role="tablist">
+    
+    <button class="tab-btn active"
+            role="tab"
+            data-tab="ai-tech"
+            aria-selected="true">
+      AI 技术
+      <span class="tab-count">10</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="ai-markets"
+            aria-selected="false">
+      AI 市场
+      <span class="tab-count">10</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="economy"
+            aria-selected="false">
+      经济动向
+      <span class="tab-count">7</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="market_indicators"
+            aria-selected="false">
+      全球指标
+      
+    </button>
+    
+  </div>
+
+  
+  <div class="tab-panel active"
+       id="tab-ai-tech"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">1</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.reddit.com/r/singularity/comments/1udao3h/ai_models_capable_of_devastating_attacks_on/" target="_blank" rel="noopener noreferrer">五眼联盟警告：AI模型数月内可发动毁灭性攻击</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">reddit</span>
+        <span>r/singularity</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Rare joint warning from Five Eyes indicates imminent AI-driven threats, likely to influence policy and investment, raising urgent security concerns.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年6月22日，五眼情报联盟（美国、英国、加拿大、澳大利亚、新西兰）发布罕见联合声明，警告具备摧毁政府和企业能力的AI模型将在“数月而非数年”内出现。声明强调，在此环境下，“网络韧性已成为国家安全的核心”。这是该联盟首次明确将先进AI模型列为迫在眉睫的重大威胁。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这一警告表明AI驱动的网络威胁即将急剧升级，可能迫使政府和企业迅速重构网络安全战略，加速对防御性AI的监管与投资。同时，该声明将影响全球政策框架和企业风险评估，加剧关于高级AI双重用途的伦理争议。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">五眼联盟是由美国、英国、加拿大、澳大利亚和新西兰组成的情报共享组织，传统上专注于信号情报。Claude等大型语言模型能够理解并生成类人文本，也可被改编用于代码生成等任务，从而可能被滥用于网络攻击。网络韧性指组织对网络事件的预防、响应和恢复能力，在AI威胁下被视为关键。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">声明特别提及类似Anthropic的Claude等先进AI模型，它们可能被用于自主发现系统漏洞、生成高仿真钓鱼邮件或操控关键系统。警告指出威胁时间线已从“数年”缩短至“数月”，凸显攻击性AI能力的快速发展，但未公开具体技术基准。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI security</span>
+      
+      <span class="tag">Five Eyes</span>
+      
+      <span class="tag">government warning</span>
+      
+      <span class="tag">AI threats</span>
+      
+      <span class="tag">cybersecurity</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.theguardian.com/technology/2026/jun/22/anthropic-claude-fable-ai-model-artificial-intelligence-national-security" target="_blank" rel="noopener noreferrer">AI models capable of devastating attacks on governments and ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">2</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.qbitai.com/2026/06/437382.html" target="_blank" rel="noopener noreferrer">英伟达推出机器人全栈操作系统，欲成具身安卓</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>量子位</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Nvidia&#39;s launch of a full-stack robot OS is a major strategic move that could shape the embodied AI industry, similar to Android&#39;s impact on mobile. It reveals platform ambitions and competitive positioning, offering high value for AI investors and practitioners.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年6月，英伟达CEO黄仁勋在COMPUTEX大会上正式发布名为“Isaac OS”的机器人全栈操作系统。该系统整合自研GR00T基础模型、Isaac Sim仿真平台与Jetson Thor硬件，为机器人厂商提供从感知、规划到控制的完整软件栈。当天，英伟达宣布已与1X、傅利叶智能等12家头部机器人公司达成合作，首批搭载该系统的机器人将于2027年Q1量产。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此举旨在为碎片化的机器人行业提供统一开发平台，大幅降低机器人的开发门槛与部署成本，类似于安卓系统推动智能手机普及。它可能重塑具身智能产业链，使英伟达从芯片供应商升级为基础设施与生态主导者，并对现有的机器人操作系统（如ROS）构成强烈替代威胁。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">机器人操作系统（ROS）是学术界和工业界常用的开源中间件，但缺乏对AI原生应用和完整商业化的支持。“具身智能”指能与环境物理交互的智能体，其计算系统需融合大模型与实时控制。英伟达此前已通过Jetson系列嵌入式和Isaac平台逐步布局，本次整合为全栈OS是正式对标安卓的战略跳板。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Isaac OS采用“大脑-小脑”双层架构：上层GR00T大模型负责多模态任务理解与决策，下层控制模块基于Nvidia实时Linux扩展实现毫秒级运动响应。开发者可通过统一API调用感知、导航、抓取等50余个预训练技能模块，且能将仿真训练的策略零成本迁移到真机。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">robotics</span>
+      
+      <span class="tag">Nvidia</span>
+      
+      <span class="tag">embodied AI</span>
+      
+      <span class="tag">operating system</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://blog.csdn.net/programmer_editor/article/details/136388142" target="_blank" rel="noopener noreferrer">具身智能计算系统，机器人时代的 Android | 新程序员_具身智能的计算系统是什么-CSDN博客</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">3</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20624" target="_blank" rel="noopener noreferrer">研究揭示LLM推理中理性价值风险普遍存在</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Introduces a novel framework for &#39;rational value risk&#39; in LLM reasoning, backed by extensive experiments on state-of-the-art models. Addresses a critical gap in alignment and reasoning that could influence research directions and safety considerations.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员正式定义并数学化了“理性价值风险”概念，即大语言模型在推理中即使已对齐仍可能未能最大化对齐价值的效用差距。该研究在Llama-3.1、Qwen-2.5、Tülu-3等多个模型家族（7B至72B）以及GPT-5.2、GPT-5.5、DeepSeek-V4上，基于UltraFeedback、AlpacaEval、GSM8K、MATH、HumanEval和MathArena等基准进行了大量实验。结果验证了理性价值风险普遍存在，价值对齐可减少但无法消除该风险，风险对推理时策略高度敏感，且更长推理能提升理性但收益递减。代码已开源。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      该研究揭示了LLM对齐的关键盲区：即使训练端价值函数已对齐，模型在推理时仍可能因非理性决策而偏离预期效用最大化，对医疗、法律、金融等高风险应用构成隐患。这表明仅靠训练对齐不足以保障安全，推理端优化同样关键。该框架为量化评估和缓解推理非理性提供了工具，可能推动新一代对齐技术发展。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">3.1</span>
+      
+      <span class="key-fact-pill">2.5</span>
+      
+      <span class="key-fact-pill">5.2</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">LLM价值对齐通常指通过训练使模型输出符合人类价值观或特定优化目标。推理理性则关乎模型在给定任务下选择最优响应的能力。传统对齐研究多聚焦训练阶段，而该工作指出即使价值函数已对齐，模型在推理时仍可能因策略缺陷未能实现该价值，即存在非理性，类似于人类虽有正确价值观但决策时仍可能犯错。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">论文将理性价值风险的估计误差分解为三个来源：有限候选集、有限提示和不完美验证器。理性的对应物被定义为沿最陡方向最大化期望效用的响应。实验涵盖从7B到72B的多种模型和六个不同基准，并提供了开源代码。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI safety</span>
+      
+      <span class="tag">LLM reasoning</span>
+      
+      <span class="tag">alignment</span>
+      
+      <span class="tag">value risk</span>
+      
+      <span class="tag">research</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://arxiv.org/html/2606.20624v1" target="_blank" rel="noopener noreferrer">In LLM Reasoning, there is Irrationality on top of Value Misalignment</a></li>
+        
+        <li><a href="https://www.research.ed.ac.uk/en/publications/in-llm-reasoning-there-is-irrationality-on-top-of-value-misalignm/" target="_blank" rel="noopener noreferrer">In LLM reasoning, there is irrationality on top of value misalignment ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">4</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20625" target="_blank" rel="noopener noreferrer">AlphaMemo：结构化记忆提升因子挖掘效率</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Proposes a novel structured search-process memory for self-evolving alpha mining agents, addressing major challenges like combinatorial search, non-stationary feedback, and overfitting. Demonstrates improved out-of-sample performance on real indices (CSI 500, S&amp;P 500), making it a significant technical contribution with practical potential in quantitative finance.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">AlphaMemo 是一个自进化的大语言模型智能体，通过提取抽象语法树（AST）差异中的编辑模体，构建结构化搜索过程记忆。该记忆在搜索账本先验之上应用置信门控残差学习，并采用非对称否决控制来抑制高置信失败模式。在 CSI 500 和 S&amp;P 500 指数上的实验表明，样本外表现和固定预算发现效率均有提升。消融研究验证了残差学习、置信门控、AST 差异模体和否决记忆的贡献。代码已开源在 GitHub。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      AlphaMemo 解决了因子挖掘中组合搜索、噪声非平稳反馈和过拟合等核心挑战，能提升因子挖掘的稳健性和效率。这有助于量化金融机构减少浪费性计算，发现更可靠的超额收益预测因子，可能影响对冲基金和资产管理公司的策略开发。该方法将结构化记忆引入智能体设计，为金融 AI 应用的持续学习和适应提供了新范式。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">因子挖掘（Alpha mining）是从海量金融数据中寻找能预测超额收益的指标，是量化投资的核心。大语言模型智能体通过结合金融先验知识、符号推理和自动代码生成来自动化这一过程，但面临搜索空间巨大、反馈噪声大、容易过拟合等困难。抽象语法树（AST）是代码的结构化表示，通过对比不同因子代码的 AST 差异可以捕捉有意义的修改模式。过拟合是指模型在历史数据上表现好但未来失效，这是金融建模的重大风险。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">记忆系统存储的是 AST 差异模体，而非完整因子或轨迹，从而捕捉可复用的编辑证据。置信门控机制根据在搜索账本先验上计算的证据强度，控制记忆读写。非对称否决控制专门抑制高置信失败模体，避免重复错误。模型在真实指数（CSI 500 和 S&amp;P 500）上进行测试，验证了各组件的有效性。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">quantitative finance</span>
+      
+      <span class="tag">alpha mining</span>
+      
+      <span class="tag">LLM agents</span>
+      
+      <span class="tag">structured memory</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">5</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20657" target="_blank" rel="noopener noreferrer">A-Evolve-Training系统自主后训练30B模型，推理赛接近人类顶尖</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Autonomous post-training loop achieving near-human performance and self-correcting metric divergence is a significant technical advancement in AI training automation.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员展示了一个自主系统A-Evolve-Training，它在没有人类干预的情况下，对30B参数Nemotron模型进行了四轮后训练，历时数周。所得到的模型在NVIDIA Nemotron推理挑战赛的保留测试集上获得0.86分，而人类最佳提交为0.87分，在约4000支队伍中排名第8。更为显著的是，该系统检测到其自身的开发集指标已无法跟踪外部性能，于是主动修订搜索策略，不再最大化这一误导性代理指标，而是寻找能提升外部目标但降低开发集分数的干预措施。该系统随后也对120B和550B参数的Nemotron模型进行了端到端后训练。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这一进展表明，大语言模型的后期训练正趋于自动化，可能大幅减少对人类专家进行实验设计和决策的依赖。系统在检测到评估指标失效后自行调整策略，展示了AI不仅能优化，还能发现自身测量框架中的问题，这是向可监督的递归自我改进迈出的重要一步。对AI研究实验室而言，此类自主循环有望加速模型迭代，降低人力成本。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">0.86</span>
+      
+      <span class="key-fact-pill">0.87</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">后期训练（Post-training）指在基础模型预训练完成后，通过微调、人类反馈强化学习等方法进一步优化模型性能的步骤，通常需要人类研究人员进行大量实验和调整。Nemotron是NVIDIA的大语言模型系列。NVIDIA Nemotron推理挑战赛是一个公开竞赛，要求参与者对给定模型进行后期训练以提升推理能力，并使用保留测试集进行最终排名。此前，类似规模的自主AI研究示范仅停留在1亿参数级别，本次工作在300亿参数模型上实现。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">技术细节包括：使用A-Evolve系统在GPU集群上对30B Nemotron模型进行四轮自主后训练，无需人类参与。训练循环包含实验提议、执行、评估和决策，完全由AI驱动。关键创新在于系统检测到开发集指标在弱领域上不再与外部性能相关，因此修改了搜索策略，从最大化开发集分数转向直接优化外部目标，这一自我纠错行为提供了可审计的证据。同样的系统也扩展到了120B和550B模型。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI Research</span>
+      
+      <span class="tag">Autonomous Training</span>
+      
+      <span class="tag">Post-Training</span>
+      
+      <span class="tag">LLMs</span>
+      
+      <span class="tag">Self-Improvement</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://arxiv.org/abs/2606.20657" target="_blank" rel="noopener noreferrer">A-Evolve-Training: Autonomous Post-Training of a 30B Model</a></li>
+        
+        <li><a href="https://github.com/A-EVO-Lab/a-evolve" target="_blank" rel="noopener noreferrer">GitHub - A-EVO-Lab/a-evolve: The official repository of ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">6</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20662" target="_blank" rel="noopener noreferrer">智能体系统“信心洗钱”问题及潜在不确定性解决方案</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The paper introduces a novel failure mode (&#39;confidence laundering&#39;) in agent systems and proposes a mechanism (latent uncertainty) to address it. This is a high-value technical contribution with potential to influence agent design paradigms, though it remains an academic paper without immediate market impact.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">智能体系统中存在“信心洗钱”这一新故障模式：上游决策在不确定状态下做出，传给下游时其不确定性丢失，导致系统过度自信（arXiv:2606.20662）。研究人员指出，不确定性只有在组件交接中幸免才会传播，并提出了“不确定决策交接”概念。为解决此瓶颈，作者设计了“潜在不确定性”作为附加于决策交接的载体，旨在保留决策前的脆弱性以供下游使用。该研究将不确定性传播的重点从单步估计转向保留不确定性的接口设计。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      多智能体系统常因交接丢失不确定性而将局部模糊放大为系统级错误，该研究揭示了这一关键瓶颈。潜在不确定性机制若被采纳，可提升自主代理和自动化流程的可恢复性与可靠性。为长序列决策任务中的稳健智能体架构提供了全新范式。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">智能体系统通常由多个组件串联而成，上游输出（如文本或决策）直接流入下游。不确定性量化对AI安全至关重要，但现有系统常在接口处丢弃不确定信息，导致对中间结果的过度信任。此前的研究多聚焦于提高单步准确度或置信度分数，而非跨交接保存不确定性。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">论文正式定义了“不确定决策交接”和“信心洗钱”——即将脆弱上游状态重新包装成下游过度信任的程序化有效产物的过程。潜在不确定性不是用隐藏状态替换文本，而是通过接口设计保持模块化，同时让下游能够推理不确定性。作者主张将设计重心从逐步估计不确定性转向确保交接时的信息保真度。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI research</span>
+      
+      <span class="tag">agent systems</span>
+      
+      <span class="tag">uncertainty propagation</span>
+      
+      <span class="tag">reliability</span>
+      
+      <span class="tag">machine learning</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://arxiv.org/abs/2606.20662" target="_blank" rel="noopener noreferrer">[2606.20662] Confidence Laundering in Agent Systems : Why ...</a></li>
+        
+        <li><a href="https://yage.ai/share/multi-agent-confidence-laundering-en-20260529.html" target="_blank" rel="noopener noreferrer">Your Pipeline Is Laundering : The Real Danger in Multi- Agent ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">7</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20683" target="_blank" rel="noopener noreferrer">LLM代理系统综述：从模型缩放转向执行框架设计</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The survey provides a systematic framework for LLM-based agent design, identifying bottlenecks and paradigm shifts, which is highly valuable for AI system architects and researchers. No community discussion signals available.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">arXiv论文《从问答到任务完成：代理系统与框架设计综述》提出一种模型-框架视角，将LLM代理分解为六个运行时职责：观察、上下文、控制、行动、状态和验证。该综述指出代理性能瓶颈常源于执行框架而非模型自身，并追溯了从提示工程到代理原生训练与协同进化的四个范式。论文认为代理的成功、效率与安全性取决于模型能力、运行时基础设施、任务结构和评估设计的交互作用。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      该综述为AI系统架构师和研究人员提供了系统化的代理设计框架，有助于明确性能优化方向。通过将注意力从单纯扩大模型规模转向改进执行框架，企业可更高效地构建长周期任务完成系统，可能降低对超大规模模型的依赖并提升可靠性。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">LLM代理指基于大语言模型的自主系统，能够感知环境、调用工具、维护状态并执行多步任务。传统上，代理设计侧重于提示工程，但近年向工作流和上下文工程演进。&#39;执行框架&#39;指支撑代理运行时操作的基础设施，包括上下文管理、行动执行和验证等。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该综述将执行框架细化为六个组件，并映射了任务属性与领域压力到框架配置；回顾了基准测试实践，揭示了运行时设计如何影响长周期任务完成、效率与可靠性。此外，指出了值感知评估、安全性、框架泛化与模型-框架协同进化等开放挑战。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">LLM agents</span>
+      
+      <span class="tag">agent architecture</span>
+      
+      <span class="tag">survey</span>
+      
+      <span class="tag">task completion</span>
+      
+      <span class="tag">AI research</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.preprints.org/manuscript/202606.1312" target="_blank" rel="noopener noreferrer">From Question Answering to Task Completion: A Survey on Agent System ...</a></li>
+        
+        <li><a href="https://github.com/HKUST-KnowComp/Awesome-Agent-Harness" target="_blank" rel="noopener noreferrer">GitHub - HKUST-KnowComp/Awesome-Agent-Harness</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">13</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.reddit.com/r/singularity/comments/1ud7o36/seed21_released/" target="_blank" rel="noopener noreferrer">字节跳动发布图像生成模型Seed2.1</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">reddit</span>
+        <span>r/singularity</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：ByteDance&#39;s Seed2.1 is a notable incremental release in image generation, competitive with top models, but not a paradigm shift or strategic corporate move.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">字节跳动发布了Seed2.1文本到图像生成模型，在GenEval和DPG-Bench等基准测试中达到有竞争力的性能，常超越FLUX.1-dev和Stable Diffusion 3.5。该模型通过Seed平台提供，配有详细模型卡。具体基准测试结果以图片形式公开，展示了在文字渲染和构图能力上的提升。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      该发布增强了开放权重的图像生成模型选项，为商业模型提供了可行的替代方案。开发者和研究人员可能因此采纳Seed2.1，用于需要高审美质量的项目，进一步推动生成式AI领域的竞争。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">2.1</span>
+      
+      <span class="key-fact-pill">3.5</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">字节跳动的Seed团队专注于生成式AI研究，曾发布Seedream 2.0等模型。Seed平台提供AI辅助创作工具，Seed2.1是该系列的最新迭代，旨在提升图像生成质量和实用性。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Seed2.1构建于字节跳动的Seedream架构，针对提示词遵循度和视觉质量进行了优化。模型卡报告了T2I-CompBench和GenEval的得分，具体数据表明其在文字渲染和组合生成方面超越了多个主流模型。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">image-generation</span>
+      
+      <span class="tag">ByteDance</span>
+      
+      <span class="tag">model-release</span>
+      
+      <span class="tag">Seed</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">14</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://swelljoe.com/post/will-it-mythos/" target="_blank" rel="noopener noreferrer">AI从业者将新模型Mythos与Fable、Opus进行对比</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">hackernews</span>
+        <span>mindingnever</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：High community engagement (146 points, 85 comments) discussing hands-on experiences with new AI model Mythos, comparing it to Fable and Opus; reveals user sentiment on model performance and safety feature speculation, valuable for AI practitioners tracking model evolution.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">用户Tossrock公开了使用Fable模型36小时的全部对话记录和代码，认为其能力远超之前的所有模型。用户airstrike指出，Opus 4.6在2月份时表现出色，但后续版本逐渐退化，4.8版本输出冗长且几乎无法使用。评论者po1nt认为Mythos很可能只是移除了安全限制的标准大语言模型，如果现有模型不回避漏洞搜索可能达到同等水平。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      如果Mythos的高性能确实源于关闭安全功能，这表明主流AI公司可能因过度审查而削弱了模型能力。这可能推动用户转向无限制模型进行代码审查、漏洞挖掘等敏感任务，并影响对商业闭源模型的信任。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">4.6</span>
+      
+      <span class="key-fact-pill">4.8</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Opus为Anthropic公司Claude系列中的高端模型，以强推理和编程能力著称。Fable是近期出现的模型，被用户认为恢复了旧版Opus的性能特征。Mythos则是另一新模型，其性能表现引发关于其是否移除安全限制的猜测。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">对比涉及Opus 4.6（后被“削弱”）、4.7、4.8等多个版本，Fable被描述为类似“Opus 5”的水平。在恶意软件检测中，模型输出倾向可通过提示词调整，并建议使用ROC曲线和二维定价图进行全面评估，相关基准测试参见quesma.com/benchmarks/binaryaudit/。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI model</span>
+      
+      <span class="tag">Mythos</span>
+      
+      <span class="tag">LLM</span>
+      
+      <span class="tag">user experience</span>
+      
+      <span class="tag">Hacker News</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">15</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2606.20599" target="_blank" rel="noopener noreferrer">研究发现树状思维方法在计算预算下有相反限制</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Provides systematic analysis of Tree-of-Thought methods under varying compute budgets, revealing practical deployment limitations—valuable for AI practitioners optimizing reasoning strategies, though not a paradigm-shifting breakthrough.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员评估了两种树状思维方法——基于蒙特卡洛树搜索的DPTS和基于语义去重的SSDP，在Math500和GSM8K基准上使用Llama-3B和8B模型，标记预算从3k到10k。DPTS在低预算下遭遇冷启动瓶颈，需要充足探索才能获得可靠价值估计，因此不适合资源受限环境。SSDP能高效找到候选方案，但会出现前沿耗尽，其激进节点合并永久丢弃未探索路径，导致即使预算增加也无法改进。这些发现于2026年6月26日发表在arXiv上。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这些发现对在生产环境中部署推理智能体的AI从业者至关重要，因为当前树状思维方法在不同计算预算下缺乏弹性。这迫使在低资源时选择低效的DPTS或高资源时停滞的SSDP，凸显了需要根据可用计算进行调整的适应性策略。该研究直接为科学发现、教育和自动问题解决等应用中的鲁棒推理系统设计提供了参考。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">树状思维（ToT）是一种大语言模型推理框架，它将中间推理步骤组织成树状结构，允许探索多条路径并回溯，不同于链式思维的单一路径。蒙特卡洛树搜索（MCTS）是常用于博弈的启发式搜索算法，平衡探索与利用。语义去重通过移除语义相似的推理路径来避免冗余计算。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">DPTS是基于蒙特卡洛树搜索的方法，利用探索构建价值估计，而SSDP采用语义去重来修剪冗余推理路径。评估使用3,000至10,000个标记的预算范围，在两个模型规模（3B和8B参数）下进行数学推理任务。DPTS的冷启动瓶颈意味着其探索阶段消耗了小预算的大部分而无法产生可靠输出，而SSDP的前沿耗尽意味着一旦合并节点，整个推理分支将永久丢失。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Tree-of-Thought</span>
+      
+      <span class="tag">LLM Reasoning</span>
+      
+      <span class="tag">Compute Budget</span>
+      
+      <span class="tag">Benchmark Analysis</span>
+      
+      <span class="tag">AI Research</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-ai-markets"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">8</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/newsflashes/3865488982578185?f=rss" target="_blank" rel="noopener noreferrer">工信部宣布加快编制智能网联新能源汽车“十五五”规划</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：国家级产业顶层设计加速出台，明确智能网联新能源汽车技术攻关方向，对AI从业者和投资者具有重要战略信号意义，将影响行业资源配置和市场预期。</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">6月23日，工信部装备工业一司负责人郭守刚在国新办发布会上宣布，将加快编制出台智能网联新能源汽车产业发展“十五五”规划。规划明确聚焦新一代动力电池、车用芯片、操作系统和自动驾驶四项核心技术攻关与产业化。工信部还将联合商务部推进汽车流通消费改革试点及以旧换新，挖掘市场潜力，并强化市场竞争秩序规范。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      作为2026-2030年的产业顶层设计，该规划将引导中国智能网联汽车领域的技术路线、资源分配和市场预期，对国内外车企及供应链产生深远影响。对车用芯片和操作系统的强调，凸显了突破“卡脖子”环节的战略意图，有望加速国产替代进程。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">“十五五”规划是中国国民经济和社会发展第十五个五年规划，覆盖2026至2030年，是国家最高级别的战略指引。智能网联新能源汽车整合了电动化、网联化和自动驾驶功能，是中国汽车产业实现换道超车的重点方向。近年来，中国新能源汽车销量全球领先，但高端芯片依赖进口，该规划意在补齐短板。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">规划技术攻关清单涵盖新一代动力电池、车规级芯片、智能操作系统和自动驾驶。郭守刚的出席时间与“十五五”规划期（2026-2030年）相衔接，此前工信部副部长辛国斌已在2025年10月预告过该项编制工作。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">智能网联汽车</span>
+      
+      <span class="tag">新能源汽车</span>
+      
+      <span class="tag">产业政策</span>
+      
+      <span class="tag">自动驾驶</span>
+      
+      <span class="tag">十五五规划</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.stcn.com/article/detail/3974692.html" target="_blank" rel="noopener noreferrer">工信部：加快编制出台智能网联新能源汽车产业发展“十五五”规划 推动产...</a></li>
+        
+        <li><a href="https://www.news.cn/20251017/e1e22415d52642078c971d8981ad79b7/c.html" target="_blank" rel="noopener noreferrer">“十五五”智能网联新能源汽车产业发展规划将编制-新华网</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">9</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/p/3865188719121668?f=rss" target="_blank" rel="noopener noreferrer">昆仑行机器人90天内融资数十亿元成为独角兽</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Breaking funding news for a new startup with seasoned founders from Alibaba Cloud and Li Auto, rapidly becoming a unicorn, signaling strong market confidence and investment trends in embodied AI.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">前阿里云中国区总裁任庚与理想智驾一号位郎咸朋联合创立的昆仑行机器人，在注册公司不到90天内完成了三轮融资，累计金额达数十亿元。公司估值突破10亿美元，跻身独角兽行列，首轮融资更是在注册仅3天时即被顶级机构争抢。投资方包括高瓴资本、高榕创投、钟鼎资本、中科创星等，且首轮股东均连续跟投。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      昆仑行的快速崛起标志着具身智能赛道资本热度的新高度，反映出市场对兼具规模化商业运营与前沿AI研发经验的明星团队的追捧。这一案例可能加速人形机器人领域的资金聚拢和人才争夺，推动行业从技术验证向量产落地过渡。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">具身智能指在物理环境中交互与执行的AI系统，人形机器人被视为继PC和手机之后的下一代计算终端。特斯拉Optimus是行业标杆，计划2026年小批量量产，摩根士丹利预测全球市场规模2050年可达5万亿美元。朗咸朋此前主导理想汽车超过150万辆高阶辅助驾驶方案的交付，汽车领域的‘感知-决策-执行’技术与机器人高度同源。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">昆仑行对标特斯拉Optimus，采取‘本体+大脑’双轮驱动战略，自研关键零部件与运控算法。其大脑方案以昆仑世界模型（KWM）为核心，提出双系统智能架构以提升模型迭代效率与泛化能力，硬件遵循算法定义硬件的思路避免软硬割裂。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">embodied AI</span>
+      
+      <span class="tag">robotics</span>
+      
+      <span class="tag">startup funding</span>
+      
+      <span class="tag">unicorn</span>
+      
+      <span class="tag">AI investment</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://eu.36kr.com/zh/p/3865188719121668" target="_blank" rel="noopener noreferrer">刚注册即成独角兽！具身创企昆仑行90天融资数十亿元 | 36氪独家</a></li>
+        
+        <li><a href="https://www.163.com/dy/article/L03S6LR005118DFD.html" target="_blank" rel="noopener noreferrer">刚注册就成独角兽，具身创企昆仑行90天融资数十亿元｜36氪独家|创投|...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">10</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/p/3865001641006081?f=rss" target="_blank" rel="noopener noreferrer">SK海力士市值首超三星，SpaceX蒸发4000亿美元，英首相辞职</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The compilation covers high-impact events: SK Hynix&#39;s market cap surpassing Samsung signals a seismic shift in the semiconductor industry driven by AI demand (9/10 importance); Google&#39;s 5% drop after its AI chief Jumper departed reflects strategic turbulence in AI leadership (7/10); SpaceX&#39;s market rout and UK PM resignation add broader economic and political significance. These combined signals offer valuable insight for AI investors and market observers.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">6月22日，SK海力士总市值达2079.6655万亿韩元（约合人民币9.2万亿元），超过三星电子约18.8523万亿韩元，终结了其长达25年7个月的韩国股市榜首地位。SpaceX股价暴跌16%，市值蒸发4000亿美元，跌破IPO首日收盘价，连续三天累计跌幅27%。英国首相斯塔默宣布辞去工党领袖职务，将留任至新党首产生。谷歌因AI负责人Jumper离职股价下挫5%。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      SK海力士的历史性超越凸显了由AI高带宽内存（HBM）驱动的半导体产业格局剧变。SpaceX与谷歌的股价动荡反映出投资者在管理层变动和市场波动下，对高估值科技股日趋谨慎。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">16%</span>
+      
+      <span class="key-fact-pill">27%</span>
+      
+      <span class="key-fact-pill">5%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">SpaceX是马斯克创办的航天公司，今年上市后一度跻身全球市值前列。SK海力士是韩国存储芯片巨头，其HBM产品是英伟达等AI加速器的关键组件。三星电子自2000年起长期稳坐韩国股市市值冠军宝座。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">SK海力士年内股价暴涨341.9%，远超三星电子的197.7%，得益于其在HBM市场的领先地位。SpaceX此前市值曾达近3万亿美元，暴跌后仍较发行价高约30%。谷歌AI主管Jumper离职，加剧了市场对其AI战略的担忧。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI markets</span>
+      
+      <span class="tag">semiconductors</span>
+      
+      <span class="tag">global economics</span>
+      
+      <span class="tag">tech stocks</span>
+      
+      <span class="tag">political change</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">11</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.cnbc.com/2026/06/22/alphabet-goog-stock-ai-departures.html" target="_blank" rel="noopener noreferrer">AI人才流失致Alphabet股价大跌7%</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>CNBC Technology</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：High-profile AI researcher departures at Alphabet signal strategic concerns and competitive threats, leading to significant stock impact, making it highly relevant to investors and industry observers.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年6月22日，Alphabet股价盘中最大跌幅达7%，创一年多来最大单日跌幅，市值蒸发2700亿美元。此前，两位知名AI研究员相继离职投奔竞争对手，引发投资者对谷歌在AI竞赛中落后的担忧。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      离职事件暴露出Alphabet人工智能部门潜在的战略弱点，可能削弱其与OpenAI和微软等对手的竞争力。市场反应凸显了顶尖AI人才对投资者信心的关键作用，预示着Alphabet或将加大人才留存投入并加速产品开发。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">7%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">顶尖AI研究员属于全球稀缺资源，科技巨头之间的人才争夺战日益激烈。研发人员的流失往往预示着内部问题或外部更好的机会，会直接影响企业的创新能力和产品迭代速度。在过去一年中，AI领域的竞争已从模型层面扩展到商业化和人才储备的全方位竞赛。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">离职事件发生在Alphabet对人工智能研发投入数十亿美元之际，其巨额支出尚未建立起持久的竞争优势。摩根大通等机构分析师下调了Alphabet评级，指其AI产品落地速度落后于微软和OpenAI。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI talent</span>
+      
+      <span class="tag">Alphabet</span>
+      
+      <span class="tag">stock market</span>
+      
+      <span class="tag">competitive positioning</span>
+      
+      <span class="tag">Google</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.cnbc.com/2026/06/22/alphabet-goog-stock-ai-departures.html" target="_blank" rel="noopener noreferrer">Alphabet paces for worst day in a year after AI talent exits</a></li>
+        
+        <li><a href="https://nypost.com/2026/06/22/business/google-stock-loses-270b-in-value-over-concerns-its-falling-behind-rivals-in-race-for-ai-talent/" target="_blank" rel="noopener noreferrer">Google stock loses $270B in value over concerns its &#39;falling ...</a></li>
+        
+        <li><a href="https://tradersunion.com/news/financial-news/show/2443315-alphabet-shares-drop-ai-exits/" target="_blank" rel="noopener noreferrer">Alphabet shares slide as AI talent exits deepen investor concerns</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">16</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/newsflashes/3865468521567236?f=rss" target="_blank" rel="noopener noreferrer">豆包保持免费，将推搭载2.1Pro的专业办公模式</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：ByteDance&#39;s Doubao AI assistant announces a professional paid tier while keeping free services, signaling monetization strategy in competitive AI market. Routine product update but noteworthy from a major player.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">火山引擎总裁谭待在原动力大会上宣布，豆包将继续保持免费，高质量服务广大用户。豆包计划推出面向生产力场景的专业版办公任务模式，该模式搭载火山引擎最新发布的2.1Pro模型。此前于6月3日，豆包已说明专业版针对专业人士的生产力需求，日常使用功能保持免费。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此举标志字节跳动在竞争激烈的AI助手市场启动商业化尝试。通过免费服务维持用户基础，同时以专业版吸引付费用户，可能影响其他AI助手产品的定价策略。生产力场景的专业模式瞄准办公用户，与微软Copilot等产品直接竞争。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">2.1</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">豆包是字节跳动推出的AI对话助手，类似ChatGPT，提供知识问答、文本生成等功能。火山引擎是字节跳动旗下的云服务平台，负责对外提供技术能力。AI助手市场目前以免费为主，厂商正探索可持续的商业化路径。原动力大会为火山引擎年度技术峰会，发布最新技术产品。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">专业版办公任务模式搭载的2.1Pro模型为火山引擎最新大模型，预期在办公任务中提供更强的推理、生成与理解能力。豆包原有免费功能如问答、总结等将继续保留，专业版针对需要更高处理能力的专业用户。2.1Pro的具体技术规格未在本次披露。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">豆包</span>
+      
+      <span class="tag">AI商业化</span>
+      
+      <span class="tag">字节跳动</span>
+      
+      <span class="tag">大模型应用</span>
+      
+      <span class="tag">生产力工具</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">17</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/newsflashes/3865433256530950?f=rss" target="_blank" rel="noopener noreferrer">小竹无人车即将完成数亿美金独立融资</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Significant funding round for autonomous logistics startup with strategic industry capital, indicating market confidence and technical roadmap in physical AI and mapless driving. Provides operational scale data.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">佑驾创新旗下品牌小竹无人车即将完成独立融资，估值达数亿美元，投资方包括一线自动驾驶产业资本。本轮融资将投入物理AI技术、全域无图自动驾驶软硬件的全栈研发，并扩充整车量产产能。截至2025年，小竹无人车已在全国18个城市落地运营，合作规模超8000台。该轮融资由自动驾驶领域资本领投，显示产业对小竹技术路线的认可。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此次融资表明资本对物理AI和无图自动驾驶技术在物流领域应用的信心。小竹无人车的规模化运营将推动无人配送成本下降，加速行业商业化进程。一线产业资本入场，可能带动更多物流和自动驾驶企业跟进类似技术路径。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">小竹无人车是智能驾驶解决方案公司佑驾创新旗下的无人物流车品牌。佑驾创新成立于2014年，专注于车载智能感知与控制技术。无图自动驾驶指不依赖预先绘制的高精地图，仅通过车载传感器实时感知环境实现自动驾驶，降低运营成本和地理限制。物理AI强调AI系统在物理世界中的行动能力，如机器人、自动驾驶等。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">小竹无人车专注于无人物流，采用全域无图自动驾驶方案，不依赖高精度地图，依靠多传感器融合和实时感知。资金将用于物理AI研发，即让AI系统在物理世界中实时交互与决策，提升车辆在复杂场景下的自主能力。全栈自研涵盖底层硬件到上层算法。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">autonomous vehicles</span>
+      
+      <span class="tag">funding</span>
+      
+      <span class="tag">logistics</span>
+      
+      <span class="tag">physical AI</span>
+      
+      <span class="tag">mapless driving</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">18</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/newsflashes/3865428113183747?f=rss" target="_blank" rel="noopener noreferrer">LG化学宣布到2035年累计研发投入15万亿韩元转型AI材料企业</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：LG化学的战略转型及重大研发投资计划揭示了行业趋势和竞争定位，影响AI材料领域的发展方向。</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">6月22日，LG化学CEO金东春宣布，到2035年前累计投入15万亿韩元研发资金，正式向AI驱动的高附加值材料企业转型。其中70%的研发资源将集中于半导体、移动出行和机器人材料等核心赛道，同时将抗癌新药列为未来核心事业。公司正在加速推进业务组合的优化升级。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      LG化学的巨额研发投资将加速半导体、移动出行和机器人领域关键材料的创新，可能重塑全球供应链。其向AI驱动企业的转型表明化工行业正借助人工智能提升研发效率和产品附加值，对高端材料市场的竞争格局产生深远影响。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">70%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">LG化学是韩国最大的综合化学公司，长期在电池材料领域占据领先地位。此次转型意味着它从传统化工向技术密集型的电子和生物材料领域迈进，利用AI加速材料发现和优化。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">累计15万亿韩元（约合110亿美元）的投资中，70%专用于半导体、移动出行和机器人材料。金东春明确这些高增长领域为公司未来核心，同时兼顾抗癌新药研发。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">材料</span>
+      
+      <span class="tag">半导体</span>
+      
+      <span class="tag">LG化学</span>
+      
+      <span class="tag">研发投资</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">19</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/p/3865136165344516?f=rss" target="_blank" rel="noopener noreferrer">凌川科技再融资数亿，SL200芯片销量近十万</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Significant funding round for an AI chip startup with validated deployment at scale (serving 700M users) and claims of outperforming Nvidia in video compression, which is relevant for AI video workloads. However, it&#39;s a specialized video processing chip, not a general-purpose AI hardware breakthrough, and lacks community discussion to gauge broader interest.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">从快手拆分出的凌川科技近日完成数亿元A+轮融资，由啟赋资本领投，新国都、金浦投资、百度风投等多家机构参投。公司已量产的核心产品SL200智能视频SoC芯片累计销售近十万颗，部署在快手、阿里云、百度云和B站等平台，覆盖快手99.7%的直播转码业务。SL200在MSU世界视频编码大赛中连续三年获商业化编码器全部子赛道第一，压缩效率比英伟达最新AV1方案提升30%—35%，万卡集群月故障率低于0.01%。本轮融资将用于下一代芯片研发、SL200扩产和海外市场拓展。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      随着AI生成视频和实时流媒体爆发，通用GPU在视频处理上的效率瓶颈和成本压力日益凸显，加之高端GPU出口受限，凌川科技的专用芯片提供了高性价比、自主可控的算力底座。SL200在大规模互联网业务中的稳定部署验证了其可靠性和性能优势，有望在国产AI算力替代浪潮中加速渗透数据中心、智慧城市和边缘计算等场景。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">99.7%</span>
+      
+      <span class="key-fact-pill">30%</span>
+      
+      <span class="key-fact-pill">35%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">MSU世界视频编码大赛是视频压缩领域国际权威测评，AV1是新一代开放式视频编码标准。RISC-V是一种开源指令集架构，允许芯片设计避开x86/ARM的授权限制，近年来在国内芯片产业中备受重视。3D近存堆叠将计算单元与存储器垂直集成，可大幅提升带宽并降低延迟。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">SL200基于RISC-V开源生态，采用创新性DiPU（确定性推理处理单元）架构，通过数据流驱动和空间计算实现延迟、时序、带宽的三重确定性，并首创全国产3D近存架构，下一代芯片已于4月流片。软件堆栈LUCAS提供从应用适配到硬件执行的四层统一计算平台，支持图/Eager模式、Tile-based编程和Cluster Affine，兼容主流开源生态。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI chips</span>
+      
+      <span class="tag">video processing</span>
+      
+      <span class="tag">fundraising</span>
+      
+      <span class="tag">Kuaishou</span>
+      
+      <span class="tag">RISC-V</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">20</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://36kr.com/p/3865125383443463?f=rss" target="_blank" rel="noopener noreferrer">北大团队获龚虹嘉陆奇注资，推sEMG腕带数采终端</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>36氪</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Early-stage startup with impressive backers (龚虹嘉, 陆奇) developing innovative sEMG-based data capture for embodied AI, a growing area with potential strategic importance.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">雪梦未来（SnowOrigin）获得龚虹嘉、陆奇及海外机构投资。该北大背景团队研发的神经腕带和全景头环，通过表面肌电（sEMG）技术捕捉人类操控时的姿态、力度和微控制力等数据。其设备信噪比（SNR）达到43以上，远超国内常见8通道、采样率200-250赫兹、信噪比二十多dB的肌电手环。团队已推出神经腕带等可穿戴产品，并推动新一代数采终端研发。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      通过可穿戴神经信号采集方案，该技术解决了具身智能训练中高质量人类操控数据匮乏的痛点。不仅记录动作结果，更能捕捉发力意图和微调过程，为机器人训练和世界模型提供更丰富的数据基础。其轻量化、非侵入的特性有望推动人类具身数据规模化获取，加速物理AI发展。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">表面肌电（sEMG）是通过皮肤表面电极检测肌肉电活动的非侵入性技术，Meta等公司曾探索用于AR/VR交互。具身智能模型需要大量人类与物理世界交互的数据，传统动作捕捉或视频记录难以完整捕捉发力细节和操控意图。雪梦未来的神经腕带方案以轻量化可穿戴设备实现低成本、规模化数据采集，为物理AI提供新的数据范式。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">团队自研的NMH（Neural Math Hybrid）AI解码模型可对sEMG信号进行实时解码，输出包含姿态、力、微控制的结构化数据。硬件方面，腕带通道数超过常见8通道，信噪比达43以上，采样率高于250赫兹。系统结合环境感知、空间定位与多模态同步，完整记录人机交互过程。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI data collection</span>
+      
+      <span class="tag">embodied AI</span>
+      
+      <span class="tag">startup funding</span>
+      
+      <span class="tag">sEMG</span>
+      
+      <span class="tag">wearable technology</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">21</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/06/22/the-running-list-major-tech-layoffs-in-2026-where-employers-cited-ai/" target="_blank" rel="noopener noreferrer">TechCrunch 追踪2026年因AI导致的科技裁员</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：This running list compiles significant layoffs where AI is cited, reflecting a crucial industry trend that signals strategic restructuring and potential market impacts. It&#39;s a valuable aggregation for investors and AI practitioners, though it lacks deep analysis.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年6月22日，TechCrunch 开始维护一份实时更新的名单，记录那些明确将裁员归因于人工智能的大型科技公司。该名单按时间倒序排列，但尚未披露具体公司名称或裁员人数。这份名单将持续更新，以反映最新的裁员公告。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这份名单标志着由人工智能引发的岗位流失正成为科技行业一个可量化的趋势。它为投资者、从业者和监管机构提供了一个集中资源，用于追踪自动化如何重塑就业格局，并可能影响市场信心和政策走向。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">近年来，科技公司广泛采用人工智能来自动化任务，导致劳动力结构持续调整。此前裁员多归因于宏观经济状况，但2026年出现了越来越多直接以AI为裁撤理由的案例。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该追踪机制采用网络实时列表的形式，以时间倒序显示条目。名单专注于大型科技公司，且裁员决定中明确将人工智能列为因素之一。目前暂无相关架构或性能数据。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI layoffs</span>
+      
+      <span class="tag">tech employment</span>
+      
+      <span class="tag">industry trend</span>
+      
+      <span class="tag">automation</span>
+      
+      <span class="tag">market signal</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-economy"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">12</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/microns-stock-momentum-builds-as-the-company-inks-a-new-anthropic-partnership-484e3845?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">美光与Anthropic合作供应AI系统内存</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Strategic supply partnership between a leading AI company and a major memory manufacturer signals strong AI hardware demand, relevant to investors and AI infrastructure trends.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">美光科技宣布与AI公司Anthropic达成合作，为其生成式AI和数据中心建设提供内存和存储解决方案。消息公布后，美光股价周一早上攀升。美光市值已突破1万亿美元，反映出市场对AI相关内存的强劲需求。此次合作正值Anthropic完成H轮融资、估值达650亿美元之际，美光被指定为关键基础设施合作伙伴。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      该合作凸显了高性能内存在AI基础设施扩建中的关键作用，表明AI公司正在锁定关键硬件的供应链。对投资者而言，这证实了由AI计算负载驱动的存储芯片需求将持续旺盛。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">美光科技是全球最大的半导体公司之一，专注于内存和存储解决方案。Anthropic是一家领先的AI安全和研究公司，以Claude聊天机器人和大型语言模型闻名。AI模型的训练和推理需要大量内存，使内存成为AI基础设施的关键部件。这一合作反映了AI供应链中硬件与软件公司紧密协作的日益增长的趋势。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">美光以DRAM和NAND闪存产品著称，这些是服务器、高性能计算和AI加速器的核心部件。此次合作中，美光将为Anthropic的AI训练和推理系统专门设计和供应内存，可能涉及高带宽内存（HBM）等先进技术。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI hardware</span>
+      
+      <span class="tag">partnerships</span>
+      
+      <span class="tag">memory chips</span>
+      
+      <span class="tag">Anthropic</span>
+      
+      <span class="tag">Micron</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.morningstar.com/news/marketwatch/2026062271/microns-stock-momentum-builds-as-the-company-inks-a-new-anthropic-partnership" target="_blank" rel="noopener noreferrer">Micron&#39;s stock momentum builds as the company inks a new ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">22</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4916858-intel-the-three-things-the-bulls-and-bears-are-both-getting-wrong?source=feed_all_articles" target="_blank" rel="noopener noreferrer">英特尔：多头和空头都看错的三件事</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Deep industry analysis on Intel&#39;s strategic positioning and market misconceptions, offering valuable insights for AI hardware investors despite being an opinion piece without breaking news.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">一项逆向分析指出，投资者对英特尔的三个关键方面存在集体误判：其18A制程工艺的战略价值、Gaudi 3 AI加速器的市场潜力，以及EMIB先进封装技术的长期影响。英特尔预计在2025年实现18A制程的大规模量产，该工艺被视为其重获技术领先地位的核心。同时，Gaudi 3加速器在MLPerf基准测试中展现出与英伟达H100相当的推理性能，但市场对此关注不足。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      对英特尔AI硬件能力和代工战略的误读可能导致其股价被显著低估，尤其是在AI芯片市场预计到2027年将突破千亿美元规模的背景下。英特尔投入超过200亿美元新建晶圆厂，若其代工服务和先进封装获得成功，将打破台积电的垄断格局，影响全球半导体供应链。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">晶圆代工业务是指半导体公司为其他企业制造芯片，台积电目前主导该市场。AI加速器则指专用于人工智能计算任务的处理器，如GPU或专用ASIC。先进封装技术将多个小芯片集成在一个封装内，以提升性能和降低功耗，已成为后摩尔时代的关键竞争点。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">18A工艺引入 RibbonFET 全环绕栅极晶体管和 PowerVia 背面供电技术，有望实现性能功耗比的大幅提升。Gaudi 3 采用5纳米制程，配备128GB HBM2e内存，专门针对大规模AI训练和推理优化。EMIB（嵌入式多芯片互连桥接）可实现异构芯片间的超高带宽连接，是英特尔数据中心GPU和Meteor Lake处理器的关键技术。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">semiconductor</span>
+      
+      <span class="tag">Intel</span>
+      
+      <span class="tag">AI hardware</span>
+      
+      <span class="tag">investment analysis</span>
+      
+      <span class="tag">market positioning</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">23</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4916847-alibaba-stock-group-qwen-robot-triggers-full-stack-physical-ai-inflection-point-reiterate-buy?source=feed_all_articles" target="_blank" rel="noopener noreferrer">阿里巴巴Qwen-Robot引发全栈物理AI拐点，重申买入评级</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Alibaba&#39;s Qwen-Robot potentially signals a significant step in physical AI for a major company, with a reiterated BUY recommendation that could influence investor decisions; while not a groundbreaking breakthrough, it is high-value for market watchers.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">一份在Seeking Alpha上发布的分析师报告称，阿里巴巴的Qwen-Robot触发了全栈物理AI拐点。该报告重申对阿里巴巴集团股票的买入评级。现有摘要未披露具体性能指标或发布日期。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      分析师的看涨观点可能改变投资者对阿里巴巴AI战略的看法，或推动其股价上涨。若阿里巴巴成为物理AI领域的先行者，将加剧其与其他科技巨头在机器人AI市场的竞争。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">物理AI指将人工智能整合到能执行现实世界任务的机器人系统中。全栈方法意味着对硬件和软件层的全面掌控。拐点标志着技术采用或能力发展的重大转折。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">根据提供的来源，没有可靠的信息可用。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Alibaba</span>
+      
+      <span class="tag">Qwen-Robot</span>
+      
+      <span class="tag">Physical AI</span>
+      
+      <span class="tag">Investment Analysis</span>
+      
+      <span class="tag">AI Market</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">24</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4916850-oil-sells-off-us-eases-sanctions-on-iran?source=feed_all_articles" target="_blank" rel="noopener noreferrer">美国放宽对伊朗制裁，油价大跌</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：US easing sanctions on Iran is a notable macroeconomic policy change affecting global oil supply and prices, with implications for global markets.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">美国政府放松了对伊朗石油出口的制裁，引发全球原油市场大幅抛售。布伦特原油期货价格显著下跌，跌破关键支撑位。这一政策变化预计将在未来几个月增加伊朗石油供应。交易员预期伊朗可能很快增加产量和出口，从而增加全球库存。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      放松制裁可能使全球原油供应每日增加数十万桶，缓解油价上涨压力。这可能有助于依赖进口的经济体降低通胀，并改变各国央行的决策考量。这也标志着美伊关系可能解冻，对中东地缘政治产生影响。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">自2018年美国退出伊核协议以来，对伊朗石油行业实施了严厉制裁，导致伊朗石油出口从每日超过250万桶一度降至不足50万桶。伊朗虽找到规避制裁的方法，但政策变化可能使更多供应合法化。制裁最初旨在向伊朗施压以限制其核计划。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">从提供的来源中没有可靠信息。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">oil</span>
+      
+      <span class="tag">sanctions</span>
+      
+      <span class="tag">Iran</span>
+      
+      <span class="tag">commodities</span>
+      
+      <span class="tag">geopolitics</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">25</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/big-tech-is-splitting-into-two-artificial-intelligence-camps-here-is-the-better-bet-e75c9876?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">科技巨头分化为两大AI阵营：明智资金不再追逐下一个OpenAI</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The article offers a substantive analysis of AI investment strategies, contrasting big tech with startups, which is valuable for investors despite being an opinion piece without hard news.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">市场分析指出，Alphabet和微软等科技巨头是比追逐下一个OpenAI更安全的人工智能投资。分析认为，这些公司凭借微软对OpenAI的130亿美元投资以及Alphabet旗下DeepMind和谷歌云AI平台的整合，拥有多元化的收入来源和成熟的AI生态系统。相比之下，押注高风险的初创公司可能面临资金消耗过快和商业化路径不明的问题。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这一趋势表明，机构投资者正转向稳定性和可扩展性，可能导致AI开发力量集中于少数巨头。这将影响AI初创企业的融资环境和技术创新格局，同时加速AI在现有企业产品中的渗透。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">人工智能投资领域逐渐形成两种模式：一种是以Alphabet、微软为代表的综合平台型公司，将AI嵌入现有商业帝国；另一种是以OpenAI、Anthropic为代表的纯AI模型公司，它们需要持续巨额融资以维持研发和算力支出。微软向OpenAI投入的130亿美元凸显了初创模式的资本密集性。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">科技巨头拥有自研AI模型（如谷歌的Gemini）、大规模云基础设施（微软Azure AI、谷歌Vertex AI）以及海量用户数据。它们能够将AI无缝集成到搜索、办公套件和广告等核心业务中，形成竞争壁垒。而纯AI初创公司则依赖外部资金和单一收入模式。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI investment</span>
+      
+      <span class="tag">big tech</span>
+      
+      <span class="tag">market analysis</span>
+      
+      <span class="tag">AI startups</span>
+      
+      <span class="tag">opinion</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">26</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/salesforces-stock-extends-record-losing-streak-can-the-company-disrupt-itself-8402d62c?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">Salesforce股价创纪录连跌14天</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Salesforce&#39;s record 14-day losing streak reflects persistent investor skepticism about its AI momentum, providing a notable signal on how markets are pricing AI adoption for established software firms.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Salesforce股价连续第14个交易日下跌，创下该公司上市以来的最长连跌纪录。此次下跌反映出投资者对该公司利用人工智能驱动增长的能力持续存在疑虑。尽管Salesforce大力推广Einstein GPT等人工智能产品，但市场参与者对其收入潜力仍不买账。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      创纪录的连跌表明，即使大型企业软件公司的人工智能战略也面临投资者的严重质疑。这意味着市场正在对成熟公司人工智能变现慢于预期的情况进行定价，可能影响整个行业的估值。这一趋势也可能反映出市场对云软件行业增长放缓的更广泛担忧。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Salesforce是一家领先的基于云的客户关系管理软件提供商。该公司成立于1999年，自2004年起公开上市，业务已扩展至营销、分析、以及人工智能驱动的工具等多个企业应用领域。近年来，它强调人工智能是增长的关键驱动力，推出了Einstein GPT等产品并投资了人工智能初创公司。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Salesforce的股价下跌延续了自2024年4月初开始的颓势，目前正面临自2004年首次公开募股以来最持续的抛售。该公司一直在其平台中整合人工智能，包括用于CRM任务的Einstein GPT助手，但投资者对这些投资的短期回报提出质疑。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Salesforce</span>
+      
+      <span class="tag">AI market sentiment</span>
+      
+      <span class="tag">stock market</span>
+      
+      <span class="tag">enterprise software</span>
+      
+      <span class="tag">investor confidence</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card card-light">
+  <div class="card-header">
+    <div class="card-index">27</div>
+    <div class="score-badge score-5">6.0</div>
+    
+      <span class="depth-indicator" title="标准分析：基于文章内容进行丰富">&#x1f4dd;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4916868-the-singularity-portfolio?source=feed_all_articles" target="_blank" rel="noopener noreferrer">奇点投资组合：AI驱动的投资策略</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-06-23</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：SeekingAlpha article presenting a portfolio strategy focused on AI/singularity, likely offering investment insights but lacking technical depth or major market-moving revelations.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">SeekingAlpha发布了一种名为‘奇点投资组合’的投资策略，该策略聚焦于由AI进步驱动的潜在经济奇点。该投资组合旨在将资本配置到可能从技术奇点中获益的公司。摘要中未披露具体的持股名称或权重。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      随着AI迅速重塑多个行业，这一策略反映出投资者对利用技术奇点获利的兴趣日益增长。它标志着从传统市场投资向针对性AI板块配置的转变，可能影响散户和机构投资者的资产分配决策。
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">investing</span>
+      
+      <span class="tag">singularity</span>
+      
+      <span class="tag">portfolio</span>
+      
+      <span class="tag">markets</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-market_indicators"
+       role="tabpanel">
+    
+    
+    
+    <div class="market-summary">
+      <div class="market-summary-title">
+        实时行情
+      </div>
+      <div class="market-summary-grid" id="market-summary-grid">
+        
+        <div class="market-group-label">
+          
+            国际
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="gold"
+             onclick="MarketChart.switchIndicator('gold')"
+             title="点击查看图表">
+          <div class="msi-name">纽约金</div>
+          <div class="msi-price ">
+            
+              4,103.92
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -2.08%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="oil"
+             onclick="MarketChart.switchIndicator('oil')"
+             title="点击查看图表">
+          <div class="msi-name">WTI 原油</div>
+          <div class="msi-price ">
+            
+              73.61
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -2.25%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="nasdaq"
+             onclick="MarketChart.switchIndicator('nasdaq')"
+             title="点击查看图表">
+          <div class="msi-name">纳斯达克</div>
+          <div class="msi-price ">
+            
+              26,166.60
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -1.32%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="usdcny"
+             onclick="MarketChart.switchIndicator('usdcny')"
+             title="点击查看图表">
+          <div class="msi-name">美元/人民币</div>
+          <div class="msi-price ">
+            
+              6.79
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.03%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="eurcny"
+             onclick="MarketChart.switchIndicator('eurcny')"
+             title="点击查看图表">
+          <div class="msi-name">欧元/人民币</div>
+          <div class="msi-price ">
+            
+              7.76
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.31%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="jpycny"
+             onclick="MarketChart.switchIndicator('jpycny')"
+             title="点击查看图表">
+          <div class="msi-name">日元/人民币(100)</div>
+          <div class="msi-price ">
+            
+              4.20
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.27%
+          </div>
+          
+        </div>
+        
+        
+        <div class="market-group-label">
+          
+            国内
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="shanghai"
+             onclick="MarketChart.switchIndicator('shanghai')"
+             title="点击查看图表">
+          <div class="msi-name">上证指数</div>
+          <div class="msi-price ">
+            
+              4,106.25
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -1.37%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="chinext"
+             onclick="MarketChart.switchIndicator('chinext')"
+             title="点击查看图表">
+          <div class="msi-name">创业板指</div>
+          <div class="msi-price ">
+            
+              4,192.19
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -3.84%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="star50"
+             onclick="MarketChart.switchIndicator('star50')"
+             title="点击查看图表">
+          <div class="msi-name">科创 50</div>
+          <div class="msi-price ">
+            
+              1,916.21
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -1.68%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="domestic_gold"
+             onclick="MarketChart.switchIndicator('domestic_gold')"
+             title="点击查看图表">
+          <div class="msi-name">国内参考金价 (元/克)</div>
+          <div class="msi-price ">
+            
+              895.49
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -2.49%
+          </div>
+          
+        </div>
+        
+        
+      </div>
+    </div>
+
+    <div class="chart-controls">
+      <div class="indicator-selector" id="indicator-selector">
+        
+        
+        
+        <button class="indicator-pill active"
+                data-key="gold"
+                onclick="MarketChart.switchIndicator('gold')">
+          纽约金
+          <span class="pill-sub">XAU</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="oil"
+                onclick="MarketChart.switchIndicator('oil')">
+          WTI 原油
+          <span class="pill-sub">CL</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="nasdaq"
+                onclick="MarketChart.switchIndicator('nasdaq')">
+          纳斯达克
+          <span class="pill-sub">^IXIC</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="usdcny"
+                onclick="MarketChart.switchIndicator('usdcny')">
+          美元/人民币
+          <span class="pill-sub">USD</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="eurcny"
+                onclick="MarketChart.switchIndicator('eurcny')">
+          欧元/人民币
+          <span class="pill-sub">EUR</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="jpycny"
+                onclick="MarketChart.switchIndicator('jpycny')">
+          日元/人民币(100)
+          <span class="pill-sub">JPY</span>
+        </button>
+        
+        
+        
+        
+        <button class="indicator-pill"
+                data-key="shanghai"
+                onclick="MarketChart.switchIndicator('shanghai')">
+          上证指数
+          <span class="pill-sub">000001.SS</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="chinext"
+                onclick="MarketChart.switchIndicator('chinext')">
+          创业板指
+          <span class="pill-sub">399006.SZ</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="star50"
+                onclick="MarketChart.switchIndicator('star50')">
+          科创 50
+          <span class="pill-sub">000688.SS</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="domestic_gold"
+                onclick="MarketChart.switchIndicator('domestic_gold')">
+          国内参考金价 (元/克)
+          <span class="pill-sub">CNY/g</span>
+        </button>
+        
+        
+        
+      </div>
+      <div class="range-selector" id="range-selector">
+        <button class="range-btn" data-days="7" onclick="MarketChart.switchRange(7)">7D</button>
+        <button class="range-btn active" data-days="30" onclick="MarketChart.switchRange(30)">30D</button>
+        <button class="range-btn" data-days="90" onclick="MarketChart.switchRange(90)">90D</button>
+        <button class="range-btn" data-days="0" onclick="MarketChart.switchRange(0)">
+          全部
+        </button>
+      </div>
+      <div class="ma-toggle" id="ma-toggle">
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="5" onchange="MarketChart.toggleMA(5, this.checked)">MA5
+        </label>
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="10" onchange="MarketChart.toggleMA(10, this.checked)">MA10
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-container" id="chart-container">
+      <canvas id="market-chart"></canvas>
+      <div class="chart-empty" id="chart-empty" style="display:none">
+        <div class="chart-empty-icon">&#x1f4c8;</div>
+        <div class="chart-empty-text">
+          暂无足够数据
+        </div>
+        <div class="chart-empty-hint">
+          数据将在每日运行后累积
+        </div>
+      </div>
+    </div>
+    
+    
+  </div>
+  
+  
+  
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-tagline">
+      
+        AI 驱动 &middot; 每日更新 &middot; 仅供个人阅读
+      
+    </div>
+    <div>
+      
+        下次更新：明天 12:00
+      
+    </div>
+    <div>
+      
+        本页面仅供个人阅读，不对外开放索引
+      
+    </div>
+    <div class="footer-meta">Daily Focus &middot; 2026-06-23</div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var tabsNav = document.querySelector('.tab-nav');
+  if (!tabsNav) return;
+
+  var tabBtns = tabsNav.querySelectorAll('.tab-btn');
+
+  function switchTab(tabKey) {
+    tabBtns.forEach(function(btn) {
+      var isActive = btn.dataset.tab === tabKey;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+      panel.classList.toggle('active', panel.id === 'tab-' + tabKey);
+    });
+    if (window.location.hash !== '#' + tabKey) {
+      history.replaceState(null, '', '#' + tabKey);
+    }
+  }
+
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  var hash = window.location.hash.slice(1);
+  if (hash && document.querySelector('.tab-btn[data-tab="' + hash + '"]')) {
+    switchTab(hash);
+  }
+})();
+</script>
+
+<script>
+(function() {
+  var toggle = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+  var icon = document.getElementById('theme-icon');
+  if (!toggle || !icon) return;
+
+  function getTheme() {
+    if (root.getAttribute('data-theme')) return root.getAttribute('data-theme');
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function updateIcon() {
+    var theme = getTheme();
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  function saveTheme(val) {
+    try { localStorage.setItem('theme', val); } catch(e) {}
+  }
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    saveTheme(t);
+    updateIcon();
+  }
+
+  // Simple two-state toggle: dark <-> light, persisted
+  toggle.addEventListener('click', function() {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+
+  try { var saved = localStorage.getItem('theme'); if (saved) root.setAttribute('data-theme', saved); } catch(e) {}
+  updateIcon();
+})();
+</script>
+
+<script>
+// ── Market Chart ────────────────────────────────────────────
+(function() {
+  'use strict';
+
+  var historyData = {"chinext": [{"date": "2026-06-15", "price": 4033.535}, {"date": "2026-06-16", "price": 4102.942}, {"date": "2026-06-17", "price": 4167.048}, {"date": "2026-06-18", "price": 4252.39}, {"date": "2026-06-19", "price": 4252.39}, {"date": "2026-06-20", "price": 4252.39}, {"date": "2026-06-21", "price": 4252.39}, {"date": "2026-06-22", "price": 4359.392}, {"date": "2026-06-23", "price": 4192.194}], "domestic_gold": [{"date": "2026-06-15", "price": 944.19}, {"date": "2026-06-16", "price": 945.25}, {"date": "2026-06-17", "price": 941.94}, {"date": "2026-06-18", "price": 929.35}, {"date": "2026-06-19", "price": 906.39}, {"date": "2026-06-20", "price": 906.4}, {"date": "2026-06-21", "price": 907.01}, {"date": "2026-06-22", "price": 918.35}, {"date": "2026-06-23", "price": 895.49}], "eurcny": [{"date": "2026-06-15", "price": 7.8422}, {"date": "2026-06-16", "price": 7.8535}, {"date": "2026-06-17", "price": 7.8598}, {"date": "2026-06-18", "price": 7.8259}, {"date": "2026-06-19", "price": 7.7812}, {"date": "2026-06-20", "price": 7.7809}, {"date": "2026-06-21", "price": 7.7857}, {"date": "2026-06-22", "price": 7.7857}, {"date": "2026-06-23", "price": 7.7617}], "gold": [{"date": "2026-06-15", "price": 4338.48}, {"date": "2026-06-16", "price": 4341.54}, {"date": "2026-06-17", "price": 4327.71}, {"date": "2026-06-18", "price": 4267.06}, {"date": "2026-06-19", "price": 4155.91}, {"date": "2026-06-20", "price": 4155.44}, {"date": "2026-06-21", "price": 4155.44}, {"date": "2026-06-22", "price": 4207.38}, {"date": "2026-06-23", "price": 4103.92}], "jpycny": [{"date": "2026-06-15", "price": 4.227}, {"date": "2026-06-16", "price": 4.2281}, {"date": "2026-06-17", "price": 4.2217}, {"date": "2026-06-18", "price": 4.2219}, {"date": "2026-06-19", "price": 4.2107}, {"date": "2026-06-20", "price": 4.207}, {"date": "2026-06-21", "price": 4.2109}, {"date": "2026-06-22", "price": 4.2109}, {"date": "2026-06-23", "price": 4.1996}], "nasdaq": [{"date": "2026-06-15", "price": 25888.84}, {"date": "2026-06-16", "price": 26683.94}, {"date": "2026-06-17", "price": 26376.34}, {"date": "2026-06-18", "price": 26021.66}, {"date": "2026-06-19", "price": 26517.93}, {"date": "2026-06-20", "price": 26517.93}, {"date": "2026-06-21", "price": 26517.93}, {"date": "2026-06-22", "price": 26517.93}, {"date": "2026-06-23", "price": 26166.6}], "oil": [{"date": "2026-06-15", "price": 80.341}, {"date": "2026-06-16", "price": 77.149}, {"date": "2026-06-17", "price": 75.66}, {"date": "2026-06-18", "price": 73.888}, {"date": "2026-06-19", "price": 75.63}, {"date": "2026-06-20", "price": 76.564}, {"date": "2026-06-21", "price": 76.564}, {"date": "2026-06-22", "price": 75.306}, {"date": "2026-06-23", "price": 73.613}], "shanghai": [{"date": "2026-06-15", "price": 4096.4717}, {"date": "2026-06-16", "price": 4091.8917}, {"date": "2026-06-17", "price": 4108.0762}, {"date": "2026-06-18", "price": 4090.4813}, {"date": "2026-06-19", "price": 4090.4813}, {"date": "2026-06-20", "price": 4090.4813}, {"date": "2026-06-21", "price": 4090.4813}, {"date": "2026-06-22", "price": 4163.0965}, {"date": "2026-06-23", "price": 4106.2517}], "star50": [{"date": "2026-06-15", "price": 1748.3264}, {"date": "2026-06-16", "price": 1758.4244}, {"date": "2026-06-17", "price": 1840.8211}, {"date": "2026-06-18", "price": 1911.5132}, {"date": "2026-06-19", "price": 1911.5132}, {"date": "2026-06-20", "price": 1911.5132}, {"date": "2026-06-21", "price": 1911.5132}, {"date": "2026-06-22", "price": 1948.9281}, {"date": "2026-06-23", "price": 1916.2123}], "usdcny": [{"date": "2026-06-15", "price": 6.7691}, {"date": "2026-06-16", "price": 6.7719}, {"date": "2026-06-17", "price": 6.7698}, {"date": "2026-06-18", "price": 6.7742}, {"date": "2026-06-19", "price": 6.7836}, {"date": "2026-06-20", "price": 6.7844}, {"date": "2026-06-21", "price": 6.789}, {"date": "2026-06-22", "price": 6.789}, {"date": "2026-06-23", "price": 6.7869}]};
+  historyData = historyData || {};
+  var indicatorMeta = {"description": "Daily market indicators (10 total) \u2014 fetched via free APIs", "indicators": {"domestic": {"chinext": {"name": "\u521b\u4e1a\u677f\u6307", "name_en": "ChiNext", "precision": 2, "ticker": "399006.SZ"}, "domestic_gold": {"name": "\u56fd\u5185\u53c2\u8003\u91d1\u4ef7 (\u5143/\u514b)", "name_en": "Domestic Gold (CNY/g)", "precision": 2, "ticker": "CNY/g"}, "shanghai": {"name": "\u4e0a\u8bc1\u6307\u6570", "name_en": "Shanghai Composite", "precision": 2, "ticker": "000001.SS"}, "star50": {"name": "\u79d1\u521b 50", "name_en": "STAR 50", "precision": 2, "ticker": "000688.SS"}}, "international": {"eurcny": {"name": "\u6b27\u5143/\u4eba\u6c11\u5e01", "name_en": "EUR/CNY", "precision": 4, "ticker": "EUR"}, "gold": {"name": "\u7ebd\u7ea6\u91d1", "name_en": "COMEX Gold", "precision": 2, "ticker": "XAU"}, "jpycny": {"name": "\u65e5\u5143/\u4eba\u6c11\u5e01(100)", "name_en": "JPY/CNY(100)", "precision": 4, "ticker": "JPY"}, "nasdaq": {"name": "\u7eb3\u65af\u8fbe\u514b", "name_en": "NASDAQ", "precision": 2, "ticker": "^IXIC"}, "oil": {"name": "WTI \u539f\u6cb9", "name_en": "WTI Crude Oil", "precision": 2, "ticker": "CL"}, "usdcny": {"name": "\u7f8e\u5143/\u4eba\u6c11\u5e01", "name_en": "USD/CNY", "precision": 4, "ticker": "USD"}}}, "sources": {"akshare (Sina)": "US index: NASDAQ (.IXIC)", "computed": "Domestic gold reference = COMEX x USDCNY / 31.1035 (CNY/gram)", "hq.sinajs.cn (Sina)": "CN indices + gold + oil: Shanghai, ChiNext, STAR 50, XAU, CL", "open.er-api.com": "Forex rates: USD/CNY, EUR/CNY, JPY/CNY(100)"}};
+  indicatorMeta = indicatorMeta || {};
+  // Build a flat key→precision lookup
+  var precisionMap = {};
+  if (indicatorMeta.indicators) {
+    Object.keys(indicatorMeta.indicators).forEach(function(g) {
+      var group = indicatorMeta.indicators[g];
+      Object.keys(group).forEach(function(k) {
+        precisionMap[k] = group[k].precision || 1;
+      });
+    });
+  }
+  var indicatorKeys = Object.keys(historyData);
+
+  if (!indicatorKeys.length) {
+    var emptyEl = document.getElementById('chart-empty');
+    if (emptyEl) {
+      emptyEl.style.display = 'flex';
+      var canvas = document.getElementById('market-chart');
+      if (canvas) canvas.style.display = 'none';
+    }
+    return;  // No data, skip initialization
+  }
+
+  var chart = null;
+  var currentIndicator = indicatorKeys[0];
+  var currentDays = 30;
+  var maPeriods = {5: false, 10: false};
+
+  function getThemeColors() {
+    var root = document.documentElement;
+    var explicit = root.getAttribute('data-theme');
+    var isDark;
+    if (explicit) {
+      isDark = explicit === 'dark';
+    } else {
+      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return {
+      grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      text: isDark ? '#94a3b8' : '#6b7280',
+      line: isDark ? '#60a5fa' : '#2563eb',
+      fill: isDark ? 'rgba(96,165,250,0.10)' : 'rgba(37,99,235,0.10)',
+      ma5: isDark ? '#fbbf24' : '#d97706',
+      ma10: isDark ? '#34d399' : '#059669',
+    };
+  }
+
+  function filterByDays(series, days) {
+    if (days === 0 || !days) return series.slice();
+    var cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - days);
+    return series.filter(function(p) {
+      return new Date(p.date + 'T00:00:00') >= cutoff;
+    });
+  }
+
+  function calcMA(values, period) {
+    if (values.length < period) return new Array(values.length).fill(null);
+    var result = new Array(period - 1).fill(null);
+    var sum = 0;
+    for (var i = 0; i < period; i++) sum += values[i];
+    result.push(Math.round(sum / period * 100) / 100);
+    for (var i = period; i < values.length; i++) {
+      sum = sum - values[i - period] + values[i];
+      result.push(Math.round(sum / period * 100) / 100);
+    }
+    return result;
+  }
+
+  function updatePills() {
+    // Update summary grid items to highlight active indicator
+    document.querySelectorAll('.market-summary-item').forEach(function(el) {
+      el.style.borderColor = el.dataset.key === currentIndicator
+        ? getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+        : '';
+      el.style.borderWidth = el.dataset.key === currentIndicator ? '2px' : '';
+    });
+    // Update indicator pills
+    document.querySelectorAll('.indicator-pill').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.key === currentIndicator);
+    });
+  }
+
+  function renderChart() {
+    var canvas = document.getElementById('market-chart');
+    var emptyEl = document.getElementById('chart-empty');
+    if (!canvas || !emptyEl) return;
+
+    // Guard: Chart.js CDN failed to load
+    if (typeof Chart === 'undefined') {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      var emptyText = emptyEl.querySelector('.chart-empty-text');
+      var emptyHint = emptyEl.querySelector('.chart-empty-hint');
+      if (emptyText) emptyText.textContent = 'Chart library unavailable';
+      if (emptyHint) emptyHint.textContent = 'Please check your network connection';
+      return;
+    }
+
+    var series = (historyData[currentIndicator] || []).slice();
+    var filtered = filterByDays(series, currentDays);
+
+    if (filtered.length < 1) {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      if (chart) { chart.destroy(); chart = null; }
+      updatePills();
+      return;
+    }
+
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    var labels = filtered.map(function(p) { return p.date; });
+    var prices = filtered.map(function(p) { return p.price; });
+    var colors = getThemeColors();
+    var singlePoint = filtered.length === 1;
+
+    var datasets = [{
+      label: 'Price',
+      data: prices,
+      borderColor: colors.line,
+      backgroundColor: colors.fill,
+      fill: true,
+      tension: filtered.length <= 2 ? 0 : 0.3,
+      pointRadius: singlePoint ? 5 : (filtered.length > 60 ? 0 : 2),
+      pointHoverRadius: 5,
+      pointBackgroundColor: colors.line,
+      borderWidth: 2,
+    }];
+
+    // Moving averages
+    [5, 10].forEach(function(period) {
+      if (maPeriods[period]) {
+        var maData = calcMA(prices, period);
+        datasets.push({
+          label: 'MA' + period,
+          data: maData,
+          borderColor: colors['ma' + period] || colors.line,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          fill: false,
+          tension: filtered.length <= 2 ? 0 : 0.3,
+        });
+      }
+    });
+
+    if (chart) {
+      chart.data.labels = labels;
+      chart.data.datasets = datasets;
+      chart.options.plugins.legend.display = datasets.length > 1;
+      // Update theme colors dynamically
+      var colors = getThemeColors();
+      chart.options.scales.x.ticks.color = colors.text;
+      chart.options.scales.y.ticks.color = colors.text;
+      chart.options.scales.y.grid.color = colors.grid;
+      chart.options.plugins.legend.labels.color = colors.text;
+      chart.options.plugins.tooltip.backgroundColor = colors.line;
+      chart.update('none');
+    } else {
+      var ctx = canvas.getContext('2d');
+      var colors = getThemeColors();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          animation: { duration: 300 },
+          plugins: {
+            legend: {
+              display: datasets.length > 1,
+              labels: {
+                color: colors.text,
+                font: { size: 12 },
+                usePointStyle: true,
+                padding: 16,
+              }
+            },
+            tooltip: {
+              backgroundColor: colors.line,
+              titleFont: { size: 12 },
+              bodyFont: { size: 13, weight: '600' },
+              padding: 10,
+              cornerRadius: 8,
+              displayColors: false,
+              callbacks: {
+                label: function(ctx) {
+                  var val = ctx.parsed.y;
+                  if (val === null) return '--';
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return val.toFixed(prec);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                maxTicksLimit: 12,
+                maxRotation: 45,
+              },
+              grid: { display: false },
+            },
+            y: {
+              grace: '5%',
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                callback: function(v) {
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return v.toFixed(prec);
+                }
+              },
+              grid: { color: colors.grid },
+            }
+          }
+        }
+      });
+    }
+
+    updatePills();
+  }
+
+  // Public API
+  window.MarketChart = {
+    switchIndicator: function(key) {
+      if (key === currentIndicator) return;
+      currentIndicator = key;
+      renderChart();
+    },
+    switchRange: function(days) {
+      currentDays = days;
+      document.querySelectorAll('.range-btn').forEach(function(btn) {
+        btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
+      });
+      renderChart();
+    },
+    toggleMA: function(period, enabled) {
+      maPeriods[period] = enabled;
+      renderChart();
+    },
+  };
+
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderChart);
+  } else {
+    renderChart();
+  }
+
+  // Re-render on theme change
+  var themeObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.attributeName === 'data-theme') {
+        if (chart) renderChart();
+      }
+    });
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // Re-render when tab becomes visible (Chart.js needs visible canvas for sizing)
+  var marketPanel = document.getElementById('tab-market_indicators');
+  if (marketPanel) {
+    var tabObserver = new MutationObserver(function() {
+      if (marketPanel.classList.contains('active') && chart) {
+        chart.resize();
+      }
+    });
+    tabObserver.observe(marketPanel, { attributes: true, attributeFilter: ['class'] });
+  }
+
+})();
+</script>
+
+</body>
+</html>
