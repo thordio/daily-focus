@@ -1,0 +1,4809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Daily Focus - 2026-10-22">
+<title>Daily Focus — 2026-10-22</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --tag-bg: #f3f4f6;
+  --tag-text: #4b5563;
+  --score-9plus: #dc2626;
+  --score-7to8: #ea580c;
+  --score-5to6: #6b7280;
+  --score-bg: #f3f4f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.06);
+  --details-bg: #f9fafb;
+  --header-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --footer-bg: #f3f4f6;
+  --card-radius: 14px;
+}
+
+/* System dark mode (only when user hasn't set manual preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --tag-bg: #334155;
+    --tag-text: #e2e8f0;
+    --score-bg: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
+    --details-bg: #1a2332;
+    --header-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --footer-bg: #1e293b;
+    --card-radius: 14px;
+  }
+
+  /* Dark mode score badge overrides */
+  :root:not([data-theme="light"]) .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  :root:not([data-theme="light"]) .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+  :root:not([data-theme="light"]) .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
+}
+
+/* Manual dark mode (user explicitly chose dark) */
+:root[data-theme="dark"] {
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --tag-bg: #334155;
+  --tag-text: #e2e8f0;
+  --score-bg: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.3);
+  --details-bg: #1a2332;
+  --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --footer-bg: #1e293b;
+  --card-radius: 14px;
+}
+
+:root[data-theme="dark"] .score-9 { background: rgba(220,38,38,0.2); color: #fca5a5; }
+:root[data-theme="dark"] .score-7 { background: rgba(234,88,12,0.2); color: #fdba74; }
+:root[data-theme="dark"] .score-5 { background: rgba(148,163,184,0.2); color: #e2e8f0; }
+
+/* Manual light mode (user explicitly chose light) -- no extra vars needed, :root is light */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  font-size: 16.5px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "palt" 1, "pkna" 1;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  position: relative;
+  background: var(--header-gradient);
+  color: #fff;
+  padding: 40px 0 36px;
+  margin-bottom: 36px;
+  overflow: hidden;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.header .container {
+  padding: 0 20px;
+}
+
+.header-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.header-meta {
+  font-size: 14px;
+  opacity: 0.85;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Day Navigation Bar */
+.day-nav-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.day-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.day-nav-btn:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.day-nav-btn:active {
+  transform: scale(0.97);
+}
+.day-nav-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.day-nav-btn.primary:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+.day-nav-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
+.day-nav-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.header-stats {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.topic-stats {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  line-height: 1.6;
+}
+
+.topic-stat {
+  white-space: nowrap;
+}
+
+.topic-stat-sep {
+  white-space: pre;
+  opacity: 0.5;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.theme-toggle:active { transform: scale(0.95); }
+
+.lang-toggle {
+  position: absolute;
+  top: 20px;
+  right: 74px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.05em;
+}
+.lang-toggle:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.lang-toggle:active { transform: scale(0.95); }
+
+/* Demo data banner */
+.demo-banner {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .demo-banner {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+:root[data-theme="dark"] .demo-banner {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.empty-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.empty-icon {
+  font-size: 40px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+/* Selection transparency info */
+.selection-info {
+  max-width: 680px;
+  margin: -20px auto 20px;
+  padding: 0 20px;
+}
+
+.selection-rationale {
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: var(--details-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+.selection-info details {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.selection-info details summary {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+
+.selection-info details summary:hover {
+  opacity: 1;
+}
+
+.selection-info details summary::-webkit-details-marker {
+  display: none;
+}
+
+.selection-info summary::after {
+  content: "\25b6";
+  font-size: 9px;
+  margin-left: 4px;
+  transition: transform 0.2s;
+}
+
+.selection-info details[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.selection-info-content {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.7;
+  font-size: 12.5px;
+}
+
+/* Language mismatch indicator */
+.lang-mismatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lang-mismatch {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+}
+
+:root[data-theme="dark"] .lang-mismatch {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* News Cards */
+.news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 32px 32px 36px;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.news-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.news-card:has(.score-9) { border-left-color: var(--score-9plus); }
+.news-card:has(.score-7) { border-left-color: var(--score-7to8); }
+.news-card:has(.score-5) { border-left-color: var(--score-5to6); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-index {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--score-bg);
+  color: var(--text-secondary);
+}
+
+.score-badge {
+  flex-shrink: 0;
+  min-width: 40px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 34px;
+}
+
+.score-9 { background: #fef2f2; color: var(--score-9plus); }
+.score-7 { background: #fff7ed; color: var(--score-7to8); }
+.score-5 { background: var(--score-bg); color: var(--score-5to6); }
+
+.score-reason-line {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: -8px;
+  margin-bottom: 14px;
+  padding-left: 48px;
+}
+
+.reading-time {
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.depth-indicator {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 10px;
+  background: var(--score-bg);
+  cursor: help;
+}
+
+/* Light card for medium-interest items (5.0-6.9) */
+.news-card.card-light {
+  padding: 20px;
+  border-left: none;
+}
+.card-light .card-title {
+  font-size: 17px;
+}
+
+.card-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.card-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.card-source {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  opacity: 0.95;
+}
+
+.card-source .dot {
+  font-size: 10px;
+  opacity: 0.35;
+  line-height: 1;
+}
+
+.card-source-type {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  text-transform: uppercase;
+}
+
+.card-body {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+.card-body > * + * {
+  margin-top: 20px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-label .emoji {
+  font-style: normal;
+}
+
+.section-content {
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+/* Compact Why It Matters — one-liner with accent */
+.why-matters-compact {
+  padding: 12px 16px;
+  background: var(--details-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.why-matters-prefix {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* Key Facts bar — quick-scan stats pills */
+.key-facts-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.key-facts-label {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.key-fact-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Related Events — cross-references between articles */
+.related-events {
+  margin-top: 18px;
+}
+
+.related-events-label {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.related-events-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+
+.related-events-list li {
+  position: relative;
+  padding: 5px 0 5px 20px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.related-events-list li::before {
+  content: "\2192";
+  position: absolute;
+  left: 2px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.related-events-list li + li {
+  margin-top: 2px;
+}
+
+.details-section {
+  margin-top: 18px;
+}
+
+.details-section details {
+  background: var(--details-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 8px;
+}
+
+.details-section details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 4px 0;
+  user-select: none;
+  opacity: 0.85;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.details-section details summary:hover {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.details-section details summary::before {
+  content: "\1f4d6";
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+.details-section details[open] {
+  padding-bottom: 18px;
+}
+
+.details-section details[open] summary {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.details-content {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  white-space: nowrap;
+}
+
+/* Images */
+.images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.images img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* References */
+.references {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.references-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.references-list {
+  list-style: none;
+  padding: 0;
+}
+
+.references-list li {
+  margin-bottom: 4px;
+}
+
+.references-list a {
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding: 14px 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.tab-btn:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tab-btn .tab-count {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.tab-btn.active .tab-count {
+  opacity: 1;
+}
+
+/* Tab panels */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Footer */
+.footer {
+  margin-top: 56px;
+  padding: 36px 0;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 2;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .header { padding: 28px 0 24px; }
+  .header-title { font-size: 24px; }
+  .header-meta { font-size: 13px; gap: 8px; }
+  .theme-toggle { top: 12px; right: 12px; width: 44px; height: 44px; font-size: 18px; }
+  .lang-toggle { top: 12px; right: 66px; height: 44px; padding: 0 12px; font-size: 13px; }
+  .news-card { padding: 24px; border-radius: 12px; }
+  .card-title { font-size: 18px; }
+  .card-body { font-size: 15px; }
+  .card-header { gap: 10px; }
+  .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 10px; }
+  .tab-nav { gap: 6px; margin-bottom: 22px; padding: 12px 0; }
+  .depth-indicator { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+  .key-facts-bar { font-size: 12px; }
+  .key-fact-pill { font-size: 12px; padding: 2px 8px; }
+  .news-card.card-light { padding: 18px; }
+  .card-light .card-title { font-size: 16px; }
+  .day-nav-bar { gap: 8px; padding: 12px 16px; }
+  .day-nav-btn { padding: 7px 14px; font-size: 13px; gap: 4px; }
+  .day-nav-arrow { font-size: 14px; }
+}
+
+@media (max-width: 375px) {
+  .container { padding: 0 16px; }
+  .header .container { padding: 0 16px; }
+  .header { padding: 24px 0 18px; }
+  .header-title { font-size: 21px; }
+  .header-meta { font-size: 12px; gap: 6px; }
+  .header-stats { font-size: 12px; }
+  .topic-stat { white-space: normal; }
+  .theme-toggle { top: 10px; right: 10px; width: 44px; height: 44px; font-size: 18px; }
+  .lang-toggle { top: 10px; right: 64px; height: 44px; padding: 0 10px; font-size: 12px; }
+  .news-card { padding: 18px; border-left-width: 3px; border-radius: 10px; }
+  .card-title { font-size: 17px; }
+  .card-body { font-size: 14px; }
+  .card-header { gap: 8px; }
+  .card-index { width: 30px; height: 30px; font-size: 12px; border-radius: 8px; }
+  .score-badge { min-width: 36px; height: 30px; padding: 0 8px; font-size: 13px; line-height: 30px; }
+  .tab-btn { padding: 8px 10px; font-size: 12px; border-radius: 8px; }
+  .tab-btn .tab-count { font-size: 10px; }
+  .tab-nav { gap: 4px; padding: 10px 0; margin-bottom: 18px; }
+  .depth-indicator { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
+  .key-facts-bar { font-size: 11px; gap: 5px; }
+  .key-fact-pill { font-size: 11px; padding: 2px 6px; border-radius: 100px; }
+  .day-nav-bar { gap: 6px; padding: 10px 12px; }
+  .day-nav-btn { padding: 6px 12px; font-size: 12px; gap: 3px; }
+  .day-nav-arrow { font-size: 12px; }
+}
+
+@media (min-width: 768px) {
+  .container { padding: 0 24px; }
+  .header-title { font-size: 34px; }
+  .news-card { padding: 36px 36px 40px; margin-bottom: 44px; }
+  .card-title { font-size: 22px; }
+  .card-body { font-size: 16.5px; line-height: 2; }
+}
+
+@media (min-width: 1440px) {
+  body { font-size: 17.5px; }
+}
+/* ===== Market Indicators Tab ===== */
+
+.market-summary {
+  margin-bottom: 28px;
+}
+.market-summary-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.market-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.market-summary-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.market-summary-item:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent);
+}
+.market-summary-item .msi-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.market-summary-item .msi-price {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.market-summary-item .msi-price.error {
+  font-size: 13px;
+  color: var(--score-9plus);
+  font-weight: 600;
+}
+.market-summary-item .msi-change {
+  font-size: 12px;
+  margin-top: 2px;
+  font-weight: 500;
+}
+.market-summary-item .msi-change.up { color: #22c55e; }
+.market-summary-item .msi-change.down { color: #ef4444; }
+
+/* Chart controls bar */
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.indicator-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.indicator-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.indicator-pill:hover {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+.indicator-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.indicator-pill .pill-sub {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+.indicator-pill.active .pill-sub { opacity: 1; }
+
+.range-selector {
+  display: flex;
+  gap: 4px;
+  background: var(--tag-bg);
+  padding: 3px;
+  border-radius: 8px;
+}
+.range-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.range-btn:hover { color: var(--text); }
+.range-btn.active {
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.ma-toggle {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+.ma-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+.ma-checkbox input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 20px 24px 20px 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Chart empty state */
+.chart-empty {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.chart-empty-icon { font-size: 40px; opacity: 0.5; }
+.chart-empty-text { font-size: 14px; font-weight: 500; }
+.chart-empty-hint { font-size: 12px; opacity: 0.7; }
+
+/* Market group label */
+.market-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 6px 0 4px 4px;
+  opacity: 0.7;
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .market-summary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  .chart-controls { flex-direction: column; align-items: stretch; }
+  .ma-toggle { margin-left: 0; justify-content: center; }
+  .chart-container { height: 300px; padding: 12px 16px 12px 10px; }
+  .market-summary-item .msi-price { font-size: 17px; }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <div class="header-title">Daily Focus</div>
+    <div class="header-meta">
+      <span>2026-10-22</span>
+    </div>
+    <div class="header-stats">
+      
+        从 206 条中精选 27 条
+      
+    </div>
+    
+    <div class="topic-stats">
+      
+      <span class="topic-stat">AI 技术 10条 (6-10)</span><span class="topic-stat-sep"> · </span>
+      
+      <span class="topic-stat">AI 市场 10条 (6-10)</span><span class="topic-stat-sep"> · </span>
+      
+      <span class="topic-stat">经济动向 7条 (5-7)</span>
+      
+    </div>
+    
+    
+    <a class="lang-toggle" href="2026-10-22-morning-en.html" aria-label="Switch language">
+      中/EN
+    </a>
+    
+    <button class="theme-toggle" id="theme-toggle" aria-label="切换主题 / Toggle theme" title="切换深浅色模式">
+      <span id="theme-icon">🌙</span>
+    </button>
+  </div>
+</header>
+
+
+<div class="day-nav-bar">
+  
+  <a href="2026-10-21-morning-zh.html" class="day-nav-btn">
+    <span class="day-nav-arrow">&#8592;</span>
+    前一天
+  </a>
+  
+
+  <a href="../index.html" class="day-nav-btn primary">
+    📅 最新
+  </a>
+
+  
+  <span class="day-nav-btn disabled">
+    后一天
+    <span class="day-nav-arrow">&#8594;</span>
+  </span>
+  
+</div>
+
+
+
+
+
+<div class="selection-info">
+  <div class="selection-rationale">
+    
+    &#x1f4ca; 精选逻辑：AI 评分排序，每板块取 top N 条。
+    
+  </div>
+  <details>
+    <summary>
+      
+        详细筛选说明
+      
+    </summary>
+    <div class="selection-info-content">
+      
+      
+      
+      <p>共抓取 206 条中精选 27 条（过滤率 86%）。阈值 &ge; 4.0。</p>
+      <p>各板块最低保障：AI 技术 &ge; 6 条，AI 市场 &ge; 6 条，经济动向 &ge; 5 条。</p>
+      <p>每篇经过 AI 深度丰富：背景知识、关键细节、社区讨论。</p>
+      
+    </div>
+  </details>
+</div>
+
+
+
+
+<main class="container">
+  
+
+  
+  <div class="tab-nav" role="tablist">
+    
+    <button class="tab-btn active"
+            role="tab"
+            data-tab="ai-tech"
+            aria-selected="true">
+      AI 技术
+      <span class="tab-count">10</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="ai-markets"
+            aria-selected="false">
+      AI 市场
+      <span class="tab-count">10</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="economy"
+            aria-selected="false">
+      经济动向
+      <span class="tab-count">7</span>
+    </button>
+    
+    <button class="tab-btn"
+            role="tab"
+            data-tab="market_indicators"
+            aria-selected="false">
+      全球指标
+      
+    </button>
+    
+  </div>
+
+  
+  <div class="tab-panel active"
+       id="tab-ai-tech"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">1</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.qbitai.com/2026/10/504841.html" target="_blank" rel="noopener noreferrer">特斯拉利润腰斩，马斯克称FSD在中国遥遥领先</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>量子位</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Tesla&#39;s quarterly profit halving and significant market value drop are key financial data points, while Musk&#39;s claim about FSD leading in China and 700k paid user growth reveal strategic direction and adoption trends in autonomous driving, impactful for AI investors and practitioners.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">特斯拉最新季度财报显示净利润同比腰斩，单日市值蒸发相当于整个通用汽车的市值。马斯克宣称FSD在中国也会遥遥领先，并透露过去一年FSD付费用户增加了70万。此前特斯拉FSD已于2月25日在中国上线，但2025年第一季度在中国和欧洲推出FSD的计划仍需监管部门批准。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      FSD付费用户一年增长70万，表明自动驾驶软件订阅正成为特斯拉新的收入来源；若FSD在中国获批并全面落地，将直接与华为、小鹏等本土厂商竞争，影响中国智能驾驶市场格局。利润腰斩与股价大跌则反映市场对电动车价格战和自动驾驶投入回报的担忧。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">FSD是特斯拉从Autopilot升级的付费功能，可支持城市街道导航辅助驾驶。中国要求智能驾驶数据本地化存储，且需通过测绘资质和地图审核。特斯拉在上海超级工厂实现本地化生产，中国市场对其全球销量贡献显著。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">FSD（Full Self-Driving）是特斯拉的高级辅助驾驶系统，采用纯视觉方案和端到端神经网络，区别于多传感器融合路线。特斯拉官方2024年曾表示计划2025年第一季度在中国和欧洲推出FSD，但仍需等待监管部门批准；2月25日FSD已在中国上线。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Tesla</span>
+      
+      <span class="tag">FSD</span>
+      
+      <span class="tag">autonomous driving</span>
+      
+      <span class="tag">earnings</span>
+      
+      <span class="tag">stock market</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.leiphone.com/category/transportation/WPqWjKyXl4XZrJv7.html" target="_blank" rel="noopener noreferrer">特 斯 拉 FSD “突袭” 中 国 ，或只需两个季度即可做到类北美水平 | 雷峰网</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">2</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28763" target="_blank" rel="noopener noreferrer">Agent4Sci测试平台评估前沿智能体在科学机器学习基准上的表现</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Introduces Agent4Sci testbed and empirically shows frontier agents improve scientific ML benchmarks mostly through ML-engineering tricks rather than research insight, an important analysis of current AI capabilities and limitations; no discussion comments provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员推出Agent4Sci，一个长周期测试平台，涵盖11个领域的20个基准，衡量前沿编码智能体在科学机器学习任务上对已发布最佳模型的改进程度。Claude Opus实现10.4%的平均相对提升，且没有运行被标记为学术不端，但这些提升几乎全部来自机器学习工程技巧而非研究洞见。轨迹分析发现三个反复出现的局限：新颖性错误校准、资源利用不足和迅速陷入局部工程扫描。加入轻量级插件技能（研究构思、实验管理和定时检查清单）后，Claude Opus从10.4%提升至20.1%，Codex从4.4%提升至8.1%。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这表明当前前沿智能体能在科学基准上自动化常规机器学习工程，但缺乏领域洞见，限制了它们作为端到端自动化研究者的用途。对于期望智能体独立推进科学模型的研究团队和AI开发者而言，这一差距很关键；插件技能的提升表明定向脚手架可以部分弥补差距。Agent4Sci的跟踪可能使评估从排行榜分数转向改进类型分析。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">10.4%</span>
+      
+      <span class="key-fact-pill">10.4%</span>
+      
+      <span class="key-fact-pill">20.1%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">前沿编码智能体是能编写和执行代码以完成任务的AI系统，通常用软件工程基准评估。科学机器学习将机器学习应用于材料属性预测、分子建模等科学问题，改进模型往往需要超越通用机器学习调参的领域知识。长周期测试平台衡量智能体在扩展的开放式任务上的表现，而不是固定的短问题。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Agent4Sci采用长周期、野环境下测试设计，不排名而是分析智能体能取得的进步类型。20个基准覆盖11个科学领域，平均相对提升指标以已发布最佳模型为基线。插件技能包括研究构思、实验管理和定时检查清单，代码和数据在GitHub和Hugging Face公开。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI agents</span>
+      
+      <span class="tag">scientific ML</span>
+      
+      <span class="tag">benchmark</span>
+      
+      <span class="tag">research limitations</span>
+      
+      <span class="tag">automated science</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">3</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28909" target="_blank" rel="noopener noreferrer">DiffResearch 用扩散语言模型实现深度研究6倍加速</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Introduces a novel open-source multi-agent deep research framework using diffusion language models, demonstrating a 6x end-to-end speedup and significant reductions in planning/writing latency compared to autoregressive models. This addresses a key bottleneck in interactive AI research systems and could influence practitioners&#39; architectural choices. No comments provided for discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">DiffResearch 已作为 Apache-2.0 开源多智能体深度研究框架发布，将扩散语言模型置于规划、证据收集、综合和修订每个阶段的核心。在100项 Deep Research Bench 任务的对照测试中，在保持智能体脚手架、检索代码、提示和评估固定的情况下，把开源扩散模型替换为同量级自回归模型后，端到端速度约为6倍。加速来自规划和写作延迟的数量级下降。研究还引入 dFast 分解模式，在生成完成前读取中间去噪状态并提取子查询，分解环节中位提速1.99倍，报告质量无损失。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      交互式深度研究系统的端到端延迟主要被迭代规划、证据综合和长篇撰写拖累，6倍加速意味着用户等待时间可从分钟级压缩到秒级。这为生产环境中的深度研究助手提供了除自回归模型之外的架构选择，可能影响商业系统开发者的技术路线。开源 Apache-2.0 许可证也便于实际复制和集成。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">2.0</span>
+      
+      <span class="key-fact-pill">1.99</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">自回归语言模型从左到右逐词生成文本，规划和长文撰写的耗时随输出长度线性增长。扩散语言模型则把文本生成建模为对潜在表示的去噪过程，可以在最终序列确定前暴露中间状态。该差异是实现上述延迟下降的结构性原因。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">dFast 利用扩散生成过程中的中间去噪状态，在完整文本生成前提取子查询，单独测试中位提速1.99倍。在 Deep Research Bench 的 RACE 评分规则下，dFast 在三个配置中取得最佳总分。公开系统级排行榜快照中，基于更强扩散模型构建的实例排名超过多个商业系统。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">diffusion language models</span>
+      
+      <span class="tag">deep research</span>
+      
+      <span class="tag">multi-agent systems</span>
+      
+      <span class="tag">AI latency optimization</span>
+      
+      <span class="tag">arXiv preprint</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://github.com/alanrbtx/DiffResearch" target="_blank" rel="noopener noreferrer">GitHub - alanrbtx/ DiffResearch : DiffResearch is an open-source...</a></li>
+        
+        <li><a href="https://sander.ai/2026/08/24/continuous-dlms.html" target="_blank" rel="noopener noreferrer">Continuous diffusion language models – Sander Dieleman</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">4</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28982" target="_blank" rel="noopener noreferrer">LLM智能体存在拒绝转移失败：文本拒绝但工具调用不安全</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：高价值研究：揭示了LLM在工具调用场景下安全对齐的转移失败，对AI安全评估和代理部署有直接实践影响，技术深度高，且涉及多家模型和机制分析，属于重要进展。</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员构建了包含2304个提示的基准测试，覆盖四个领域，将相同的有害或良性请求分别置于纯文本、标准工具启用和对抗性框架工具启用三种设置中。测试五种不同规模和系列的模型后，发现在标准工具启用提示下，文本中拒绝的有害请求中有10%至52%导致了不安全的工具调用。他们在每个模型的残差流中识别出与拒绝相关的方向，在工具启用上下文中，五个模型中有四个沿该方向的激活降低。更低的激活预测了所有五个模型中的不安全工具调用（AUC为0.76至0.86），但通过激活修补恢复信号仅阻止了部分不安全调用，主要是通过抑制工具使用。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      当前LLM智能体的安全评估主要关注文本拒绝，但研究表明文本层面的拒绝不能保证模型在可通过工具行动时的安全行为。部署工具调用智能体的开发者需要审计实际工具调用，而不仅仅是聊天回复，否则模型可能看似对齐却执行有害操作。这一差距影响AI安全认证、红队测试实践以及智能体系统的护栏设计。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">10%</span>
+      
+      <span class="key-fact-pill">52%</span>
+      
+      <span class="key-fact-pill">0.76</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">大语言模型通常在聊天中经过安全对齐以拒绝有害请求，但作为智能体部署时，它们可以调用浏览器、代码解释器或API等外部工具。残差流方向是可解释性概念，即模型隐藏状态中可编码拒绝等特征的向量方向。激活修补是一种因果方法，通过替换特定层的激活来测试某个特征是否驱动行为。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该基准使用20个预定义的禁止动作来评估工具调用安全性。在机制层面，研究者在每个模型的残差流中识别出拒绝相关方向，并使用激活修补将激活恢复到纯文本条件下的值。沿该方向进行引导只有在强度足以同时抑制良性工具使用或降低输出质量时，才能几乎消除不安全的工具调用。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI安全</span>
+      
+      <span class="tag">LLM代理</span>
+      
+      <span class="tag">工具调用</span>
+      
+      <span class="tag">对齐</span>
+      
+      <span class="tag">拒绝机制</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">5</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.29414" target="_blank" rel="noopener noreferrer">Sanko在位置超劫下16分钟证明5x5围棋</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Presents a novel proof-transfer theorem that soundly restores key solving tools under positional superko and achieves a 20x speedup for 5x5 Go, representing important progress in algorithmic game solving; no comments provided to evaluate discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">并行深度优先证明数求解器Sanko在位置超劫规则下，可靠地恢复了置换表、静态死活判断和安全着法剪枝。它用6线程在16分钟内证明了5x5围棋，而此前最先进方法需6进程5.25小时；在单台192线程机器上仅需约1分30秒。Sanko还首次给出23块棋盘的位置超劫博弈值，其中11块此前在任何规则下都未解决。位置超劫改变了博弈值：4x7棋盘在基础劫规则下是全盘胜，在位置超劫下仅值12目。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      位置超劫是中国规则及计算机围棋规则的一部分，但几乎所有已解决的围棋棋盘都使用更简单的基础劫规则，因此这项工作让形式化解与竞赛和软件实际使用的规则一致。约20倍加速和恢复的剪枝工具使更大棋盘或更复杂规则集的精确求解变得可行。发布求解器源代码、命令行和每次运行结果，使可重现的博弈论结果取代不透明声明。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">5.25</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">位置超劫禁止重复任何早先的全盘局面，使着法合法性依赖整局历史；基础劫只禁止立即提回单颗棋子。这种历史依赖性破坏了标准求解工具：置换表无法安全复用，因为局面的结果可能依赖路径；静态死活识别不再可靠；着法剪枝必须考虑重复。证明数搜索是一种通过优先扩展最有希望的证明或反驳分支来确定博弈论值的算法。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">核心是一个证明转移定理：存储的证明在新路径上仍然有效，除非证明获胜方必须创建的棋盘局面已经在之前出现过，这绕开了图-历史交互问题。Sanko采用并行深度优先证明数搜索，并在位置超劫下可靠地恢复置换表、静态死活识别和安全着法剪枝。4x7棋盘在基础劫下是全盘胜，在位置超劫下仅12目，并指出了此前发布的最优线中失效的那一手。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">game solving</span>
+      
+      <span class="tag">Go</span>
+      
+      <span class="tag">proof-number search</span>
+      
+      <span class="tag">positional superko</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://senseis.xmp.net/?Superko" target="_blank" rel="noopener noreferrer">Superko at Sensei&#39;s Library</a></li>
+        
+        <li><a href="http://webdocs.cs.ualberta.ca/~hayward/355/hoven/9gosolve.pdf" target="_blank" rel="noopener noreferrer">9 - Solving Go</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">15</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.qbitai.com/2026/10/504800.html" target="_blank" rel="noopener noreferrer">谁在为OpenAI供应具身数据？</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>量子位</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Examines the supply chain for embodied data to OpenAI, revealing strategic relationships in the growing Physical AI sector; useful for AI practitioners and investors tracking data providers and market positioning. No comments provided to assess discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">OpenAI正在从多家供应商获取具身数据，这些供应商已进入全球Physical AI核心供应链。此次披露了OpenAI在物理智能领域的数据供应链关系。目前未公开具体供应商名称、数据规模或合同金额。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      掌握具身数据供应链将决定谁能训练出在物理世界中可靠运行的机器人或自主系统。进入OpenAI供应链的供应商可能影响数据标准和市场格局。这对Physical AI领域的投资者和从业者具有重要参考价值。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Physical AI指能够感知物理世界并采取行动的AI系统，例如机器人和自动驾驶。具身数据记录智能体与环境的交互过程。OpenAI已从语言模型扩展至机器人和具身智能领域。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">具身数据包括传感器读数、运动轨迹和操作记录，用于训练AI在物理环境中执行动作。OpenAI的Physical AI发展需要大规模真实世界或仿真数据。数据供应商因此成为物理智能基础设施的关键环节。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Physical AI</span>
+      
+      <span class="tag">Embodied Data</span>
+      
+      <span class="tag">OpenAI</span>
+      
+      <span class="tag">Supply Chain</span>
+      
+      <span class="tag">AI Industry</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">16</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://github.com/openai/openai-cli" target="_blank" rel="noopener noreferrer">OpenAI 发布开源命令行工具 openai-cli</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">hackernews</span>
+        <span>armcat</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Official OpenAI CLI release is relevant to AI developers, offering a potential new workflow tool; HN discussion (127 points, 72 comments) shows significant interest, but many comments express confusion about its purpose and overlap with Codex, indicating value is not yet clear.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">OpenAI 在 github.com/openai/openai-cli 发布了新的开源命令行工具。该工具与 OpenAI 现有的编码助手 Codex 存在功能重叠，但官方未明确区分二者的使用场景。开发者提出的问题包括何时应使用 openai-cli 而非 Codex，以及该工具是否面向其他工具或智能体调用。另一个名为 llcat 的项目由开发者 kristopolous 开发约一年，目标是用内置 jq 语法和调用保存提供类似 cURL、awk、sed 的无状态、可组合 LLM 原生 Unix 工具。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      对于已经使用 Codex 的 AI 开发者，模糊的定位可能导致工具选择混乱，甚至阻碍 openai-cli 的采用。OpenAI 扩展命令行开发者工具表明其在终端工作流上的投入，但若与 Codex 重叠，可能分散维护和使用者注意力。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">CLI（命令行界面）工具让开发者通过终端命令与软件交互，而非图形界面。OpenAI 的 Codex 是一种可在终端中运行的智能编码工具。Unix 过滤器如 cURL、awk 和 sed 以无状态、可组合的方式处理文本，llcat 试图为 LLM 场景复制这一模式。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该仓库位于 GitHub 的 openai/openai-cli 路径下，开源可访问。与 Codex 的关系尚未明确；Codex 已定位为 OpenAI 的终端编码代理。同期项目 llcat 使用 jq 风格语法索引文件并保存调用，展示了 Unix 风格 LLM 工具的替代设计。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">OpenAI</span>
+      
+      <span class="tag">CLI</span>
+      
+      <span class="tag">AI tools</span>
+      
+      <span class="tag">developer tools</span>
+      
+      <span class="tag">Hacker News</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">17</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28706" target="_blank" rel="noopener noreferrer">SpecEvo：多LLM推测进化降低科学发现API成本80%</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Introduces a novel multi-LLM framework that reduces cost and improves efficiency in evolutionary search for scientific discovery, which is relevant for AI researchers and practitioners; no community discussion metrics available.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">arXiv 2610.28706 提出 SpecEvo，一种多LLM框架，通过持续整合搜索证据来协调轻量模型与前沿模型。轻量模型同时驱动并行推测器生成并精化候选程序，以及顾问模型将累计的成功、失败和饱和方向提炼为后续探索的持续指导。在涵盖四个科学和算法发现领域的176项任务中，SpecEvo 匹配或超过前沿模型基线，同时将API成本降低最多80%，在方程发现上实现高达1.5倍的评估效率提升，并在最强CO-Bench基线上提高3.8%。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      对于运行LLM驱动进化搜索的研究团队和实验室，SpecEvo 将API成本降低80%意味着相同预算下可进行更多次迭代，使资源有限的团队也能开展大规模科学发现工作流。它表明轨迹条件式模型协调能在不牺牲性能的前提下降低对昂贵前沿模型的依赖，为科学发现和算法搜索提供了更具可扩展性的路径。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">80%</span>
+      
+      <span class="key-fact-pill">3.8%</span>
+      
+      <span class="key-fact-pill">1.5</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">大语言模型驱动的进化搜索通过反复生成、变异和筛选候选程序或方程来发现新解决方案，但通常需要大量对强力模型的昂贵调用。SpecEvo 借鉴推测执行的思想，让廉价模型先大量生成候选方案，只在关键节点调用更强的模型进行战略决策，从而以更低成本维持搜索质量。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">SpecEvo 将常规探索与战略推理分离：轻量并行 Speculator 生成并精化候选程序，Advisor 将成功、失败和饱和方向提炼为持续指导。前沿模型 Navigator 仅在稀疏检查点介入，根据搜索停滞程度执行合成、局部修正或重新框定。该框架在方程发现和 CO-Bench 算法任务等四个领域进行了评估。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">LLM</span>
+      
+      <span class="tag">scientific discovery</span>
+      
+      <span class="tag">evolutionary search</span>
+      
+      <span class="tag">cost efficiency</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">18</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28815" target="_blank" rel="noopener noreferrer">SSR框架让更多任务转化为更好的智能体harness</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Novel research addressing a significant failure mode in agentic harness evolution, providing a new framework (SSR) with empirical validation across benchmarks; relevant for AI agent developers and researchers, though not a paradigm-shifting breakthrough.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">现有智能体harness进化方法在任务池从40扩展到200时出现性能下降，新提出的Successive Scale Racing（SSR）框架在每轮进化中自适应搜索最优证据组合，基于任务质量和覆盖率构造多样化证据组合，并在小计算预算下竞速候选harness。在三个基准测试的全部六种配置中，SSR取得最优结果。随着任务池从40增至200，SSR的通过率从64.3%提升到68.3%，而基线方法均下降；其竞速机制还减少了60%的验证执行次数。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      对AI智能体开发者和研究人员而言，SSR解决了一个规模化陷阱：增加训练任务反而导致性能下降。它使harness进化能够可靠利用更大任务池，将更多执行经验转化为更好的指令、工具和控制流。验证执行减少60%也降低了迭代优化智能体的计算成本。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">64.3%</span>
+      
+      <span class="key-fact-pill">68.3%</span>
+      
+      <span class="key-fact-pill">60%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">智能体harness进化利用智能体的任务执行经验作为不断更新的证据，优化其指令、工具和控制流。harness是基础模型周围的支架，决定智能体如何分解和执行任务。随着任务池扩大，方法必须选择使用哪些执行证据；选择不当会导致数据增多但性能下降。Successive Scale Racing是在该优化过程中进行自适应证据组合和候选选择的框架。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">SSR把每轮进化中的证据选择视为搜索问题，结合任务质量与覆盖率构造候选证据集。它在小计算预算下对候选harness进行竞速，通过早期淘汰识别近最优候选。该方法在三个不同基准测试上取得提升，无需对每个候选进行完整验证。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI agents</span>
+      
+      <span class="tag">agentic harness</span>
+      
+      <span class="tag">optimization</span>
+      
+      <span class="tag">machine learning</span>
+      
+      <span class="tag">research</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">19</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://arxiv.org/abs/2610.28826" target="_blank" rel="noopener noreferrer">决策语言模型Jev以更低成本匹配临床AI评估中的LLM裁判</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>ArXiv cs.AI</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Presents a decision language model (Jev) as a much cheaper and faster alternative to LLM judges for clinical AI evaluation, with comparable agreement to frontier models; this could influence evaluation practices and cost decisions in healthcare AI. No community discussion provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">研究人员推出了一种返回结构化判断的决策语言模型Jev，并在四个临床用例中将其与前沿和开源权重LLM裁判进行了比较。在118个儿科答案上，Jev与医生序数质量评分的Gwet&#39;s AC2为0.50（预期评分0.53），匹配或超过了12个LLM裁判中的7个，包括Claude Opus 5.5（0.49）和GPT-6（0.38）。在医生评分的二元HealthBench标准上，Jev匹配或超过了6个LLM裁判中的4个。前沿裁判的成本比Jev高73到294倍，耗时多7到57倍。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      临床AI输出需要大规模自动化评估，但前沿LLM裁判成本和延迟较高，限制了常规质量保证。Jev的成本降低73到294倍、速度提升7到57倍，可能使医疗系统和AI开发者以更低费用更频繁地评估临床生成模型。这可能推动评估实践转向专用决策模型，而非通用LLM裁判。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">0.50</span>
+      
+      <span class="key-fact-pill">0.53</span>
+      
+      <span class="key-fact-pill">5.5</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">LLM裁判使用大语言模型对AI生成的文本进行评分，但可能昂贵且缓慢。决策语言模型是较小的模型，经过训练为特定评估任务输出结构化判断。Gwet&#39;s AC2是一种校正机会一致性的评分一致性系数；HealthBench和MedHELM是临床AI性能基准。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Jev输出结构化判断；一致性使用Gwet&#39;s AC2（一种机会校正的评分者间统计量）测量。在MedHELM的开放式任务上，Jev与三人LLM评审团的一致性接近或超过了评审员内部一致性。在HealthBench Professional上，Jev在91%的标准上与参考裁判GPT-5.4匹配，而其他裁判的匹配率为91-93%。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI evaluation</span>
+      
+      <span class="tag">clinical AI</span>
+      
+      <span class="tag">LLM judges</span>
+      
+      <span class="tag">healthcare AI</span>
+      
+      <span class="tag">decision language models</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-ai-markets"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">6</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.cnbc.com/2026/10/21/meta-earnings-q3-2026-live-updates.html" target="_blank" rel="noopener noreferrer">Meta第三季度营收超预期 业绩指引强劲</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>CNBC Technology</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Meta&#39;s Q3 earnings beat and strong guidance are important for AI investors, as AI spending and advertising growth are key indicators of tech sector health; no comments provided, so discussion quality not assessed.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Meta公布2026年第三季度营收646亿美元，每股收益3.83美元，均超出分析师预期。公司同时发布了强劲的第四季度业绩指引，股价在盘后交易中上涨约2.5%。首席执行官马克·扎克伯格表示，本季度推出了Muse和Muse Wonder，这是Meta首批前沿AI模型。AI助手Muse帮助Meta取得自2022年以来最佳的华尔街表现。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这份业绩表明，Meta在AI基础设施上的大举投入正在转化为广告收入增长和市场信心。强劲的业绩指引意味着广告主继续在Meta平台上增加支出，这对整个数字广告行业是一个关键信号。对AI投资者而言，Muse作为前沿模型的推出，显示Meta正在消费级AI助手领域直接与OpenAI和谷歌竞争。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">2.5%</span>
+      
+      <span class="key-fact-pill">3.83</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Meta已从早期的元宇宙重心转向AI，目标是打造扎克伯格所说的“人人可用的个人超级智能”。前沿模型是指能力最强的人工智能系统，通常需要数十亿美元的训练算力。Muse是Meta面向消费者的AI助手，已集成到其多个应用中，是Meta与ChatGPT和Gemini竞争战略的关键部分。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">第三季度营收为646亿美元，每股收益3.83美元，超出市场一致预期。Meta推出了Muse和Muse Wonder，这两款模型被描述为Meta的首批前沿模型，其中AI助手Muse已帮助公司取得自2022年以来最佳的华尔街表现。扎克伯格强调，公司在AI基础设施上的投资开始获得回报，核心广告业务依然强劲。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Meta</span>
+      
+      <span class="tag">earnings</span>
+      
+      <span class="tag">AI spending</span>
+      
+      <span class="tag">advertising</span>
+      
+      <span class="tag">stock market</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.cnbc.com/2026/10/21/meta-earnings-q3-2026-live-updates.html" target="_blank" rel="noopener noreferrer">Meta reports third-quarter revenue beat and issues strong ...</a></li>
+        
+        <li><a href="https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Third-Quarter-2026-Results/default.aspx" target="_blank" rel="noopener noreferrer">Meta - Meta Reports Third Quarter 2026 Results</a></li>
+        
+        <li><a href="https://tickernews.co/meta-reports-q3-revenue-beat-strong-guidance/" target="_blank" rel="noopener noreferrer">Meta reports Q3 revenue beat, strong guidance - tickernews.co</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">7</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.theverge.com/transportation/1016118/tesla-robotaxi-customer-owned-vehicle-fleet-network-q3-2026-earnings" target="_blank" rel="noopener noreferrer">Tesla says customers can add their own vehicles to the robotaxi fleet next year — will it happen?</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>The Verge</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Major strategic announcement from Tesla regarding customer-owned vehicles joining robotaxi fleet, with potential to reshape autonomous ride-hailing and impact investor sentiment, though tempered by Musk&#39;s history of missed deadlines.</div>
+    
+
+    
+    <div class="lang-mismatch">
+      
+        &#x26a0;&#xfe0f; 此条内容可能为英文，正在优化中文输出
+      
+    </div>
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Tesla announced on its Q3 earnings call that owners may be able to add their own vehicles to the robotaxi network next year, a significant step in its autonomous driving strategy.</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      Major strategic announcement from Tesla regarding customer-owned vehicles joining robotaxi fleet, with potential to reshape autonomous ride-hailing and impact investor sentiment, though tempered by Musk&#39;s history of missed deadlines.
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Tesla</span>
+      
+      <span class="tag">robotaxi</span>
+      
+      <span class="tag">autonomous driving</span>
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">earnings</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">8</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/10/21/meta-wants-to-pay-for-its-broad-ai-buildout-with-a-newly-created-class-of-stock/" target="_blank" rel="noopener noreferrer">Meta wants to pay for its broad AI buildout with a newly created class of stock</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Meta&#39;s plan to create a new stock class to fund its AI buildout is a strategic financial move by a major AI company, signaling the scale of AI capital expenditure and potentially affecting investor decisions and market perception. No comments provided to assess discussion quality.</div>
+    
+
+    
+    <div class="lang-mismatch">
+      
+        &#x26a0;&#xfe0f; 此条内容可能为英文，正在优化中文输出
+      
+    </div>
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Meta is planning to issue a new class of stock to finance its large-scale AI investments.</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      Meta&#39;s plan to create a new stock class to fund its AI buildout is a strategic financial move by a major AI company, signaling the scale of AI capital expenditure and potentially affecting investor decisions and market perception. No comments provided to assess discussion quality.
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">Meta</span>
+      
+      <span class="tag">stock market</span>
+      
+      <span class="tag">corporate finance</span>
+      
+      <span class="tag">AI investment</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">9</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.theverge.com/tech/1015799/meta-shares-class-ai-q3-2026-earnings" target="_blank" rel="noopener noreferrer">Meta拟发行无投票权新股为AI投资筹资，2027年开始交易</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>The Verge</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Meta&#39;s decision to issue a new class of non-voting shares to fund AI initiatives and acquisitions is a significant strategic financial move, indicating aggressive investment in AI and affecting capital structure and investor considerations. No community discussion provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Meta在10月21日周三发布的第三季度财报中宣布，将发行一类新的无投票权股票，为AI计划提供资金。该股票预计于2027年开始交易。公司表示，所得资金还将用于潜在收购和员工薪酬。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此举表明Meta在AI领域投入巨大，可能推高资本开支，影响股东投票权和资本结构。发行无投票权股票可在不稀释现有控制权的情况下筹集资金，对长期投资者构成重要信号。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">无投票权股票允许公司筹集资金而不赋予新股东投票权。Meta创始人马克·扎克伯格通过持有超级投票权B类股保持控制权，新增无投票权类别可进一步融资同时不削弱其控制力。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">新发行的股票为无投票权类别，交易计划于2027年启动。募集资金用途包括AI基础设施建设、潜在收购以及员工股权激励。这一结构类似其他科技公司采用的多类别股权安排。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Meta</span>
+      
+      <span class="tag">AI investment</span>
+      
+      <span class="tag">corporate finance</span>
+      
+      <span class="tag">stock issuance</span>
+      
+      <span class="tag">tech earnings</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.theverge.com/tech/1015799/meta-shares-class-ai-q3-2026-earnings" target="_blank" rel="noopener noreferrer">Meta to create a new class of shares to fund AI push - The Verge</a></li>
+        
+        <li><a href="https://finance.yahoo.com/technology/ai/articles/meta-wants-pay-broad-ai-224534564.html?fr=sycsrp_catchall" target="_blank" rel="noopener noreferrer">Meta wants to pay for its broad AI buildout with a newly ...</a></li>
+        
+        <li><a href="https://techcrunch.com/2026/10/21/meta-wants-to-pay-for-its-broad-ai-buildout-with-a-newly-created-class-of-stock/" target="_blank" rel="noopener noreferrer">Meta wants to pay for its broad AI buildout with a newly ...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">10</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/10/21/year-old-ai-lab-flapping-airplanes-raises-1b-at-a-6b-valuation/" target="_blank" rel="noopener noreferrer">Flapping Airplanes获10亿美元A轮融资，估值60亿美元</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：A $1B Series A at $6B valuation for a year-old AI lab is a major funding event, indicating strong investor confidence and strategic market positioning in AI. While not a breakthrough technology or macro policy change, it is high-value information for AI investors and practitioners. No community discussion provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">成立仅一年的AI实验室Flapping Airplanes完成了10亿美元A轮融资，投后估值60亿美元，由Index Ventures和Lux Capital联合领投。此轮融资距其1.8亿美元种子轮仅9个月。该公司的目标是“不吞掉半个互联网”就能训练大模型，探索大幅减少数据需求的新方法。目前该公司尚未推出任何商用产品。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      一家尚无产品、成立仅一年的实验室获得60亿美元估值，表明顶级投资者愿意为追求数据高效训练AI的团队支付溢价，这有望降低当前行业依赖的巨额算力和数据成本。若成功，这条路线可能让小型团队也能开发前沿模型，减少对互联网规模数据抓取的依赖，从而改变拥有最大数据储备的巨头的竞争优势。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">在风险投资中，种子轮通常规模远小于1.8亿美元；一家没有收入的AI实验室获得10亿美元A轮同样极不寻常。主流大语言模型训练依赖从数十亿网页抓取数据，产生巨大的算力、存储和法律成本。需要更少数据的方法有可能降低这些成本，并降低构建前沿AI系统的门槛。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该实验室声称的目标是“不吞掉半个互联网”训练大模型，这暗示其重点可能放在精选数据集、合成数据或替代训练目标上。模型参数规模、训练数据集和基准测试分数等具体信息均未公开。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">funding</span>
+      
+      <span class="tag">startup</span>
+      
+      <span class="tag">valuation</span>
+      
+      <span class="tag">machine learning</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://techcrunch.com/2026/10/21/year-old-ai-lab-flapping-airplanes-raises-1b-at-a-6b-valuation/" target="_blank" rel="noopener noreferrer">Year - old AI lab Flapping Airplanes raises $ 1 B at a $ 6 B valuation</a></li>
+        
+        <li><a href="https://www.bloomberg.com/news/articles/2026-10-21/ai-research-startup-flapping-airplanes-valued-at-6-billion-in-round" target="_blank" rel="noopener noreferrer">AI Research Startup Flapping Airplanes Valued at... - Bloomberg</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">11</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/10/21/legal-ai-startup-legora-raises-550m-series-e-at-8-8b-valuation/" target="_blank" rel="noopener noreferrer">法律AI公司Legora完成5.5亿美元E轮融资，估值88亿美元</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Large $550M Series E round at $8.8B valuation for a legal AI startup, indicating strong investor confidence and strategic importance in AI for legal industry; high market signal.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年10月21日，法律AI初创公司Legora宣布完成5.5亿美元E轮融资，投后估值达到88亿美元。本轮融资由Atreides Management领投，公司在纽约和斯德哥尔摩设有办公室。Legora称其产品为面向法律专业人士的“代理式操作系统”（agentic operating system）。该公司计划利用这笔资金扩大美国市场业务。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这笔大额融资表明投资者对法律行业AI应用的信心增强，行业正从测试AI工具转向在整个组织内部署AI。Legora首席执行官Max Junestrand表示，随着法律行业拥抱AI，律所将不得不改变向客户收费的方式。资金将支持其美国扩张，可能加剧法律科技市场竞争。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">法律AI通常利用大语言模型处理合同审查、法律研究和文件分析等任务。代理式AI（agentic AI）能分解目标并调用工具完成复杂工作，区别于单一问答。E轮融资是后期风险投资，投后估值反映公司在新资本注入后的总价值。Legora总部位于斯德哥尔摩，正在向美国扩张。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">Legora的产品定位为“代理式操作系统”，意味着其AI可以自主执行多步骤法律任务，而非仅提供被动问答。本轮融资由Atreides Management领投，投后估值88亿美元。官方公告未披露具体的性能数据或客户数量。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">legal tech</span>
+      
+      <span class="tag">funding</span>
+      
+      <span class="tag">startup</span>
+      
+      <span class="tag">venture capital</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://legora.com/blog/series-e" target="_blank" rel="noopener noreferrer">Legora raises $ 550 million Series E at $ 8 . 8 billion valuation to...</a></li>
+        
+        <li><a href="https://www.youtube.com/watch?v=E1Ps94gjg3g" target="_blank" rel="noopener noreferrer">Legal AI Startup Legora Raises $ 550 Million for US... - YouTube</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">12</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/10/21/php-armageddon-openai-googles-wiz-find-ancient-holes-panicking-the-internet/" target="_blank" rel="noopener noreferrer">OpenAI与谷歌旗下Wiz发现PHP古老严重漏洞</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Critical PHP vulnerabilities discovered by AI (OpenAI and Google&#39;s Wiz) could affect widespread internet infrastructure; demonstrates AI&#39;s significant role in cybersecurity vulnerability detection. No community discussion provided, but potential impact and technical novelty merit high value.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年10月21日，OpenAI与谷歌旗下Wiz披露了PHP中存在多年的严重漏洞，其中包括通过文件上传机制实现远程命令执行的缺陷。同一日，针对该漏洞的利用程序被公开，开发人员正在准备紧急补丁。安全测试公司Calif参与了OpenAI的“Patch the Planet”计划，以发现开源软件中的缺陷。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      PHP支撑着大量服务器端网络基础设施，远程命令执行漏洞可能使众多网站面临被接管的风险。AI驱动的漏洞发现缩短了漏洞从引入到被检测的时间窗口，但同样的自动化也可能加速攻击者利用。使用PHP的组织需要立即应用紧急补丁。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">PHP是一种广泛使用的服务器端脚本语言，文件上传处理是远程代码执行漏洞的常见来源，当用户输入未正确过滤时就会出现。AI辅助安全测试可以扫描大型代码库，找到人类审查可能遗漏的模式。“Patch the Planet”是OpenAI发起的一项计划，旨在在攻击者利用之前发现并修复开源软件漏洞。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该漏洞允许通过文件上传过程在服务器上执行命令，绕过正常的输入验证。发现工作使用了OpenAI和谷歌旗下Wiz的AI工具，属于“Patch the Planet”计划的一部分。现有来源未提供具体的CVE编号或受影响的PHP版本。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI security</span>
+      
+      <span class="tag">cybersecurity</span>
+      
+      <span class="tag">PHP vulnerabilities</span>
+      
+      <span class="tag">OpenAI</span>
+      
+      <span class="tag">Google Wiz</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://techcrunch.com/2026/10/21/php-armageddon-openai-googles-wiz-find-ancient-holes-panicking-the-internet/" target="_blank" rel="noopener noreferrer">PHP Armageddon : OpenAI , Google &#39; s Wiz find ancient holes ...</a></li>
+        
+        <li><a href="https://techora.ru/news/opublikovan-eksploit-dlya-php-ugroza-vypolneniya-2026-10-21" target="_blank" rel="noopener noreferrer">Опубликован эксплоит для PHP : угроза выполнения команд...</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">13</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://techcrunch.com/2026/10/21/blacksmith-hits-unicorn-valuation-after-sequoia-leads-series-c/" target="_blank" rel="noopener noreferrer">Blacksmith获红杉资本领投6600万美元C轮融资，估值达10亿美元</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>TechCrunch</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Significant funding round: $66M Series C led by Sequoia at $1B valuation indicates strong investor confidence in AI developer tooling, relevant for AI market tracking.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年10月21日，AI代码测试平台Blacksmith宣布完成6600万美元C轮融资，由红杉资本领投，公司估值达到10亿美元。该平台帮助企业更有效地构建和测试AI代码。本轮融资使Blacksmith跻身独角兽行列。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此次融资表明风险投资对AI开发者工具领域信心增强，尤其是在AI生成代码的质量保障环节。10亿美元估值将帮助Blacksmith吸引更多企业客户与人才，同时可能加剧AI代码测试赛道竞争。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">C轮融资通常指企业较后期的风险投资轮次，旨在扩大规模和市场份额；独角兽指估值达到10亿美元以上的未上市公司。AI代码测试平台用于验证AI生成代码的正确性、安全性和性能，避免低质量代码进入生产环境。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">官方公告未披露具体技术架构、性能基准或产品实现细节。已知信息仅包括其平台定位为构建和测试AI代码。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">funding</span>
+      
+      <span class="tag">startup</span>
+      
+      <span class="tag">Sequoia</span>
+      
+      <span class="tag">developer tools</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">14</div>
+    <div class="score-badge score-7">8.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.cnbc.com/2026/10/21/openai-bring-its-ai-models-to-googles-cloud-expands-beyond-microsoft.html" target="_blank" rel="noopener noreferrer">OpenAI模型登陆谷歌云，完成三大云厂商布局</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>CNBC Technology</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-21</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 2 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Significant strategic move by OpenAI to distribute models on all major cloud platforms, including rival Google Cloud, indicating a shift from Microsoft exclusivity and broad enterprise reach; no community comments provided to gauge discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年10月21日，OpenAI与Google Cloud宣布合作，将OpenAI的前沿模型和Codex智能体工作流引入Google Cloud的Model Garden。Google Cloud客户可通过统一平台原生访问GPT模型，同时使用Gemini、Claude以及200多个第一方、第三方和开源模型。至此，OpenAI模型已覆盖AWS、Microsoft Azure和Google Cloud三大云厂商。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      企业开发者可以在一个平台上同时使用OpenAI、Google和Anthropic的模型，减少供应商锁定，简化多模型部署。OpenAI超越Microsoft独家合作关系，表明其模型正成为可在各主要云平台上使用的中立组件，而Google Cloud则成为唯一同时提供Gemini、Claude和GPT的超大规模云服务商。这将加剧企业AI工作负载的竞争，并可能加速多模型智能体系统的采用。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Google Cloud的Model Garden是一个精选模型仓库，客户可以在其中发现、测试和部署来自多个提供商的基础模型。OpenAI此前与Microsoft Azure保持独家算力合作关系，其模型主要通过微软提供。此次发布将OpenAI的分发范围扩展到Google Cloud，使其在AWS、Azure和Google Cloud三大公有云上均可使用。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">该集成通过Google Cloud的Model Garden提供原生API访问OpenAI前沿模型和Codex智能体工作流。Google Cloud表示，其平台将200多个第一方、第三方和开源模型与数据治理和高性能基础设施相结合。客户可以在Google Cloud的治理控制下大规模运行复杂的智能体工作流。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">OpenAI</span>
+      
+      <span class="tag">Google Cloud</span>
+      
+      <span class="tag">Cloud Computing</span>
+      
+      <span class="tag">Enterprise AI</span>
+      
+    </div>
+    
+
+    
+    <div class="references">
+      <div class="references-title">参考来源</div>
+      <ul class="references-list">
+        
+        <li><a href="https://www.cnbc.com/2026/10/21/openai-bring-its-ai-models-to-googles-cloud-expands-beyond-microsoft.html" target="_blank" rel="noopener noreferrer">OpenAI bring its AI models to Google&#39;s cloud, expands beyond ...</a></li>
+        
+        <li><a href="https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-brings-openai-models-to-customers" target="_blank" rel="noopener noreferrer">Google Cloud brings OpenAI models to customers | Google Cloud ...</a></li>
+        
+        <li><a href="https://openai.com/index/openai-models-google-cloud/" target="_blank" rel="noopener noreferrer">OpenAI models are coming to Google Cloud</a></li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">20</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.cnbc.com/2026/10/22/nvidia-jensen-huang-neocloud-demand-capital.html" target="_blank" rel="noopener noreferrer">英伟达CEO黄仁勋：新云需求“爆棚”但资本稀缺</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>CNBC Technology</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Nvidia CEO&#39;s statement reveals strong demand for neocloud services but highlights capital scarcity as a growth bottleneck, providing a meaningful market signal for AI investors and operators assessing the neocloud sector; no comments provided to evaluate discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">2026年10月22日，英伟达CEO黄仁勋在接受CNBC采访时表示，新云企业的需求“爆棚”，但资本稀缺。他指出，资本匮乏正在制约新云领域的增长。黄仁勋未披露具体收入或融资数据。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      黄仁勋的判断表明，AI基础设施需求正超过可用资本，即使AI服务持续增长，GPU算力的部署也可能放缓。新云市场的运营商和投资者可能面临更高的融资成本或行业整合。这一瓶颈可能影响AI公司扩展算力资源的速度。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">新云公司为需要大规模GPU集群但无力自建数据中心的AI开发者提供服务。它们通常从英伟达等供应商购买GPU，并按小时出租。资本稀缺会限制其采购更多硬件的能力，造成供需紧张。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">新云指专门提供GPU算力租赁、用于AI训练和推理的云服务商，有别于通用云计算。英伟达是这些服务商GPU的主要供应商。黄仁勋“爆棚”的表述表明需求远超当前算力供给。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI markets</span>
+      
+      <span class="tag">Nvidia</span>
+      
+      <span class="tag">neocloud</span>
+      
+      <span class="tag">capital scarcity</span>
+      
+      <span class="tag">Jensen Huang</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-economy"
+       role="tabpanel">
+    
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">21</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/metas-stock-rises-as-investors-glimpse-an-opportunity-that-could-dwarf-the-ad-business-89369c6c?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">Meta股价早盘下跌，广告业务强劲，Muse助理受关注</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Reports Meta&#39;s strong advertising quarter alongside emerging strategic focus on the Muse AI assistant, signaling potential new growth area for a major AI player; lacks deeper analysis or community discussion.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Meta核心广告业务本季度表现强劲。但公司股价在早盘交易中因科技板块整体抛售而下跌，尽管业绩受到好评。投资者正日益关注新型Muse个人助理，认为其可能成为广告业务之外的变革性机遇。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      如果Muse获得市场认可，Meta可减少对广告收入的依赖，开辟第二增长曲线。这也表明主要AI企业正从基础模型转向面向消费者的AI助手，个人AI市场竞争将加剧。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">Meta是一家科技公司，其收入历来主要来自数字广告。个人AI助理是通过自然语言交互帮助用户完成任务的软件代理，对Meta及其竞争对手而言是一个新产品类别。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">现有信息未披露Muse的技术架构、用户规模或性能数据。仅提及该产品定位为个人助理，没有基准测试、集成路线图或定价细节。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Meta</span>
+      
+      <span class="tag">AI assistant</span>
+      
+      <span class="tag">stock market</span>
+      
+      <span class="tag">earnings</span>
+      
+      <span class="tag">AI market</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">22</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4956226-cloudflare-riding-ai-agent-boom-but-reality-is-misleading?source=feed_all_articles" target="_blank" rel="noopener noreferrer">Cloudflare乘AI代理热潮上涨，但基本面或存误导</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Offers a contrarian analysis on Cloudflare&#39;s AI agent boom narrative, potentially valuable for investors evaluating the stock&#39;s valuation. No comments provided to assess community discussion quality.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Cloudflare股价近期上涨，市场普遍将其归因于AI代理（AI agents）概念的火热。一项分析认为，这种上涨缺乏基本面数据的支撑，AI代理相关收入尚未得到明确披露。投资者可能高估了AI代理对Cloudflare实际业务的拉动作用。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      对于评估Cloudflare的投资者来说，区分情绪驱动和业绩驱动是关键。若AI代理需求未能转化为收入增长，股价存在回调风险。这种质疑也可能波及其他被AI概念推高的基础设施公司估值。
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">AI代理（AI agents）指能自主执行多步骤任务的AI系统，不同于单轮对话的聊天机器人。Cloudflare是一家提供内容分发网络（CDN）和边缘计算服务的公司，近年来扩展了AI推理相关产品。投资者预期AI代理的普及将增加对低延迟计算和网络流量的需求，Cloudflare可能从中受益。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">目前缺乏AI相关收入占比、客户数量或同比增长率等公开数据，无法验证AI代理热潮对Cloudflare财务表现的实际贡献。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Cloudflare</span>
+      
+      <span class="tag">AI agents</span>
+      
+      <span class="tag">stock analysis</span>
+      
+      <span class="tag">market skepticism</span>
+      
+      <span class="tag">technology investing</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card">
+  <div class="card-header">
+    <div class="card-index">23</div>
+    <div class="score-badge score-7">7.0</div>
+    
+      <span class="depth-indicator" title="深度分析：含网络搜索与完整背景资料">&#x1f50d;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/why-a-global-bank-is-slashing-thousands-of-jobs-and-what-the-fed-says-about-ai-replacing-workers-9529b6ca?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">巴克莱裁员5000人，将后台任务交由AI处理</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Reports a major global bank cutting 5% of workforce due to AI adoption, and includes Fed commentary on AI replacing workers. This reveals a concrete industry shift with potential labor market and economic implications, relevant to AI practitioners and investors.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">巴克莱银行周四表示将裁员5000人，约占其员工总数的5%，原因是该行越来越依赖人工智能处理后台任务。此次裁员主要针对后台岗位，这些岗位的工作正被AI自动化取代。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这一举措表明，AI导致的岗位流失正从讨论变为大型金融机构的实际行动。巴克莱裁员5%可能促使其他银行加速自动化计划，影响银行业数万个后台岗位。美联储官员已承认AI驱动的劳动力替代是一个日益增长的风险。
+    </div>
+    
+
+    
+    <div class="key-facts-bar">
+      <span class="key-facts-label">&#128202; 关键数据:</span>
+      
+      <span class="key-fact-pill">5%</span>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>背景知识</summary>
+        <div class="details-content">后台职能包括行政、数据处理和合规运营等支持性工作。多年来银行一直在自动化这些职能，但生成式AI加速了处理文档审查、客户咨询等非结构化任务的能力。巴克莱的举措是金融行业测试AI以降低成本和提升效率的广泛趋势的一部分。美联储一直在研究AI对劳动力市场的影响，指出自动化可能取代部分岗位，同时创造新岗位。</div>
+      </details>
+    </div>
+    
+
+    
+    <div class="details-section">
+      <details>
+        <summary>关键细节</summary>
+        <div class="details-content">巴克莱未透露具体使用的AI系统或模型，仅表示该技术正在承担此前由员工完成的后台任务。裁员5000人约占总员工数的5%，这意味着该行总员工数约为10万人。</div>
+      </details>
+    </div>
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI</span>
+      
+      <span class="tag">banking</span>
+      
+      <span class="tag">labor market</span>
+      
+      <span class="tag">Barclays</span>
+      
+      <span class="tag">Federal Reserve</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card card-light">
+  <div class="card-header">
+    <div class="card-index">24</div>
+    <div class="score-badge score-5">6.0</div>
+    
+      <span class="depth-indicator" title="标准分析：基于文章内容进行丰富">&#x1f4dd;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4956251-sustainable-bank-bond-supply-set-for-further-growth-in-2027?source=feed_all_articles" target="_blank" rel="noopener noreferrer">可持续银行债券供应预计到2027年持续增长</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Relevant to global finance/ESG investing but an incremental forecast rather than a major policy or market shift; no discussion quality available.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">可持续银行债券发行预计将在2027年之前持续增长。预测显示，可持续固定收益领域的供应将进一步扩大。银行预计将增加绿色债券、社会债券和可持续发展债券的发行。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      这一增长扩大了寻求可持续配置的投资者可获得的ESG标签固定收益资产池。它支持银行满足监管和利益相关者对可持续融资的期望。更大的供应可能改善可持续债券市场的流动性和定价效率。
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">sustainable finance</span>
+      
+      <span class="tag">bank bonds</span>
+      
+      <span class="tag">ESG investing</span>
+      
+      <span class="tag">fixed income</span>
+      
+      <span class="tag">global markets</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card card-light">
+  <div class="card-header">
+    <div class="card-index">25</div>
+    <div class="score-badge score-5">6.0</div>
+    
+      <span class="depth-indicator" title="标准分析：基于文章内容进行丰富">&#x1f4dd;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://seekingalpha.com/article/4956231-dax-german-households-and-industrials-face-a-challenging-test?source=feed_all_articles" target="_blank" rel="noopener noreferrer">DAX面临逆风：德国家庭和工业部门承压</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>SeekingAlpha All Articles</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The article discusses economic challenges facing German households and industrials, which is relevant to global markets and macroeconomic trends. It is likely a regular market analysis piece, providing useful context but not a breakthrough or high-impact development.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">DAX指数正面临压力，因为德国家庭和工业企业所处的经济环境恶化。家庭正在应对高企的能源成本和通胀，这削弱了可支配收入。包括制造业和化工在内的工业部门面临订单疲软和投入成本上升。这些压力叠加预计将在未来几个月拖累DAX的表现。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      DAX是欧洲最大经济体的关键基准，其疲软预示着更广泛的欧元区压力。投资德国股票和跟踪欧洲市场的全球基金的投资者可能面临回报下降。工业疲软还可能削弱德国的出口竞争力并影响就业。
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">DAX</span>
+      
+      <span class="tag">Germany</span>
+      
+      <span class="tag">economy</span>
+      
+      <span class="tag">markets</span>
+      
+      <span class="tag">industrials</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card card-light">
+  <div class="card-header">
+    <div class="card-index">26</div>
+    <div class="score-badge score-5">6.0</div>
+    
+      <span class="depth-indicator" title="标准分析：基于文章内容进行丰富">&#x1f4dd;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/top-hsbc-strategist-has-a-warning-for-retail-investors-chasing-the-ai-rally-e0318ada?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">汇丰策略师警告散户投资者AI投资目标不断变化</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：The article presents a cautionary market perspective from a high-profile strategist on AI investing, which is relevant to AI market sentiment but lacks specific data or actionable insights. No community discussion or engagement signals are provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">汇丰银行首席多资产策略师Maxx Kettner警告散户投资者，AI投资的“目标基准”正在不断移动。他敦促追逐当前AI涨势的投资者保持谨慎。该警告没有提供具体数据或量化目标。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      汇丰的警告表明，散户投资者可能低估了AI股票基本面快速变化带来的风险。参与AI涨势的个人投资者如果未能及时调整预期，可能在估值修正中遭受损失。
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">AI markets</span>
+      
+      <span class="tag">investment strategy</span>
+      
+      <span class="tag">retail investors</span>
+      
+      <span class="tag">market warning</span>
+      
+      <span class="tag">HSBC</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+
+
+  
+
+<article class="news-card card-light">
+  <div class="card-header">
+    <div class="card-index">27</div>
+    <div class="score-badge score-5">6.0</div>
+    
+      <span class="depth-indicator" title="标准分析：基于文章内容进行丰富">&#x1f4dd;</span>
+    
+    <div class="card-title-area">
+      <h2 class="card-title">
+        <a href="https://www.marketwatch.com/story/this-wonky-maneuver-kept-mark-zuckerberg-from-fleeing-a-california-billionaire-tax-1de34562?mod=mw_rss_topstories" target="_blank" rel="noopener noreferrer">Meta设立新股票类别助扎克伯格规避加州富豪税</a>
+      </h2>
+      <div class="card-source">
+        <span class="card-source-type">rss</span>
+        <span>MarketWatch Top Stories</span>
+        <span class="dot">&#183;</span>
+        <span>2026-10-22</span>
+        
+        
+        <span class="dot">&#183;</span>
+        <span class="reading-time">&#x231b; 1 分钟阅读</span>
+      </div>
+    </div>
+  </div>
+
+    
+    <div class="score-reason-line">评分依据：Interesting financial and corporate governance story involving Meta&#39;s CEO, but limited direct relevance to AI technology or global markets; no community discussion signals provided.</div>
+    
+
+    
+
+  <div class="card-body">
+    
+    <div>
+      <div class="section-label"><i class="emoji">&#128240;</i> 发生了什么</div>
+      <div class="section-content">Meta董事会批准设立一种新的股票类别，使首席执行官马克·扎克伯格得以继续保留其帕洛阿尔托住宅，并避免触发加州富豪税。扎克伯格在Meta同意调整股权结构前，曾计划在数日内挂牌出售这处帕洛阿尔托房产。这一新类别旨在防止扎克伯格被迫出售股票，从而避免其投票权被稀释。</div>
+    </div>
+    
+
+    
+    <div class="why-matters-compact">
+      <span class="why-matters-prefix">&#128161; 为什么重要：</span>
+      此举表明企业治理工具可被用来规避州级财富税，可能影响其他面临类似税务负担的科技公司创始人。这也引发了对富豪税可执行性的质疑，因为企业可以通过重新设计股权结构来保护创始人。
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="tags">
+      
+      <span class="tag">Mark Zuckerberg</span>
+      
+      <span class="tag">Meta</span>
+      
+      <span class="tag">California billionaire tax</span>
+      
+      <span class="tag">stock structure</span>
+      
+      <span class="tag">corporate governance</span>
+      
+    </div>
+    
+
+    
+
+  </div>
+</article>
+
+    
+    
+  </div>
+  
+  <div class="tab-panel"
+       id="tab-market_indicators"
+       role="tabpanel">
+    
+    
+    
+    <div class="market-summary">
+      <div class="market-summary-title">
+        实时行情
+      </div>
+      <div class="market-summary-grid" id="market-summary-grid">
+        
+        <div class="market-group-label">
+          
+            国际
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="gold"
+             onclick="MarketChart.switchIndicator('gold')"
+             title="点击查看图表">
+          <div class="msi-name">纽约金</div>
+          <div class="msi-price ">
+            
+              4,088.58
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -1.27%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="oil"
+             onclick="MarketChart.switchIndicator('oil')"
+             title="点击查看图表">
+          <div class="msi-name">WTI 原油</div>
+          <div class="msi-price ">
+            
+              99.28
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.78%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="nasdaq"
+             onclick="MarketChart.switchIndicator('nasdaq')"
+             title="点击查看图表">
+          <div class="msi-name">纳斯达克</div>
+          <div class="msi-price ">
+            
+              26,702.86
+            
+          </div>
+          
+          
+          <div class="msi-change up">
+            +1.05%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="usdcny"
+             onclick="MarketChart.switchIndicator('usdcny')"
+             title="点击查看图表">
+          <div class="msi-name">美元/人民币</div>
+          <div class="msi-price ">
+            
+              6.69
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.03%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="eurcny"
+             onclick="MarketChart.switchIndicator('eurcny')"
+             title="点击查看图表">
+          <div class="msi-name">欧元/人民币</div>
+          <div class="msi-price ">
+            
+              7.51
+            
+          </div>
+          
+          
+          <div class="msi-change up">
+            +0.02%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="jpycny"
+             onclick="MarketChart.switchIndicator('jpycny')"
+             title="点击查看图表">
+          <div class="msi-name">日元/人民币(100)</div>
+          <div class="msi-price ">
+            
+              4.23
+            
+          </div>
+          
+          
+          <div class="msi-change up">
+            +0.05%
+          </div>
+          
+        </div>
+        
+        
+        <div class="market-group-label">
+          
+            国内
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="shanghai"
+             onclick="MarketChart.switchIndicator('shanghai')"
+             title="点击查看图表">
+          <div class="msi-name">上证指数</div>
+          <div class="msi-price ">
+            
+              3,658.03
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -1.48%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="chinext"
+             onclick="MarketChart.switchIndicator('chinext')"
+             title="点击查看图表">
+          <div class="msi-name">创业板指</div>
+          <div class="msi-price ">
+            
+              2,576.90
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -4.37%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="star50"
+             onclick="MarketChart.switchIndicator('star50')"
+             title="点击查看图表">
+          <div class="msi-name">科创 50</div>
+          <div class="msi-price ">
+            
+              1,305.87
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -2.78%
+          </div>
+          
+        </div>
+        
+        <div class="market-summary-item" data-key="domestic_gold"
+             onclick="MarketChart.switchIndicator('domestic_gold')"
+             title="点击查看图表">
+          <div class="msi-name">国内参考金价 (元/克)</div>
+          <div class="msi-price ">
+            
+              879.31
+            
+          </div>
+          
+          
+          <div class="msi-change down">
+            -0.85%
+          </div>
+          
+        </div>
+        
+        
+      </div>
+    </div>
+
+    <div class="chart-controls">
+      <div class="indicator-selector" id="indicator-selector">
+        
+        
+        
+        <button class="indicator-pill active"
+                data-key="gold"
+                onclick="MarketChart.switchIndicator('gold')">
+          纽约金
+          <span class="pill-sub">XAU</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="oil"
+                onclick="MarketChart.switchIndicator('oil')">
+          WTI 原油
+          <span class="pill-sub">CL</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="nasdaq"
+                onclick="MarketChart.switchIndicator('nasdaq')">
+          纳斯达克
+          <span class="pill-sub">^IXIC</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="usdcny"
+                onclick="MarketChart.switchIndicator('usdcny')">
+          美元/人民币
+          <span class="pill-sub">USD</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="eurcny"
+                onclick="MarketChart.switchIndicator('eurcny')">
+          欧元/人民币
+          <span class="pill-sub">EUR</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="jpycny"
+                onclick="MarketChart.switchIndicator('jpycny')">
+          日元/人民币(100)
+          <span class="pill-sub">JPY</span>
+        </button>
+        
+        
+        
+        
+        <button class="indicator-pill"
+                data-key="shanghai"
+                onclick="MarketChart.switchIndicator('shanghai')">
+          上证指数
+          <span class="pill-sub">000001.SS</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="chinext"
+                onclick="MarketChart.switchIndicator('chinext')">
+          创业板指
+          <span class="pill-sub">399006.SZ</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="star50"
+                onclick="MarketChart.switchIndicator('star50')">
+          科创 50
+          <span class="pill-sub">000688.SS</span>
+        </button>
+        
+        
+        <button class="indicator-pill"
+                data-key="domestic_gold"
+                onclick="MarketChart.switchIndicator('domestic_gold')">
+          国内参考金价 (元/克)
+          <span class="pill-sub">CNY/g</span>
+        </button>
+        
+        
+        
+      </div>
+      <div class="range-selector" id="range-selector">
+        <button class="range-btn" data-days="7" onclick="MarketChart.switchRange(7)">7D</button>
+        <button class="range-btn active" data-days="30" onclick="MarketChart.switchRange(30)">30D</button>
+        <button class="range-btn" data-days="90" onclick="MarketChart.switchRange(90)">90D</button>
+        <button class="range-btn" data-days="0" onclick="MarketChart.switchRange(0)">
+          全部
+        </button>
+      </div>
+      <div class="ma-toggle" id="ma-toggle">
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="5" onchange="MarketChart.toggleMA(5, this.checked)">MA5
+        </label>
+        <label class="ma-checkbox">
+          <input type="checkbox" data-period="10" onchange="MarketChart.toggleMA(10, this.checked)">MA10
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-container" id="chart-container">
+      <canvas id="market-chart"></canvas>
+      <div class="chart-empty" id="chart-empty" style="display:none">
+        <div class="chart-empty-icon">&#x1f4c8;</div>
+        <div class="chart-empty-text">
+          暂无足够数据
+        </div>
+        <div class="chart-empty-hint">
+          数据将在每日运行后累积
+        </div>
+      </div>
+    </div>
+    
+    
+  </div>
+  
+  
+  
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-tagline">
+      
+        AI 驱动 &middot; 每日更新 &middot; 仅供个人阅读
+      
+    </div>
+    <div>
+      
+        下次更新：明天 12:00
+      
+    </div>
+    <div>
+      
+        本页面仅供个人阅读，不对外开放索引
+      
+    </div>
+    <div class="footer-meta">Daily Focus &middot; 2026-10-22</div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var tabsNav = document.querySelector('.tab-nav');
+  if (!tabsNav) return;
+
+  var tabBtns = tabsNav.querySelectorAll('.tab-btn');
+
+  function switchTab(tabKey) {
+    tabBtns.forEach(function(btn) {
+      var isActive = btn.dataset.tab === tabKey;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+      panel.classList.toggle('active', panel.id === 'tab-' + tabKey);
+    });
+    if (window.location.hash !== '#' + tabKey) {
+      history.replaceState(null, '', '#' + tabKey);
+    }
+  }
+
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  var hash = window.location.hash.slice(1);
+  if (hash && document.querySelector('.tab-btn[data-tab="' + hash + '"]')) {
+    switchTab(hash);
+  }
+})();
+</script>
+
+<script>
+(function() {
+  var toggle = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+  var icon = document.getElementById('theme-icon');
+  if (!toggle || !icon) return;
+
+  function getTheme() {
+    if (root.getAttribute('data-theme')) return root.getAttribute('data-theme');
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function updateIcon() {
+    var theme = getTheme();
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  function saveTheme(val) {
+    try { localStorage.setItem('theme', val); } catch(e) {}
+  }
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    saveTheme(t);
+    updateIcon();
+  }
+
+  // Simple two-state toggle: dark <-> light, persisted
+  toggle.addEventListener('click', function() {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+
+  try { var saved = localStorage.getItem('theme'); if (saved) root.setAttribute('data-theme', saved); } catch(e) {}
+  updateIcon();
+})();
+</script>
+
+<script>
+// ── Market Chart ────────────────────────────────────────────
+(function() {
+  'use strict';
+
+  var historyData = {"chinext": [{"date": "2026-06-15", "price": 4033.535}, {"date": "2026-06-16", "price": 4102.942}, {"date": "2026-06-17", "price": 4167.048}, {"date": "2026-06-18", "price": 4252.39}, {"date": "2026-06-19", "price": 4252.39}, {"date": "2026-06-20", "price": 4252.39}, {"date": "2026-06-21", "price": 4252.39}, {"date": "2026-06-22", "price": 4359.392}, {"date": "2026-06-23", "price": 4192.194}, {"date": "2026-06-24", "price": 4251.424}, {"date": "2026-06-25", "price": 4371.989}, {"date": "2026-06-26", "price": 4194.209}, {"date": "2026-06-27", "price": 4194.209}, {"date": "2026-06-28", "price": 4194.209}, {"date": "2026-06-29", "price": 4216.699}, {"date": "2026-06-30", "price": 4342.712}, {"date": "2026-07-01", "price": 4260.721}, {"date": "2026-07-02", "price": 4017.273}, {"date": "2026-07-03", "price": 4019.934}, {"date": "2026-07-04", "price": 4019.934}, {"date": "2026-07-05", "price": 4019.934}, {"date": "2026-07-06", "price": 3948.86}, {"date": "2026-07-07", "price": 3911.907}, {"date": "2026-07-08", "price": 3845.351}, {"date": "2026-07-09", "price": 4018.174}, {"date": "2026-07-10", "price": 3842.731}, {"date": "2026-07-11", "price": 3842.731}, {"date": "2026-07-12", "price": 3842.731}, {"date": "2026-07-13", "price": 3723.517}, {"date": "2026-07-14", "price": 3851.137}, {"date": "2026-07-15", "price": 3804.704}, {"date": "2026-07-16", "price": 3692.457}, {"date": "2026-07-17", "price": 3428.63}, {"date": "2026-07-18", "price": 3428.63}, {"date": "2026-07-19", "price": 3428.63}, {"date": "2026-07-20", "price": 3443.102}, {"date": "2026-07-21", "price": 3685.969}, {"date": "2026-07-22", "price": 3566.732}, {"date": "2026-07-23", "price": 3575.52}, {"date": "2026-07-24", "price": 3480.87}, {"date": "2026-07-25", "price": 3480.87}, {"date": "2026-07-26", "price": 3480.87}, {"date": "2026-07-27", "price": 3590.787}, {"date": "2026-07-28", "price": 3327.03}, {"date": "2026-07-29", "price": 3378.696}, {"date": "2026-07-30", "price": 3244.618}, {"date": "2026-07-31", "price": 3343.964}, {"date": "2026-08-01", "price": 3343.964}, {"date": "2026-08-02", "price": 3343.964}, {"date": "2026-08-03", "price": 3302.553}, {"date": "2026-08-04", "price": 3488.966}, {"date": "2026-08-05", "price": 3535.143}, {"date": "2026-08-06", "price": 3515.56}, {"date": "2026-08-07", "price": 3562.656}, {"date": "2026-08-08", "price": 3563.116}, {"date": "2026-08-09", "price": 3563.116}, {"date": "2026-08-10", "price": 3536.42}, {"date": "2026-08-11", "price": 3550.902}, {"date": "2026-08-12", "price": 3602.083}, {"date": "2026-08-13", "price": 3586.043}, {"date": "2026-08-14", "price": 3626.296}, {"date": "2026-08-15", "price": 3626.296}, {"date": "2026-08-16", "price": 3626.296}, {"date": "2026-08-17", "price": 3722.909}, {"date": "2026-08-18", "price": 3693.833}, {"date": "2026-08-19", "price": 3494.969}, {"date": "2026-08-20", "price": 3465.071}, {"date": "2026-08-21", "price": 3525.618}, {"date": "2026-08-22", "price": 3545.577}, {"date": "2026-08-23", "price": 3545.577}, {"date": "2026-08-24", "price": 3418.515}, {"date": "2026-08-25", "price": 3403.28}, {"date": "2026-08-26", "price": 3415.455}, {"date": "2026-08-27", "price": 3473.355}, {"date": "2026-08-28", "price": 3424.401}, {"date": "2026-08-29", "price": 3424.401}, {"date": "2026-08-30", "price": 3424.401}, {"date": "2026-08-31", "price": 3438.681}, {"date": "2026-09-01", "price": 3393.43}, {"date": "2026-09-02", "price": 3312.243}, {"date": "2026-09-03", "price": 3312.541}, {"date": "2026-09-04", "price": 3286.546}, {"date": "2026-09-05", "price": 3286.546}, {"date": "2026-09-06", "price": 3286.546}, {"date": "2026-09-07", "price": 3398.681}, {"date": "2026-09-08", "price": 3359.716}, {"date": "2026-09-09", "price": 3354.969}, {"date": "2026-09-10", "price": 3338.422}, {"date": "2026-09-11", "price": 3322.039}, {"date": "2026-09-12", "price": 3322.039}, {"date": "2026-09-13", "price": 3322.039}, {"date": "2026-09-14", "price": 3285.583}, {"date": "2026-09-15", "price": 3247.918}, {"date": "2026-09-16", "price": 3311.474}, {"date": "2026-09-17", "price": 3298.31}, {"date": "2026-09-18", "price": 3372.676}, {"date": "2026-09-19", "price": 3372.676}, {"date": "2026-09-20", "price": 3372.676}, {"date": "2026-09-21", "price": 3399.59}, {"date": "2026-09-22", "price": 3399.93}, {"date": "2026-09-23", "price": 3379.61}, {"date": "2026-09-24", "price": 3288.948}, {"date": "2026-09-25", "price": 3288.948}, {"date": "2026-09-26", "price": 3288.948}, {"date": "2026-09-27", "price": 3288.948}, {"date": "2026-09-28", "price": 3139.825}, {"date": "2026-09-29", "price": 3142.563}, {"date": "2026-09-30", "price": 3135.277}, {"date": "2026-10-01", "price": 3135.277}, {"date": "2026-10-02", "price": 3135.277}, {"date": "2026-10-03", "price": 3135.277}, {"date": "2026-10-04", "price": 3135.277}, {"date": "2026-10-05", "price": 3135.277}, {"date": "2026-10-06", "price": 3135.277}, {"date": "2026-10-07", "price": 3135.277}, {"date": "2026-10-08", "price": 3036.657}, {"date": "2026-10-09", "price": 3043.335}, {"date": "2026-10-10", "price": 3043.335}, {"date": "2026-10-11", "price": 3043.335}, {"date": "2026-10-12", "price": 2963.824}, {"date": "2026-10-13", "price": 2958.344}, {"date": "2026-10-14", "price": 2866.763}, {"date": "2026-10-15", "price": 2783.175}, {"date": "2026-10-16", "price": 2772.384}, {"date": "2026-10-17", "price": 2772.384}, {"date": "2026-10-18", "price": 2772.384}, {"date": "2026-10-19", "price": 2746.291}, {"date": "2026-10-20", "price": 2739.203}, {"date": "2026-10-21", "price": 2694.713}, {"date": "2026-10-22", "price": 2576.901}], "domestic_gold": [{"date": "2026-06-15", "price": 944.19}, {"date": "2026-06-16", "price": 945.25}, {"date": "2026-06-17", "price": 941.94}, {"date": "2026-06-18", "price": 929.35}, {"date": "2026-06-19", "price": 906.39}, {"date": "2026-06-20", "price": 906.4}, {"date": "2026-06-21", "price": 907.01}, {"date": "2026-06-22", "price": 918.35}, {"date": "2026-06-23", "price": 895.49}, {"date": "2026-06-24", "price": 892.22}, {"date": "2026-06-25", "price": 876.69}, {"date": "2026-06-26", "price": 883.1}, {"date": "2026-06-27", "price": 893.21}, {"date": "2026-06-28", "price": 893.68}, {"date": "2026-06-29", "price": 883.22}, {"date": "2026-06-30", "price": 878.78}, {"date": "2026-07-01", "price": 868.71}, {"date": "2026-07-02", "price": 890.85}, {"date": "2026-07-03", "price": 913.81}, {"date": "2026-07-04", "price": 911.46}, {"date": "2026-07-05", "price": 912.08}, {"date": "2026-07-06", "price": 903.41}, {"date": "2026-07-07", "price": 901.47}, {"date": "2026-07-08", "price": 901.02}, {"date": "2026-07-09", "price": 899.89}, {"date": "2026-07-10", "price": 895.75}, {"date": "2026-07-11", "price": 898.51}, {"date": "2026-07-12", "price": 899.19}, {"date": "2026-07-13", "price": 888.0}, {"date": "2026-07-14", "price": 878.72}, {"date": "2026-07-15", "price": 877.84}, {"date": "2026-07-16", "price": 878.43}, {"date": "2026-07-17", "price": 871.05}, {"date": "2026-07-18", "price": 876.09}, {"date": "2026-07-19", "price": 876.68}, {"date": "2026-07-20", "price": 876.4}, {"date": "2026-07-21", "price": 887.44}, {"date": "2026-07-22", "price": 895.57}, {"date": "2026-07-23", "price": 891.92}, {"date": "2026-07-24", "price": 882.91}, {"date": "2026-07-25", "price": 883.79}, {"date": "2026-07-26", "price": 884.34}, {"date": "2026-07-27", "price": 892.17}, {"date": "2026-07-28", "price": 883.16}, {"date": "2026-07-29", "price": 880.4}, {"date": "2026-07-30", "price": 879.56}, {"date": "2026-07-31", "price": 883.9}, {"date": "2026-08-01", "price": 880.08}, {"date": "2026-08-02", "price": 880.59}, {"date": "2026-08-03", "price": 881.92}, {"date": "2026-08-04", "price": 885.45}, {"date": "2026-08-05", "price": 906.66}, {"date": "2026-08-06", "price": 927.0}, {"date": "2026-08-07", "price": 933.84}, {"date": "2026-08-08", "price": 943.45}, {"date": "2026-08-09", "price": 944.21}, {"date": "2026-08-10", "price": 946.23}, {"date": "2026-08-11", "price": 947.63}, {"date": "2026-08-12", "price": 956.87}, {"date": "2026-08-13", "price": 951.43}, {"date": "2026-08-14", "price": 941.58}, {"date": "2026-08-15", "price": 950.41}, {"date": "2026-08-16", "price": 951.12}, {"date": "2026-08-17", "price": 954.16}, {"date": "2026-08-18", "price": 953.67}, {"date": "2026-08-19", "price": 941.85}, {"date": "2026-08-20", "price": 973.55}, {"date": "2026-08-21", "price": 985.99}, {"date": "2026-08-22", "price": 997.47}, {"date": "2026-08-23", "price": 998.23}, {"date": "2026-08-24", "price": 1005.35}, {"date": "2026-08-25", "price": 1006.37}, {"date": "2026-08-26", "price": 1004.62}, {"date": "2026-08-27", "price": 999.1}, {"date": "2026-08-28", "price": 968.08}, {"date": "2026-08-29", "price": 965.51}, {"date": "2026-08-30", "price": 966.06}, {"date": "2026-08-31", "price": 964.41}, {"date": "2026-09-01", "price": 949.67}, {"date": "2026-09-02", "price": 933.39}, {"date": "2026-09-03", "price": 958.7}, {"date": "2026-09-04", "price": 967.43}, {"date": "2026-09-05", "price": 958.59}, {"date": "2026-09-06", "price": 959.37}, {"date": "2026-09-07", "price": 950.21}, {"date": "2026-09-08", "price": 951.09}, {"date": "2026-09-09", "price": 950.15}, {"date": "2026-09-10", "price": 951.29}, {"date": "2026-09-11", "price": 940.34}, {"date": "2026-09-12", "price": 940.21}, {"date": "2026-09-13", "price": 941.0}, {"date": "2026-09-14", "price": 927.21}, {"date": "2026-09-15", "price": 924.04}, {"date": "2026-09-16", "price": 939.48}, {"date": "2026-09-17", "price": 932.58}, {"date": "2026-09-18", "price": 945.79}, {"date": "2026-09-19", "price": 945.11}, {"date": "2026-09-20", "price": 945.72}, {"date": "2026-09-21", "price": 936.5}, {"date": "2026-09-22", "price": 934.0}, {"date": "2026-09-23", "price": 931.68}, {"date": "2026-09-24", "price": 919.09}, {"date": "2026-09-25", "price": 930.02}, {"date": "2026-09-26", "price": 926.45}, {"date": "2026-09-27", "price": 927.05}, {"date": "2026-09-28", "price": 895.92}, {"date": "2026-09-29", "price": 898.64}, {"date": "2026-09-30", "price": 903.05}, {"date": "2026-10-01", "price": 903.17}, {"date": "2026-10-02", "price": 903.3}, {"date": "2026-10-03", "price": 893.56}, {"date": "2026-10-04", "price": 894.32}, {"date": "2026-10-05", "price": 897.72}, {"date": "2026-10-06", "price": 902.04}, {"date": "2026-10-07", "price": 889.76}, {"date": "2026-10-08", "price": 889.81}, {"date": "2026-10-09", "price": 903.02}, {"date": "2026-10-10", "price": 904.39}, {"date": "2026-10-11", "price": 904.44}, {"date": "2026-10-12", "price": 898.29}, {"date": "2026-10-13", "price": 901.32}, {"date": "2026-10-14", "price": 893.34}, {"date": "2026-10-15", "price": 895.43}, {"date": "2026-10-16", "price": 900.31}, {"date": "2026-10-17", "price": 896.78}, {"date": "2026-10-18", "price": 897.37}, {"date": "2026-10-19", "price": 898.74}, {"date": "2026-10-20", "price": 886.19}, {"date": "2026-10-21", "price": 886.84}, {"date": "2026-10-22", "price": 879.31}], "eurcny": [{"date": "2026-06-15", "price": 7.8422}, {"date": "2026-06-16", "price": 7.8535}, {"date": "2026-06-17", "price": 7.8598}, {"date": "2026-06-18", "price": 7.8259}, {"date": "2026-06-19", "price": 7.7812}, {"date": "2026-06-20", "price": 7.7809}, {"date": "2026-06-21", "price": 7.7857}, {"date": "2026-06-22", "price": 7.7857}, {"date": "2026-06-23", "price": 7.7617}, {"date": "2026-06-24", "price": 7.7457}, {"date": "2026-06-25", "price": 7.7403}, {"date": "2026-06-26", "price": 7.7358}, {"date": "2026-06-27", "price": 7.7551}, {"date": "2026-06-28", "price": 7.7574}, {"date": "2026-06-29", "price": 7.7469}, {"date": "2026-06-30", "price": 7.7678}, {"date": "2026-07-01", "price": 7.7531}, {"date": "2026-07-02", "price": 7.7432}, {"date": "2026-07-03", "price": 7.764}, {"date": "2026-07-04", "price": 7.7675}, {"date": "2026-07-05", "price": 7.7726}, {"date": "2026-07-06", "price": 7.7609}, {"date": "2026-07-07", "price": 7.7767}, {"date": "2026-07-08", "price": 7.7664}, {"date": "2026-07-09", "price": 7.773}, {"date": "2026-07-10", "price": 7.7733}, {"date": "2026-07-11", "price": 7.749}, {"date": "2026-07-12", "price": 7.7556}, {"date": "2026-07-13", "price": 7.7327}, {"date": "2026-07-14", "price": 7.7368}, {"date": "2026-07-15", "price": 7.7441}, {"date": "2026-07-16", "price": 7.7606}, {"date": "2026-07-17", "price": 7.7624}, {"date": "2026-07-18", "price": 7.7587}, {"date": "2026-07-19", "price": 7.7636}, {"date": "2026-07-20", "price": 7.7495}, {"date": "2026-07-21", "price": 7.7395}, {"date": "2026-07-22", "price": 7.7298}, {"date": "2026-07-23", "price": 7.7382}, {"date": "2026-07-24", "price": 7.7238}, {"date": "2026-07-25", "price": 7.7157}, {"date": "2026-07-26", "price": 7.7222}, {"date": "2026-07-27", "price": 7.7196}, {"date": "2026-07-28", "price": 7.7089}, {"date": "2026-07-29", "price": 7.7146}, {"date": "2026-07-30", "price": 7.7362}, {"date": "2026-07-31", "price": 7.7879}, {"date": "2026-08-01", "price": 7.7874}, {"date": "2026-08-02", "price": 7.7936}, {"date": "2026-08-03", "price": 7.7994}, {"date": "2026-08-04", "price": 7.7883}, {"date": "2026-08-05", "price": 7.7933}, {"date": "2026-08-06", "price": 7.8114}, {"date": "2026-08-07", "price": 7.7981}, {"date": "2026-08-08", "price": 7.8086}, {"date": "2026-08-09", "price": 7.8124}, {"date": "2026-08-10", "price": 7.8016}, {"date": "2026-08-11", "price": 7.8011}, {"date": "2026-08-12", "price": 7.8001}, {"date": "2026-08-13", "price": 7.7932}, {"date": "2026-08-14", "price": 7.7923}, {"date": "2026-08-15", "price": 7.8135}, {"date": "2026-08-16", "price": 7.818}, {"date": "2026-08-17", "price": 7.8094}, {"date": "2026-08-18", "price": 7.824}, {"date": "2026-08-19", "price": 7.8217}, {"date": "2026-08-20", "price": 7.8585}, {"date": "2026-08-21", "price": 7.8728}, {"date": "2026-08-22", "price": 7.8711}, {"date": "2026-08-23", "price": 7.8772}, {"date": "2026-08-24", "price": 7.8595}, {"date": "2026-08-25", "price": 7.8612}, {"date": "2026-08-26", "price": 7.862}, {"date": "2026-08-27", "price": 7.8547}, {"date": "2026-08-28", "price": 7.8498}, {"date": "2026-08-29", "price": 7.8273}, {"date": "2026-08-30", "price": 7.8301}, {"date": "2026-08-31", "price": 7.8114}, {"date": "2026-09-01", "price": 7.8201}, {"date": "2026-09-02", "price": 7.8109}, {"date": "2026-09-03", "price": 7.8027}, {"date": "2026-09-04", "price": 7.8263}, {"date": "2026-09-05", "price": 7.8141}, {"date": "2026-09-06", "price": 7.821}, {"date": "2026-09-07", "price": 7.8035}, {"date": "2026-09-08", "price": 7.8204}, {"date": "2026-09-09", "price": 7.821}, {"date": "2026-09-10", "price": 7.8242}, {"date": "2026-09-11", "price": 7.8166}, {"date": "2026-09-12", "price": 7.8018}, {"date": "2026-09-13", "price": 7.8099}, {"date": "2026-09-14", "price": 7.7885}, {"date": "2026-09-15", "price": 7.7686}, {"date": "2026-09-16", "price": 7.7613}, {"date": "2026-09-17", "price": 7.733}, {"date": "2026-09-18", "price": 7.7207}, {"date": "2026-09-19", "price": 7.7062}, {"date": "2026-09-20", "price": 7.7109}, {"date": "2026-09-21", "price": 7.6951}, {"date": "2026-09-22", "price": 7.6973}, {"date": "2026-09-23", "price": 7.6883}, {"date": "2026-09-24", "price": 7.6623}, {"date": "2026-09-25", "price": 7.6447}, {"date": "2026-09-26", "price": 7.6654}, {"date": "2026-09-27", "price": 7.6684}, {"date": "2026-09-28", "price": 7.6501}, {"date": "2026-09-29", "price": 7.6448}, {"date": "2026-09-30", "price": 7.6208}, {"date": "2026-10-01", "price": 7.6171}, {"date": "2026-10-02", "price": 7.5673}, {"date": "2026-10-03", "price": 7.5548}, {"date": "2026-10-04", "price": 7.561}, {"date": "2026-10-05", "price": 7.5491}, {"date": "2026-10-06", "price": 7.5265}, {"date": "2026-10-07", "price": 7.5522}, {"date": "2026-10-08", "price": 7.5172}, {"date": "2026-10-09", "price": 7.5262}, {"date": "2026-10-10", "price": 7.5152}, {"date": "2026-10-11", "price": 7.5152}, {"date": "2026-10-12", "price": 7.5063}, {"date": "2026-10-13", "price": 7.4912}, {"date": "2026-10-14", "price": 7.5049}, {"date": "2026-10-15", "price": 7.4981}, {"date": "2026-10-16", "price": 7.5175}, {"date": "2026-10-17", "price": 7.5305}, {"date": "2026-10-18", "price": 7.5346}, {"date": "2026-10-19", "price": 7.5127}, {"date": "2026-10-20", "price": 7.5085}, {"date": "2026-10-21", "price": 7.512}, {"date": "2026-10-22", "price": 7.5136}], "gold": [{"date": "2026-06-15", "price": 4338.48}, {"date": "2026-06-16", "price": 4341.54}, {"date": "2026-06-17", "price": 4327.71}, {"date": "2026-06-18", "price": 4267.06}, {"date": "2026-06-19", "price": 4155.91}, {"date": "2026-06-20", "price": 4155.44}, {"date": "2026-06-21", "price": 4155.44}, {"date": "2026-06-22", "price": 4207.38}, {"date": "2026-06-23", "price": 4103.92}, {"date": "2026-06-24", "price": 4080.81}, {"date": "2026-06-25", "price": 3999.59}, {"date": "2026-06-26", "price": 4034.24}, {"date": "2026-06-27", "price": 4081.02}, {"date": "2026-06-28", "price": 4081.02}, {"date": "2026-06-29", "price": 4037.71}, {"date": "2026-06-30", "price": 4016.96}, {"date": "2026-07-01", "price": 3975.55}, {"date": "2026-07-02", "price": 4074.15}, {"date": "2026-07-03", "price": 4182.09}, {"date": "2026-07-04", "price": 4174.77}, {"date": "2026-07-05", "price": 4174.77}, {"date": "2026-07-06", "price": 4141.07}, {"date": "2026-07-07", "price": 4122.25}, {"date": "2026-07-08", "price": 4120.15}, {"date": "2026-07-09", "price": 4109.95}, {"date": "2026-07-10", "price": 4097.09}, {"date": "2026-07-11", "price": 4119.01}, {"date": "2026-07-12", "price": 4119.01}, {"date": "2026-07-13", "price": 4073.73}, {"date": "2026-07-14", "price": 4026.22}, {"date": "2026-07-15", "price": 4025.93}, {"date": "2026-07-16", "price": 4030.85}, {"date": "2026-07-17", "price": 3995.8}, {"date": "2026-07-18", "price": 4016.36}, {"date": "2026-07-19", "price": 4016.36}, {"date": "2026-07-20", "price": 4019.99}, {"date": "2026-07-21", "price": 4072.29}, {"date": "2026-07-22", "price": 4110.47}, {"date": "2026-07-23", "price": 4090.82}, {"date": "2026-07-24", "price": 4048.57}, {"date": "2026-07-25", "price": 4053.29}, {"date": "2026-07-26", "price": 4053.29}, {"date": "2026-07-27", "price": 4094.26}, {"date": "2026-07-28", "price": 4054.75}, {"date": "2026-07-29", "price": 4039.75}, {"date": "2026-07-30", "price": 4038.82}, {"date": "2026-07-31", "price": 4063.48}, {"date": "2026-08-01", "price": 4046.42}, {"date": "2026-08-02", "price": 4046.42}, {"date": "2026-08-03", "price": 4057.93}, {"date": "2026-08-04", "price": 4070.52}, {"date": "2026-08-05", "price": 4169.85}, {"date": "2026-08-06", "price": 4263.82}, {"date": "2026-08-07", "price": 4294.53}, {"date": "2026-08-08", "price": 4341.12}, {"date": "2026-08-09", "price": 4341.12}, {"date": "2026-08-10", "price": 4358.69}, {"date": "2026-08-11", "price": 4363.13}, {"date": "2026-08-12", "price": 4403.57}, {"date": "2026-08-13", "price": 4379.65}, {"date": "2026-08-14", "price": 4334.25}, {"date": "2026-08-15", "price": 4375.8}, {"date": "2026-08-16", "price": 4375.8}, {"date": "2026-08-17", "price": 4397.53}, {"date": "2026-08-18", "price": 4392.43}, {"date": "2026-08-19", "price": 4335.54}, {"date": "2026-08-20", "price": 4488.65}, {"date": "2026-08-21", "price": 4550.52}, {"date": "2026-08-22", "price": 4604.53}, {"date": "2026-08-23", "price": 4604.53}, {"date": "2026-08-24", "price": 4646.97}, {"date": "2026-08-25", "price": 4645.06}, {"date": "2026-08-26", "price": 4638.17}, {"date": "2026-08-27", "price": 4612.13}, {"date": "2026-08-28", "price": 4469.32}, {"date": "2026-08-29", "price": 4454.23}, {"date": "2026-08-30", "price": 4454.23}, {"date": "2026-08-31", "price": 4453.29}, {"date": "2026-09-01", "price": 4384.98}, {"date": "2026-09-02", "price": 4309.37}, {"date": "2026-09-03", "price": 4426.46}, {"date": "2026-09-04", "price": 4467.44}, {"date": "2026-09-05", "price": 4430.96}, {"date": "2026-09-06", "price": 4430.96}, {"date": "2026-09-07", "price": 4398.43}, {"date": "2026-09-08", "price": 4396.64}, {"date": "2026-09-09", "price": 4392.32}, {"date": "2026-09-10", "price": 4399.43}, {"date": "2026-09-11", "price": 4347.17}, {"date": "2026-09-12", "price": 4348.35}, {"date": "2026-09-13", "price": 4348.35}, {"date": "2026-09-14", "price": 4294.4}, {"date": "2026-09-15", "price": 4273.62}, {"date": "2026-09-16", "price": 4343.99}, {"date": "2026-09-17", "price": 4314.96}, {"date": "2026-09-18", "price": 4376.41}, {"date": "2026-09-19", "price": 4378.29}, {"date": "2026-09-20", "price": 4378.29}, {"date": "2026-09-21", "price": 4344.47}, {"date": "2026-09-22", "price": 4329.31}, {"date": "2026-09-23", "price": 4316.44}, {"date": "2026-09-24", "price": 4252.3}, {"date": "2026-09-25", "price": 4306.31}, {"date": "2026-09-26", "price": 4285.12}, {"date": "2026-09-27", "price": 4285.12}, {"date": "2026-09-28", "price": 4147.08}, {"date": "2026-09-29", "price": 4158.36}, {"date": "2026-09-30", "price": 4181.09}, {"date": "2026-10-01", "price": 4182.27}, {"date": "2026-10-02", "price": 4184.3}, {"date": "2026-10-03", "price": 4139.28}, {"date": "2026-10-04", "price": 4139.28}, {"date": "2026-10-05", "price": 4161.05}, {"date": "2026-10-06", "price": 4178.49}, {"date": "2026-10-07", "price": 4123.2}, {"date": "2026-10-08", "price": 4123.1}, {"date": "2026-10-09", "price": 4182.53}, {"date": "2026-10-10", "price": 4194.39}, {"date": "2026-10-11", "price": 4194.39}, {"date": "2026-10-12", "price": 4169.95}, {"date": "2026-10-13", "price": 4180.59}, {"date": "2026-10-14", "price": 4144.05}, {"date": "2026-10-15", "price": 4152.84}, {"date": "2026-10-16", "price": 4177.66}, {"date": "2026-10-17", "price": 4164.05}, {"date": "2026-10-18", "price": 4164.05}, {"date": "2026-10-19", "price": 4176.79}, {"date": "2026-10-20", "price": 4117.83}, {"date": "2026-10-21", "price": 4122.36}, {"date": "2026-10-22", "price": 4088.58}], "jpycny": [{"date": "2026-06-15", "price": 4.227}, {"date": "2026-06-16", "price": 4.2281}, {"date": "2026-06-17", "price": 4.2217}, {"date": "2026-06-18", "price": 4.2219}, {"date": "2026-06-19", "price": 4.2107}, {"date": "2026-06-20", "price": 4.207}, {"date": "2026-06-21", "price": 4.2109}, {"date": "2026-06-22", "price": 4.2109}, {"date": "2026-06-23", "price": 4.1996}, {"date": "2026-06-24", "price": 4.2097}, {"date": "2026-06-25", "price": 4.2153}, {"date": "2026-06-26", "price": 4.2086}, {"date": "2026-06-27", "price": 4.2096}, {"date": "2026-06-28", "price": 4.212}, {"date": "2026-06-29", "price": 4.2059}, {"date": "2026-06-30", "price": 4.2031}, {"date": "2026-07-01", "price": 4.1825}, {"date": "2026-07-02", "price": 4.184}, {"date": "2026-07-03", "price": 4.2126}, {"date": "2026-07-04", "price": 4.2101}, {"date": "2026-07-05", "price": 4.2136}, {"date": "2026-07-06", "price": 4.2044}, {"date": "2026-07-07", "price": 4.1953}, {"date": "2026-07-08", "price": 4.1959}, {"date": "2026-07-09", "price": 4.1904}, {"date": "2026-07-10", "price": 4.1879}, {"date": "2026-07-11", "price": 4.1941}, {"date": "2026-07-12", "price": 4.1969}, {"date": "2026-07-13", "price": 4.1883}, {"date": "2026-07-14", "price": 4.1823}, {"date": "2026-07-15", "price": 4.182}, {"date": "2026-07-16", "price": 4.1801}, {"date": "2026-07-17", "price": 4.1769}, {"date": "2026-07-18", "price": 4.1777}, {"date": "2026-07-19", "price": 4.1807}, {"date": "2026-07-20", "price": 4.1732}, {"date": "2026-07-21", "price": 4.1719}, {"date": "2026-07-22", "price": 4.1571}, {"date": "2026-07-23", "price": 4.1582}, {"date": "2026-07-24", "price": 4.1438}, {"date": "2026-07-25", "price": 4.1398}, {"date": "2026-07-26", "price": 4.1427}, {"date": "2026-07-27", "price": 4.1409}, {"date": "2026-07-28", "price": 4.1378}, {"date": "2026-07-29", "price": 4.1375}, {"date": "2026-07-30", "price": 4.1421}, {"date": "2026-07-31", "price": 4.2135}, {"date": "2026-08-01", "price": 4.2671}, {"date": "2026-08-02", "price": 4.2747}, {"date": "2026-08-03", "price": 4.2779}, {"date": "2026-08-04", "price": 4.3049}, {"date": "2026-08-05", "price": 4.2907}, {"date": "2026-08-06", "price": 4.2905}, {"date": "2026-08-07", "price": 4.2751}, {"date": "2026-08-08", "price": 4.2821}, {"date": "2026-08-09", "price": 4.2837}, {"date": "2026-08-10", "price": 4.2768}, {"date": "2026-08-11", "price": 4.25}, {"date": "2026-08-12", "price": 4.2429}, {"date": "2026-08-13", "price": 4.2419}, {"date": "2026-08-14", "price": 4.2392}, {"date": "2026-08-15", "price": 4.2425}, {"date": "2026-08-16", "price": 4.2459}, {"date": "2026-08-17", "price": 4.239}, {"date": "2026-08-18", "price": 4.2389}, {"date": "2026-08-19", "price": 4.2339}, {"date": "2026-08-20", "price": 4.2549}, {"date": "2026-08-21", "price": 4.2432}, {"date": "2026-08-22", "price": 4.2388}, {"date": "2026-08-23", "price": 4.2441}, {"date": "2026-08-24", "price": 4.2346}, {"date": "2026-08-25", "price": 4.2348}, {"date": "2026-08-26", "price": 4.2306}, {"date": "2026-08-27", "price": 4.2314}, {"date": "2026-08-28", "price": 4.2285}, {"date": "2026-08-29", "price": 4.2158}, {"date": "2026-08-30", "price": 4.2181}, {"date": "2026-08-31", "price": 4.2087}, {"date": "2026-09-01", "price": 4.2157}, {"date": "2026-09-02", "price": 4.2076}, {"date": "2026-09-03", "price": 4.2344}, {"date": "2026-09-04", "price": 4.3171}, {"date": "2026-09-05", "price": 4.309}, {"date": "2026-09-06", "price": 4.3122}, {"date": "2026-09-07", "price": 4.3024}, {"date": "2026-09-08", "price": 4.3574}, {"date": "2026-09-09", "price": 4.3742}, {"date": "2026-09-10", "price": 4.3788}, {"date": "2026-09-11", "price": 4.3618}, {"date": "2026-09-12", "price": 4.3739}, {"date": "2026-09-13", "price": 4.3764}, {"date": "2026-09-14", "price": 4.3718}, {"date": "2026-09-15", "price": 4.356}, {"date": "2026-09-16", "price": 4.3378}, {"date": "2026-09-17", "price": 4.3208}, {"date": "2026-09-18", "price": 4.3134}, {"date": "2026-09-19", "price": 4.275}, {"date": "2026-09-20", "price": 4.2754}, {"date": "2026-09-21", "price": 4.2727}, {"date": "2026-09-22", "price": 4.2644}, {"date": "2026-09-23", "price": 4.2648}, {"date": "2026-09-24", "price": 4.2514}, {"date": "2026-09-25", "price": 4.233}, {"date": "2026-09-26", "price": 4.2685}, {"date": "2026-09-27", "price": 4.2737}, {"date": "2026-09-28", "price": 4.2666}, {"date": "2026-09-29", "price": 4.2727}, {"date": "2026-09-30", "price": 4.2683}, {"date": "2026-10-01", "price": 4.2702}, {"date": "2026-10-02", "price": 4.2518}, {"date": "2026-10-03", "price": 4.2546}, {"date": "2026-10-04", "price": 4.2581}, {"date": "2026-10-05", "price": 4.2543}, {"date": "2026-10-06", "price": 4.2501}, {"date": "2026-10-07", "price": 4.2442}, {"date": "2026-10-08", "price": 4.2457}, {"date": "2026-10-09", "price": 4.2493}, {"date": "2026-10-10", "price": 4.2369}, {"date": "2026-10-11", "price": 4.2371}, {"date": "2026-10-12", "price": 4.2345}, {"date": "2026-10-13", "price": 4.2296}, {"date": "2026-10-14", "price": 4.2354}, {"date": "2026-10-15", "price": 4.2364}, {"date": "2026-10-16", "price": 4.2401}, {"date": "2026-10-17", "price": 4.2397}, {"date": "2026-10-18", "price": 4.2423}, {"date": "2026-10-19", "price": 4.2383}, {"date": "2026-10-20", "price": 4.2247}, {"date": "2026-10-21", "price": 4.229}, {"date": "2026-10-22", "price": 4.2311}], "nasdaq": [{"date": "2026-06-15", "price": 25888.84}, {"date": "2026-06-16", "price": 26683.94}, {"date": "2026-06-17", "price": 26376.34}, {"date": "2026-06-18", "price": 26021.66}, {"date": "2026-06-19", "price": 26517.93}, {"date": "2026-06-20", "price": 26517.93}, {"date": "2026-06-21", "price": 26517.93}, {"date": "2026-06-22", "price": 26517.93}, {"date": "2026-06-23", "price": 26166.6}, {"date": "2026-06-24", "price": 25587.04}, {"date": "2026-06-25", "price": 25476.63}, {"date": "2026-06-26", "price": 25358.6}, {"date": "2026-06-27", "price": 25297.62}, {"date": "2026-06-28", "price": 25297.62}, {"date": "2026-06-29", "price": 25297.62}, {"date": "2026-06-30", "price": 25820.14}, {"date": "2026-07-01", "price": 26213.72}, {"date": "2026-07-02", "price": 26040.03}, {"date": "2026-07-03", "price": 25832.67}, {"date": "2026-07-04", "price": 25832.67}, {"date": "2026-07-05", "price": 25832.67}, {"date": "2026-07-06", "price": 25832.67}, {"date": "2026-07-07", "price": 26121.16}, {"date": "2026-07-08", "price": 25818.69}, {"date": "2026-07-09", "price": 25870.65}, {"date": "2026-07-10", "price": 26206.89}, {"date": "2026-07-11", "price": 26281.61}, {"date": "2026-07-12", "price": 26281.61}, {"date": "2026-07-13", "price": 26281.61}, {"date": "2026-07-14", "price": 25873.18}, {"date": "2026-07-15", "price": 26107.01}, {"date": "2026-07-16", "price": 26269.23}, {"date": "2026-07-17", "price": 25881.95}, {"date": "2026-07-18", "price": 25520.24}, {"date": "2026-07-19", "price": 25520.24}, {"date": "2026-07-20", "price": 25520.24}, {"date": "2026-07-21", "price": 25508.07}, {"date": "2026-07-22", "price": 25837.21}, {"date": "2026-07-23", "price": 25690.9}, {"date": "2026-07-24", "price": 25137.69}, {"date": "2026-07-25", "price": 24975.82}, {"date": "2026-07-26", "price": 24975.82}, {"date": "2026-07-27", "price": 24975.82}, {"date": "2026-07-28", "price": 24932.08}, {"date": "2026-07-29", "price": 24876.91}, {"date": "2026-07-30", "price": 24442.94}, {"date": "2026-07-31", "price": 25122.18}, {"date": "2026-08-01", "price": 25373.85}, {"date": "2026-08-02", "price": 25373.85}, {"date": "2026-08-03", "price": 25373.85}, {"date": "2026-08-04", "price": 25913.9}, {"date": "2026-08-05", "price": 26584.99}, {"date": "2026-08-06", "price": 26363.44}, {"date": "2026-08-07", "price": 26348.35}, {"date": "2026-08-08", "price": 26690.62}, {"date": "2026-08-09", "price": 26690.62}, {"date": "2026-08-10", "price": 26690.62}, {"date": "2026-08-11", "price": 26605.36}, {"date": "2026-08-12", "price": 26445.45}, {"date": "2026-08-13", "price": 26588.49}, {"date": "2026-08-14", "price": 26803.03}, {"date": "2026-08-15", "price": 26729.16}, {"date": "2026-08-16", "price": 26729.16}, {"date": "2026-08-17", "price": 26729.16}, {"date": "2026-08-18", "price": 26644.91}, {"date": "2026-08-19", "price": 26289.71}, {"date": "2026-08-20", "price": 26331.09}, {"date": "2026-08-21", "price": 26067.17}, {"date": "2026-08-22", "price": 26180.46}, {"date": "2026-08-23", "price": 26180.46}, {"date": "2026-08-24", "price": 26180.46}, {"date": "2026-08-25", "price": 25980.19}, {"date": "2026-08-26", "price": 26151.3}, {"date": "2026-08-27", "price": 26130.2}, {"date": "2026-08-28", "price": 26541.35}, {"date": "2026-08-29", "price": 26402.42}, {"date": "2026-08-30", "price": 26402.42}, {"date": "2026-08-31", "price": 26402.42}, {"date": "2026-09-01", "price": 26370.89}, {"date": "2026-09-02", "price": 26099.77}, {"date": "2026-09-03", "price": 26217.83}, {"date": "2026-09-04", "price": 26584.06}, {"date": "2026-09-05", "price": 26506.99}, {"date": "2026-09-06", "price": 26506.99}, {"date": "2026-09-07", "price": 26506.99}, {"date": "2026-09-08", "price": 26506.99}, {"date": "2026-09-09", "price": 26421.41}, {"date": "2026-09-10", "price": 26253.34}, {"date": "2026-09-11", "price": 26081.72}, {"date": "2026-09-12", "price": 26333.04}, {"date": "2026-09-13", "price": 26333.04}, {"date": "2026-09-14", "price": 26333.04}, {"date": "2026-09-15", "price": 26186.41}, {"date": "2026-09-16", "price": 25981.57}, {"date": "2026-09-17", "price": 25978.42}, {"date": "2026-09-18", "price": 26418.3}, {"date": "2026-09-19", "price": 26522.54}, {"date": "2026-09-20", "price": 26522.54}, {"date": "2026-09-21", "price": 26522.54}, {"date": "2026-09-22", "price": 27122.09}, {"date": "2026-09-23", "price": 27244.28}, {"date": "2026-09-24", "price": 26936.04}, {"date": "2026-09-25", "price": 26939.37}, {"date": "2026-09-26", "price": 27068.72}, {"date": "2026-09-27", "price": 27068.72}, {"date": "2026-09-28", "price": 27068.72}, {"date": "2026-09-29", "price": 26820.38}, {"date": "2026-09-30", "price": 26797.54}, {"date": "2026-10-01", "price": 26861.06}, {"date": "2026-10-02", "price": 26871.6}, {"date": "2026-10-03", "price": 27190.86}, {"date": "2026-10-04", "price": 27190.86}, {"date": "2026-10-05", "price": 27190.86}, {"date": "2026-10-06", "price": 27477.31}, {"date": "2026-10-07", "price": 27599.79}, {"date": "2026-10-08", "price": 27538.69}, {"date": "2026-10-09", "price": 27193.34}, {"date": "2026-10-10", "price": 27366.17}, {"date": "2026-10-11", "price": 27366.17}, {"date": "2026-10-12", "price": 27366.17}, {"date": "2026-10-13", "price": 27245.9}, {"date": "2026-10-14", "price": 27204.38}, {"date": "2026-10-15", "price": 26692.87}, {"date": "2026-10-16", "price": 26713.03}, {"date": "2026-10-17", "price": 26140.03}, {"date": "2026-10-18", "price": 26140.03}, {"date": "2026-10-19", "price": 26140.03}, {"date": "2026-10-20", "price": 26430.89}, {"date": "2026-10-21", "price": 26424.82}, {"date": "2026-10-22", "price": 26702.86}], "oil": [{"date": "2026-06-15", "price": 80.341}, {"date": "2026-06-16", "price": 77.149}, {"date": "2026-06-17", "price": 75.66}, {"date": "2026-06-18", "price": 73.888}, {"date": "2026-06-19", "price": 75.63}, {"date": "2026-06-20", "price": 76.564}, {"date": "2026-06-21", "price": 76.564}, {"date": "2026-06-22", "price": 75.306}, {"date": "2026-06-23", "price": 73.613}, {"date": "2026-06-24", "price": 71.945}, {"date": "2026-06-25", "price": 69.182}, {"date": "2026-06-26", "price": 69.372}, {"date": "2026-06-27", "price": 70.386}, {"date": "2026-06-28", "price": 70.386}, {"date": "2026-06-29", "price": 70.014}, {"date": "2026-06-30", "price": 70.764}, {"date": "2026-07-01", "price": 68.435}, {"date": "2026-07-02", "price": 68.003}, {"date": "2026-07-03", "price": 68.446}, {"date": "2026-07-04", "price": 68.823}, {"date": "2026-07-05", "price": 68.823}, {"date": "2026-07-06", "price": 68.279}, {"date": "2026-07-07", "price": 69.354}, {"date": "2026-07-08", "price": 71.999}, {"date": "2026-07-09", "price": 72.812}, {"date": "2026-07-10", "price": 72.092}, {"date": "2026-07-11", "price": 71.429}, {"date": "2026-07-12", "price": 71.429}, {"date": "2026-07-13", "price": 73.468}, {"date": "2026-07-14", "price": 80.444}, {"date": "2026-07-15", "price": 80.369}, {"date": "2026-07-16", "price": 79.014}, {"date": "2026-07-17", "price": 78.973}, {"date": "2026-07-18", "price": 81.797}, {"date": "2026-07-19", "price": 81.797}, {"date": "2026-07-20", "price": 81.471}, {"date": "2026-07-21", "price": 81.945}, {"date": "2026-07-22", "price": 87.626}, {"date": "2026-07-23", "price": 89.544}, {"date": "2026-07-24", "price": 90.417}, {"date": "2026-07-25", "price": 90.721}, {"date": "2026-07-26", "price": 90.721}, {"date": "2026-07-27", "price": 83.059}, {"date": "2026-07-28", "price": 80.724}, {"date": "2026-07-29", "price": 82.113}, {"date": "2026-07-30", "price": 85.238}, {"date": "2026-07-31", "price": 82.1}, {"date": "2026-08-01", "price": 86.843}, {"date": "2026-08-02", "price": 86.843}, {"date": "2026-08-03", "price": 80.632}, {"date": "2026-08-04", "price": 80.877}, {"date": "2026-08-05", "price": 75.811}, {"date": "2026-08-06", "price": 75.458}, {"date": "2026-08-07", "price": 77.898}, {"date": "2026-08-08", "price": 77.031}, {"date": "2026-08-09", "price": 77.031}, {"date": "2026-08-10", "price": 78.042}, {"date": "2026-08-11", "price": 83.47}, {"date": "2026-08-12", "price": 83.69}, {"date": "2026-08-13", "price": 82.886}, {"date": "2026-08-14", "price": 82.3}, {"date": "2026-08-15", "price": 82.453}, {"date": "2026-08-16", "price": 82.453}, {"date": "2026-08-17", "price": 81.163}, {"date": "2026-08-18", "price": 84.477}, {"date": "2026-08-19", "price": 84.951}, {"date": "2026-08-20", "price": 84.46}, {"date": "2026-08-21", "price": 86.224}, {"date": "2026-08-22", "price": 86.573}, {"date": "2026-08-23", "price": 86.573}, {"date": "2026-08-24", "price": 85.281}, {"date": "2026-08-25", "price": 84.35}, {"date": "2026-08-26", "price": 80.873}, {"date": "2026-08-27", "price": 82.891}, {"date": "2026-08-28", "price": 83.476}, {"date": "2026-08-29", "price": 83.467}, {"date": "2026-08-30", "price": 83.467}, {"date": "2026-08-31", "price": 86.553}, {"date": "2026-09-01", "price": 87.77}, {"date": "2026-09-02", "price": 90.392}, {"date": "2026-09-03", "price": 92.406}, {"date": "2026-09-04", "price": 90.999}, {"date": "2026-09-05", "price": 91.315}, {"date": "2026-09-06", "price": 91.315}, {"date": "2026-09-07", "price": 91.555}, {"date": "2026-09-08", "price": 94.027}, {"date": "2026-09-09", "price": 95.214}, {"date": "2026-09-10", "price": 97.527}, {"date": "2026-09-11", "price": 99.338}, {"date": "2026-09-12", "price": 99.878}, {"date": "2026-09-13", "price": 99.878}, {"date": "2026-09-14", "price": 102.464}, {"date": "2026-09-15", "price": 103.605}, {"date": "2026-09-16", "price": 99.01}, {"date": "2026-09-17", "price": 96.02}, {"date": "2026-09-18", "price": 96.417}, {"date": "2026-09-19", "price": 95.412}, {"date": "2026-09-20", "price": 95.412}, {"date": "2026-09-21", "price": 93.492}, {"date": "2026-09-22", "price": 89.746}, {"date": "2026-09-23", "price": 89.493}, {"date": "2026-09-24", "price": 93.322}, {"date": "2026-09-25", "price": 92.848}, {"date": "2026-09-26", "price": 92.338}, {"date": "2026-09-27", "price": 92.338}, {"date": "2026-09-28", "price": 96.153}, {"date": "2026-09-29", "price": 91.577}, {"date": "2026-09-30", "price": 90.518}, {"date": "2026-10-01", "price": 91.796}, {"date": "2026-10-02", "price": 89.312}, {"date": "2026-10-03", "price": 91.499}, {"date": "2026-10-04", "price": 91.499}, {"date": "2026-10-05", "price": 90.138}, {"date": "2026-10-06", "price": 87.188}, {"date": "2026-10-07", "price": 89.748}, {"date": "2026-10-08", "price": 92.612}, {"date": "2026-10-09", "price": 90.602}, {"date": "2026-10-10", "price": 91.716}, {"date": "2026-10-11", "price": 91.716}, {"date": "2026-10-12", "price": 93.744}, {"date": "2026-10-13", "price": 92.51}, {"date": "2026-10-14", "price": 95.462}, {"date": "2026-10-15", "price": 94.853}, {"date": "2026-10-16", "price": 97.596}, {"date": "2026-10-17", "price": 101.846}, {"date": "2026-10-18", "price": 101.846}, {"date": "2026-10-19", "price": 98.384}, {"date": "2026-10-20", "price": 100.648}, {"date": "2026-10-21", "price": 100.06}, {"date": "2026-10-22", "price": 99.28}], "shanghai": [{"date": "2026-06-15", "price": 4096.4717}, {"date": "2026-06-16", "price": 4091.8917}, {"date": "2026-06-17", "price": 4108.0762}, {"date": "2026-06-18", "price": 4090.4813}, {"date": "2026-06-19", "price": 4090.4813}, {"date": "2026-06-20", "price": 4090.4813}, {"date": "2026-06-21", "price": 4090.4813}, {"date": "2026-06-22", "price": 4163.0965}, {"date": "2026-06-23", "price": 4106.2517}, {"date": "2026-06-24", "price": 4110.8134}, {"date": "2026-06-25", "price": 4120.2806}, {"date": "2026-06-26", "price": 4027.2648}, {"date": "2026-06-27", "price": 4027.2648}, {"date": "2026-06-28", "price": 4027.2648}, {"date": "2026-06-29", "price": 4073.9017}, {"date": "2026-06-30", "price": 4094.3972}, {"date": "2026-07-01", "price": 4112.4453}, {"date": "2026-07-02", "price": 4028.9038}, {"date": "2026-07-03", "price": 4043.6432}, {"date": "2026-07-04", "price": 4043.6432}, {"date": "2026-07-05", "price": 4043.6432}, {"date": "2026-07-06", "price": 4041.2382}, {"date": "2026-07-07", "price": 3990.2353}, {"date": "2026-07-08", "price": 3970.8797}, {"date": "2026-07-09", "price": 4036.5879}, {"date": "2026-07-10", "price": 3996.1616}, {"date": "2026-07-11", "price": 3996.1616}, {"date": "2026-07-12", "price": 3996.1616}, {"date": "2026-07-13", "price": 3913.794}, {"date": "2026-07-14", "price": 3967.1262}, {"date": "2026-07-15", "price": 3955.5781}, {"date": "2026-07-16", "price": 3882.4126}, {"date": "2026-07-17", "price": 3764.1547}, {"date": "2026-07-18", "price": 3764.1547}, {"date": "2026-07-19", "price": 3764.1547}, {"date": "2026-07-20", "price": 3796.2814}, {"date": "2026-07-21", "price": 3864.3671}, {"date": "2026-07-22", "price": 3867.0336}, {"date": "2026-07-23", "price": 3876.7774}, {"date": "2026-07-24", "price": 3814.1978}, {"date": "2026-07-25", "price": 3814.1978}, {"date": "2026-07-26", "price": 3814.1978}, {"date": "2026-07-27", "price": 3858.245}, {"date": "2026-07-28", "price": 3813.3146}, {"date": "2026-07-29", "price": 3828.469}, {"date": "2026-07-30", "price": 3804.6926}, {"date": "2026-07-31", "price": 3832.2624}, {"date": "2026-08-01", "price": 3832.2624}, {"date": "2026-08-02", "price": 3832.2624}, {"date": "2026-08-03", "price": 3809.6629}, {"date": "2026-08-04", "price": 3822.2846}, {"date": "2026-08-05", "price": 3878.4296}, {"date": "2026-08-06", "price": 3900.3523}, {"date": "2026-08-07", "price": 3938.5869}, {"date": "2026-08-08", "price": 3940.0371}, {"date": "2026-08-09", "price": 3940.0371}, {"date": "2026-08-10", "price": 3967.5919}, {"date": "2026-08-11", "price": 3934.8988}, {"date": "2026-08-12", "price": 3946.6752}, {"date": "2026-08-13", "price": 3926.9648}, {"date": "2026-08-14", "price": 3927.1764}, {"date": "2026-08-15", "price": 3927.1764}, {"date": "2026-08-16", "price": 3927.1764}, {"date": "2026-08-17", "price": 3971.3738}, {"date": "2026-08-18", "price": 3976.7507}, {"date": "2026-08-19", "price": 3892.8344}, {"date": "2026-08-20", "price": 3890.6714}, {"date": "2026-08-21", "price": 3897.4962}, {"date": "2026-08-22", "price": 3905.2026}, {"date": "2026-08-23", "price": 3905.2026}, {"date": "2026-08-24", "price": 3873.4368}, {"date": "2026-08-25", "price": 3889.2491}, {"date": "2026-08-26", "price": 3911.0504}, {"date": "2026-08-27", "price": 3956.571}, {"date": "2026-08-28", "price": 3952.179}, {"date": "2026-08-29", "price": 3952.179}, {"date": "2026-08-30", "price": 3952.179}, {"date": "2026-08-31", "price": 3986.298}, {"date": "2026-09-01", "price": 3979.8877}, {"date": "2026-09-02", "price": 3941.3862}, {"date": "2026-09-03", "price": 3942.0879}, {"date": "2026-09-04", "price": 3930.1164}, {"date": "2026-09-05", "price": 3930.1164}, {"date": "2026-09-06", "price": 3930.1164}, {"date": "2026-09-07", "price": 3932.6992}, {"date": "2026-09-08", "price": 3940.5509}, {"date": "2026-09-09", "price": 3951.5068}, {"date": "2026-09-10", "price": 3934.4036}, {"date": "2026-09-11", "price": 3888.1106}, {"date": "2026-09-12", "price": 3888.1106}, {"date": "2026-09-13", "price": 3888.1106}, {"date": "2026-09-14", "price": 3885.3328}, {"date": "2026-09-15", "price": 3864.2794}, {"date": "2026-09-16", "price": 3891.6005}, {"date": "2026-09-17", "price": 3875.6044}, {"date": "2026-09-18", "price": 3911.8714}, {"date": "2026-09-19", "price": 3911.8714}, {"date": "2026-09-20", "price": 3911.8714}, {"date": "2026-09-21", "price": 3949.9068}, {"date": "2026-09-22", "price": 3952.128}, {"date": "2026-09-23", "price": 3936.5199}, {"date": "2026-09-24", "price": 3888.3738}, {"date": "2026-09-25", "price": 3888.3738}, {"date": "2026-09-26", "price": 3888.3738}, {"date": "2026-09-27", "price": 3888.3738}, {"date": "2026-09-28", "price": 3823.6206}, {"date": "2026-09-29", "price": 3830.4513}, {"date": "2026-09-30", "price": 3842.1946}, {"date": "2026-10-01", "price": 3842.1946}, {"date": "2026-10-02", "price": 3842.1946}, {"date": "2026-10-03", "price": 3842.1946}, {"date": "2026-10-04", "price": 3842.1946}, {"date": "2026-10-05", "price": 3842.1946}, {"date": "2026-10-06", "price": 3842.1946}, {"date": "2026-10-07", "price": 3842.1946}, {"date": "2026-10-08", "price": 3811.9043}, {"date": "2026-10-09", "price": 3813.7913}, {"date": "2026-10-10", "price": 3813.7913}, {"date": "2026-10-11", "price": 3813.7913}, {"date": "2026-10-12", "price": 3797.2424}, {"date": "2026-10-13", "price": 3800.8644}, {"date": "2026-10-14", "price": 3767.2271}, {"date": "2026-10-15", "price": 3707.476}, {"date": "2026-10-16", "price": 3716.2842}, {"date": "2026-10-17", "price": 3716.2842}, {"date": "2026-10-18", "price": 3716.2842}, {"date": "2026-10-19", "price": 3730.92}, {"date": "2026-10-20", "price": 3735.3704}, {"date": "2026-10-21", "price": 3713.0277}, {"date": "2026-10-22", "price": 3658.0256}], "star50": [{"date": "2026-06-15", "price": 1748.3264}, {"date": "2026-06-16", "price": 1758.4244}, {"date": "2026-06-17", "price": 1840.8211}, {"date": "2026-06-18", "price": 1911.5132}, {"date": "2026-06-19", "price": 1911.5132}, {"date": "2026-06-20", "price": 1911.5132}, {"date": "2026-06-21", "price": 1911.5132}, {"date": "2026-06-22", "price": 1948.9281}, {"date": "2026-06-23", "price": 1916.2123}, {"date": "2026-06-24", "price": 1989.4257}, {"date": "2026-06-25", "price": 2066.3309}, {"date": "2026-06-26", "price": 2032.2842}, {"date": "2026-06-27", "price": 2032.2842}, {"date": "2026-06-28", "price": 2032.2842}, {"date": "2026-06-29", "price": 2126.0105}, {"date": "2026-06-30", "price": 2207.8648}, {"date": "2026-07-01", "price": 2153.0431}, {"date": "2026-07-02", "price": 1987.291}, {"date": "2026-07-03", "price": 1975.6001}, {"date": "2026-07-04", "price": 1975.6001}, {"date": "2026-07-05", "price": 1975.6001}, {"date": "2026-07-06", "price": 1996.1029}, {"date": "2026-07-07", "price": 2001.5859}, {"date": "2026-07-08", "price": 2016.2327}, {"date": "2026-07-09", "price": 2185.8251}, {"date": "2026-07-10", "price": 2064.9756}, {"date": "2026-07-11", "price": 2064.9756}, {"date": "2026-07-12", "price": 2064.9756}, {"date": "2026-07-13", "price": 1994.3192}, {"date": "2026-07-14", "price": 2009.7296}, {"date": "2026-07-15", "price": 1924.2735}, {"date": "2026-07-16", "price": 1846.8766}, {"date": "2026-07-17", "price": 1715.4044}, {"date": "2026-07-18", "price": 1715.4044}, {"date": "2026-07-19", "price": 1715.4044}, {"date": "2026-07-20", "price": 1718.6895}, {"date": "2026-07-21", "price": 1903.1613}, {"date": "2026-07-22", "price": 1860.0848}, {"date": "2026-07-23", "price": 1789.6941}, {"date": "2026-07-24", "price": 1787.1958}, {"date": "2026-07-25", "price": 1787.1958}, {"date": "2026-07-26", "price": 1787.1958}, {"date": "2026-07-27", "price": 1807.951}, {"date": "2026-07-28", "price": 1693.4786}, {"date": "2026-07-29", "price": 1678.7376}, {"date": "2026-07-30", "price": 1588.4149}, {"date": "2026-07-31", "price": 1635.9624}, {"date": "2026-08-01", "price": 1635.9624}, {"date": "2026-08-02", "price": 1635.9624}, {"date": "2026-08-03", "price": 1552.8903}, {"date": "2026-08-04", "price": 1616.3582}, {"date": "2026-08-05", "price": 1693.6677}, {"date": "2026-08-06", "price": 1701.2916}, {"date": "2026-08-07", "price": 1741.0714}, {"date": "2026-08-08", "price": 1744.0236}, {"date": "2026-08-09", "price": 1744.0236}, {"date": "2026-08-10", "price": 1737.7885}, {"date": "2026-08-11", "price": 1712.4003}, {"date": "2026-08-12", "price": 1736.9912}, {"date": "2026-08-13", "price": 1717.7477}, {"date": "2026-08-14", "price": 1717.6793}, {"date": "2026-08-15", "price": 1717.6793}, {"date": "2026-08-16", "price": 1717.6793}, {"date": "2026-08-17", "price": 1774.7221}, {"date": "2026-08-18", "price": 1780.3257}, {"date": "2026-08-19", "price": 1673.4984}, {"date": "2026-08-20", "price": 1642.296}, {"date": "2026-08-21", "price": 1642.9023}, {"date": "2026-08-22", "price": 1653.5551}, {"date": "2026-08-23", "price": 1653.5551}, {"date": "2026-08-24", "price": 1595.2376}, {"date": "2026-08-25", "price": 1606.4027}, {"date": "2026-08-26", "price": 1626.5266}, {"date": "2026-08-27", "price": 1693.4796}, {"date": "2026-08-28", "price": 1662.1493}, {"date": "2026-08-29", "price": 1662.1493}, {"date": "2026-08-30", "price": 1662.1493}, {"date": "2026-08-31", "price": 1684.3873}, {"date": "2026-09-01", "price": 1647.5349}, {"date": "2026-09-02", "price": 1617.5967}, {"date": "2026-09-03", "price": 1611.1652}, {"date": "2026-09-04", "price": 1577.3606}, {"date": "2026-09-05", "price": 1577.3606}, {"date": "2026-09-06", "price": 1577.3606}, {"date": "2026-09-07", "price": 1615.5305}, {"date": "2026-09-08", "price": 1590.9954}, {"date": "2026-09-09", "price": 1580.0588}, {"date": "2026-09-10", "price": 1569.2182}, {"date": "2026-09-11", "price": 1553.394}, {"date": "2026-09-12", "price": 1553.394}, {"date": "2026-09-13", "price": 1553.394}, {"date": "2026-09-14", "price": 1528.2661}, {"date": "2026-09-15", "price": 1551.9581}, {"date": "2026-09-16", "price": 1616.1856}, {"date": "2026-09-17", "price": 1606.2869}, {"date": "2026-09-18", "price": 1652.631}, {"date": "2026-09-19", "price": 1652.631}, {"date": "2026-09-20", "price": 1652.631}, {"date": "2026-09-21", "price": 1657.4846}, {"date": "2026-09-22", "price": 1665.0418}, {"date": "2026-09-23", "price": 1660.8542}, {"date": "2026-09-24", "price": 1621.872}, {"date": "2026-09-25", "price": 1621.872}, {"date": "2026-09-26", "price": 1621.872}, {"date": "2026-09-27", "price": 1621.872}, {"date": "2026-09-28", "price": 1555.9804}, {"date": "2026-09-29", "price": 1569.3384}, {"date": "2026-09-30", "price": 1530.0057}, {"date": "2026-10-01", "price": 1530.0057}, {"date": "2026-10-02", "price": 1530.0057}, {"date": "2026-10-03", "price": 1530.0057}, {"date": "2026-10-04", "price": 1530.0057}, {"date": "2026-10-05", "price": 1530.0057}, {"date": "2026-10-06", "price": 1530.0057}, {"date": "2026-10-07", "price": 1530.0057}, {"date": "2026-10-08", "price": 1456.3239}, {"date": "2026-10-09", "price": 1457.2665}, {"date": "2026-10-10", "price": 1457.2665}, {"date": "2026-10-11", "price": 1457.2665}, {"date": "2026-10-12", "price": 1426.7216}, {"date": "2026-10-13", "price": 1427.1775}, {"date": "2026-10-14", "price": 1380.2577}, {"date": "2026-10-15", "price": 1359.5214}, {"date": "2026-10-16", "price": 1358.647}, {"date": "2026-10-17", "price": 1358.647}, {"date": "2026-10-18", "price": 1358.647}, {"date": "2026-10-19", "price": 1329.19}, {"date": "2026-10-20", "price": 1342.4243}, {"date": "2026-10-21", "price": 1343.2818}, {"date": "2026-10-22", "price": 1305.8731}], "usdcny": [{"date": "2026-06-15", "price": 6.7691}, {"date": "2026-06-16", "price": 6.7719}, {"date": "2026-06-17", "price": 6.7698}, {"date": "2026-06-18", "price": 6.7742}, {"date": "2026-06-19", "price": 6.7836}, {"date": "2026-06-20", "price": 6.7844}, {"date": "2026-06-21", "price": 6.789}, {"date": "2026-06-22", "price": 6.789}, {"date": "2026-06-23", "price": 6.7869}, {"date": "2026-06-24", "price": 6.8004}, {"date": "2026-06-25", "price": 6.8177}, {"date": "2026-06-26", "price": 6.8086}, {"date": "2026-06-27", "price": 6.8076}, {"date": "2026-06-28", "price": 6.8112}, {"date": "2026-06-29", "price": 6.8037}, {"date": "2026-06-30", "price": 6.8044}, {"date": "2026-07-01", "price": 6.7965}, {"date": "2026-07-02", "price": 6.8011}, {"date": "2026-07-03", "price": 6.7963}, {"date": "2026-07-04", "price": 6.7907}, {"date": "2026-07-05", "price": 6.7953}, {"date": "2026-07-06", "price": 6.7855}, {"date": "2026-07-07", "price": 6.8018}, {"date": "2026-07-08", "price": 6.8019}, {"date": "2026-07-09", "price": 6.8102}, {"date": "2026-07-10", "price": 6.8002}, {"date": "2026-07-11", "price": 6.7848}, {"date": "2026-07-12", "price": 6.79}, {"date": "2026-07-13", "price": 6.78}, {"date": "2026-07-14", "price": 6.7883}, {"date": "2026-07-15", "price": 6.782}, {"date": "2026-07-16", "price": 6.7783}, {"date": "2026-07-17", "price": 6.7803}, {"date": "2026-07-18", "price": 6.7846}, {"date": "2026-07-19", "price": 6.7892}, {"date": "2026-07-20", "price": 6.7809}, {"date": "2026-07-21", "price": 6.7781}, {"date": "2026-07-22", "price": 6.7767}, {"date": "2026-07-23", "price": 6.7815}, {"date": "2026-07-24", "price": 6.783}, {"date": "2026-07-25", "price": 6.7819}, {"date": "2026-07-26", "price": 6.7861}, {"date": "2026-07-27", "price": 6.7777}, {"date": "2026-07-28", "price": 6.7746}, {"date": "2026-07-29", "price": 6.7785}, {"date": "2026-07-30", "price": 6.7736}, {"date": "2026-07-31", "price": 6.7657}, {"date": "2026-08-01", "price": 6.7649}, {"date": "2026-08-02", "price": 6.7688}, {"date": "2026-08-03", "price": 6.7598}, {"date": "2026-08-04", "price": 6.7659}, {"date": "2026-08-05", "price": 6.7629}, {"date": "2026-08-06", "price": 6.7622}, {"date": "2026-08-07", "price": 6.7634}, {"date": "2026-08-08", "price": 6.7597}, {"date": "2026-08-09", "price": 6.7651}, {"date": "2026-08-10", "price": 6.7523}, {"date": "2026-08-11", "price": 6.7554}, {"date": "2026-08-12", "price": 6.7586}, {"date": "2026-08-13", "price": 6.7569}, {"date": "2026-08-14", "price": 6.757}, {"date": "2026-08-15", "price": 6.7556}, {"date": "2026-08-16", "price": 6.7606}, {"date": "2026-08-17", "price": 6.7487}, {"date": "2026-08-18", "price": 6.7531}, {"date": "2026-08-19", "price": 6.7569}, {"date": "2026-08-20", "price": 6.7461}, {"date": "2026-08-21", "price": 6.7394}, {"date": "2026-08-22", "price": 6.7379}, {"date": "2026-08-23", "price": 6.743}, {"date": "2026-08-24", "price": 6.7291}, {"date": "2026-08-25", "price": 6.7387}, {"date": "2026-08-26", "price": 6.737}, {"date": "2026-08-27", "price": 6.7378}, {"date": "2026-08-28", "price": 6.7372}, {"date": "2026-08-29", "price": 6.7421}, {"date": "2026-08-30", "price": 6.7459}, {"date": "2026-08-31", "price": 6.7358}, {"date": "2026-09-01", "price": 6.7362}, {"date": "2026-09-02", "price": 6.7369}, {"date": "2026-09-03", "price": 6.7365}, {"date": "2026-09-04", "price": 6.7355}, {"date": "2026-09-05", "price": 6.7289}, {"date": "2026-09-06", "price": 6.7344}, {"date": "2026-09-07", "price": 6.7194}, {"date": "2026-09-08", "price": 6.7284}, {"date": "2026-09-09", "price": 6.7283}, {"date": "2026-09-10", "price": 6.7255}, {"date": "2026-09-11", "price": 6.728}, {"date": "2026-09-12", "price": 6.7253}, {"date": "2026-09-13", "price": 6.7309}, {"date": "2026-09-14", "price": 6.7156}, {"date": "2026-09-15", "price": 6.7252}, {"date": "2026-09-16", "price": 6.7268}, {"date": "2026-09-17", "price": 6.7223}, {"date": "2026-09-18", "price": 6.7218}, {"date": "2026-09-19", "price": 6.7141}, {"date": "2026-09-20", "price": 6.7184}, {"date": "2026-09-21", "price": 6.7047}, {"date": "2026-09-22", "price": 6.7102}, {"date": "2026-09-23", "price": 6.7135}, {"date": "2026-09-24", "price": 6.7227}, {"date": "2026-09-25", "price": 6.7173}, {"date": "2026-09-26", "price": 6.7246}, {"date": "2026-09-27", "price": 6.729}, {"date": "2026-09-28", "price": 6.7195}, {"date": "2026-09-29", "price": 6.7216}, {"date": "2026-09-30", "price": 6.7179}, {"date": "2026-10-01", "price": 6.7169}, {"date": "2026-10-02", "price": 6.7146}, {"date": "2026-10-03", "price": 6.7144}, {"date": "2026-10-04", "price": 6.7201}, {"date": "2026-10-05", "price": 6.7104}, {"date": "2026-10-06", "price": 6.7145}, {"date": "2026-10-07", "price": 6.7119}, {"date": "2026-10-08", "price": 6.7125}, {"date": "2026-10-09", "price": 6.7153}, {"date": "2026-10-10", "price": 6.7065}, {"date": "2026-10-11", "price": 6.7069}, {"date": "2026-10-12", "price": 6.7003}, {"date": "2026-10-13", "price": 6.7058}, {"date": "2026-10-14", "price": 6.705}, {"date": "2026-10-15", "price": 6.7065}, {"date": "2026-10-16", "price": 6.703}, {"date": "2026-10-17", "price": 6.6985}, {"date": "2026-10-18", "price": 6.7029}, {"date": "2026-10-19", "price": 6.6927}, {"date": "2026-10-20", "price": 6.6937}, {"date": "2026-10-21", "price": 6.6913}, {"date": "2026-10-22", "price": 6.6893}]};
+  historyData = historyData || {};
+  var indicatorMeta = {"description": "Daily market indicators (10 total) \u2014 fetched via free APIs", "indicators": {"domestic": {"chinext": {"name": "\u521b\u4e1a\u677f\u6307", "name_en": "ChiNext", "precision": 2, "ticker": "399006.SZ"}, "domestic_gold": {"name": "\u56fd\u5185\u53c2\u8003\u91d1\u4ef7 (\u5143/\u514b)", "name_en": "Domestic Gold (CNY/g)", "precision": 2, "ticker": "CNY/g"}, "shanghai": {"name": "\u4e0a\u8bc1\u6307\u6570", "name_en": "Shanghai Composite", "precision": 2, "ticker": "000001.SS"}, "star50": {"name": "\u79d1\u521b 50", "name_en": "STAR 50", "precision": 2, "ticker": "000688.SS"}}, "international": {"eurcny": {"name": "\u6b27\u5143/\u4eba\u6c11\u5e01", "name_en": "EUR/CNY", "precision": 4, "ticker": "EUR"}, "gold": {"name": "\u7ebd\u7ea6\u91d1", "name_en": "COMEX Gold", "precision": 2, "ticker": "XAU"}, "jpycny": {"name": "\u65e5\u5143/\u4eba\u6c11\u5e01(100)", "name_en": "JPY/CNY(100)", "precision": 4, "ticker": "JPY"}, "nasdaq": {"name": "\u7eb3\u65af\u8fbe\u514b", "name_en": "NASDAQ", "precision": 2, "ticker": "^IXIC"}, "oil": {"name": "WTI \u539f\u6cb9", "name_en": "WTI Crude Oil", "precision": 2, "ticker": "CL"}, "usdcny": {"name": "\u7f8e\u5143/\u4eba\u6c11\u5e01", "name_en": "USD/CNY", "precision": 4, "ticker": "USD"}}}, "sources": {"akshare (Sina)": "US index: NASDAQ (.IXIC)", "computed": "Domestic gold reference = COMEX x USDCNY / 31.1035 (CNY/gram)", "hq.sinajs.cn (Sina)": "CN indices + gold + oil: Shanghai, ChiNext, STAR 50, XAU, CL", "open.er-api.com": "Forex rates: USD/CNY, EUR/CNY, JPY/CNY(100)"}};
+  indicatorMeta = indicatorMeta || {};
+  // Build a flat key→precision lookup
+  var precisionMap = {};
+  if (indicatorMeta.indicators) {
+    Object.keys(indicatorMeta.indicators).forEach(function(g) {
+      var group = indicatorMeta.indicators[g];
+      Object.keys(group).forEach(function(k) {
+        precisionMap[k] = group[k].precision || 1;
+      });
+    });
+  }
+  var indicatorKeys = Object.keys(historyData);
+
+  if (!indicatorKeys.length) {
+    var emptyEl = document.getElementById('chart-empty');
+    if (emptyEl) {
+      emptyEl.style.display = 'flex';
+      var canvas = document.getElementById('market-chart');
+      if (canvas) canvas.style.display = 'none';
+    }
+    return;  // No data, skip initialization
+  }
+
+  var chart = null;
+  var currentIndicator = indicatorKeys[0];
+  var currentDays = 30;
+  var maPeriods = {5: false, 10: false};
+
+  function getThemeColors() {
+    var root = document.documentElement;
+    var explicit = root.getAttribute('data-theme');
+    var isDark;
+    if (explicit) {
+      isDark = explicit === 'dark';
+    } else {
+      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return {
+      grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      text: isDark ? '#94a3b8' : '#6b7280',
+      line: isDark ? '#60a5fa' : '#2563eb',
+      fill: isDark ? 'rgba(96,165,250,0.10)' : 'rgba(37,99,235,0.10)',
+      ma5: isDark ? '#fbbf24' : '#d97706',
+      ma10: isDark ? '#34d399' : '#059669',
+    };
+  }
+
+  function filterByDays(series, days) {
+    if (days === 0 || !days) return series.slice();
+    var cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - days);
+    return series.filter(function(p) {
+      return new Date(p.date + 'T00:00:00') >= cutoff;
+    });
+  }
+
+  function calcMA(values, period) {
+    if (values.length < period) return new Array(values.length).fill(null);
+    var result = new Array(period - 1).fill(null);
+    var sum = 0;
+    for (var i = 0; i < period; i++) sum += values[i];
+    result.push(Math.round(sum / period * 100) / 100);
+    for (var i = period; i < values.length; i++) {
+      sum = sum - values[i - period] + values[i];
+      result.push(Math.round(sum / period * 100) / 100);
+    }
+    return result;
+  }
+
+  function updatePills() {
+    // Update summary grid items to highlight active indicator
+    document.querySelectorAll('.market-summary-item').forEach(function(el) {
+      el.style.borderColor = el.dataset.key === currentIndicator
+        ? getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+        : '';
+      el.style.borderWidth = el.dataset.key === currentIndicator ? '2px' : '';
+    });
+    // Update indicator pills
+    document.querySelectorAll('.indicator-pill').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.key === currentIndicator);
+    });
+  }
+
+  function renderChart() {
+    var canvas = document.getElementById('market-chart');
+    var emptyEl = document.getElementById('chart-empty');
+    if (!canvas || !emptyEl) return;
+
+    // Guard: Chart.js CDN failed to load
+    if (typeof Chart === 'undefined') {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      var emptyText = emptyEl.querySelector('.chart-empty-text');
+      var emptyHint = emptyEl.querySelector('.chart-empty-hint');
+      if (emptyText) emptyText.textContent = 'Chart library unavailable';
+      if (emptyHint) emptyHint.textContent = 'Please check your network connection';
+      return;
+    }
+
+    var series = (historyData[currentIndicator] || []).slice();
+    var filtered = filterByDays(series, currentDays);
+
+    if (filtered.length < 1) {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'flex';
+      if (chart) { chart.destroy(); chart = null; }
+      updatePills();
+      return;
+    }
+
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    var labels = filtered.map(function(p) { return p.date; });
+    var prices = filtered.map(function(p) { return p.price; });
+    var colors = getThemeColors();
+    var singlePoint = filtered.length === 1;
+
+    var datasets = [{
+      label: 'Price',
+      data: prices,
+      borderColor: colors.line,
+      backgroundColor: colors.fill,
+      fill: true,
+      tension: filtered.length <= 2 ? 0 : 0.3,
+      pointRadius: singlePoint ? 5 : (filtered.length > 60 ? 0 : 2),
+      pointHoverRadius: 5,
+      pointBackgroundColor: colors.line,
+      borderWidth: 2,
+    }];
+
+    // Moving averages
+    [5, 10].forEach(function(period) {
+      if (maPeriods[period]) {
+        var maData = calcMA(prices, period);
+        datasets.push({
+          label: 'MA' + period,
+          data: maData,
+          borderColor: colors['ma' + period] || colors.line,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          fill: false,
+          tension: filtered.length <= 2 ? 0 : 0.3,
+        });
+      }
+    });
+
+    if (chart) {
+      chart.data.labels = labels;
+      chart.data.datasets = datasets;
+      chart.options.plugins.legend.display = datasets.length > 1;
+      // Update theme colors dynamically
+      var colors = getThemeColors();
+      chart.options.scales.x.ticks.color = colors.text;
+      chart.options.scales.y.ticks.color = colors.text;
+      chart.options.scales.y.grid.color = colors.grid;
+      chart.options.plugins.legend.labels.color = colors.text;
+      chart.options.plugins.tooltip.backgroundColor = colors.line;
+      chart.update('none');
+    } else {
+      var ctx = canvas.getContext('2d');
+      var colors = getThemeColors();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          animation: { duration: 300 },
+          plugins: {
+            legend: {
+              display: datasets.length > 1,
+              labels: {
+                color: colors.text,
+                font: { size: 12 },
+                usePointStyle: true,
+                padding: 16,
+              }
+            },
+            tooltip: {
+              backgroundColor: colors.line,
+              titleFont: { size: 12 },
+              bodyFont: { size: 13, weight: '600' },
+              padding: 10,
+              cornerRadius: 8,
+              displayColors: false,
+              callbacks: {
+                label: function(ctx) {
+                  var val = ctx.parsed.y;
+                  if (val === null) return '--';
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return val.toFixed(prec);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                maxTicksLimit: 12,
+                maxRotation: 45,
+              },
+              grid: { display: false },
+            },
+            y: {
+              grace: '5%',
+              ticks: {
+                color: colors.text,
+                font: { size: 11 },
+                callback: function(v) {
+                  var prec = precisionMap[currentIndicator] || 1;
+                  return v.toFixed(prec);
+                }
+              },
+              grid: { color: colors.grid },
+            }
+          }
+        }
+      });
+    }
+
+    updatePills();
+  }
+
+  // Public API
+  window.MarketChart = {
+    switchIndicator: function(key) {
+      if (key === currentIndicator) return;
+      currentIndicator = key;
+      renderChart();
+    },
+    switchRange: function(days) {
+      currentDays = days;
+      document.querySelectorAll('.range-btn').forEach(function(btn) {
+        btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
+      });
+      renderChart();
+    },
+    toggleMA: function(period, enabled) {
+      maPeriods[period] = enabled;
+      renderChart();
+    },
+  };
+
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderChart);
+  } else {
+    renderChart();
+  }
+
+  // Re-render on theme change
+  var themeObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.attributeName === 'data-theme') {
+        if (chart) renderChart();
+      }
+    });
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // Re-render when tab becomes visible (Chart.js needs visible canvas for sizing)
+  var marketPanel = document.getElementById('tab-market_indicators');
+  if (marketPanel) {
+    var tabObserver = new MutationObserver(function() {
+      if (marketPanel.classList.contains('active') && chart) {
+        chart.resize();
+      }
+    });
+    tabObserver.observe(marketPanel, { attributes: true, attributeFilter: ['class'] });
+  }
+
+})();
+</script>
+
+</body>
+</html>
